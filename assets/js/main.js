@@ -15,14 +15,14 @@
     // Fixed Navbar
     $(window).scroll(function () {
         if ($(window).width() < 992) {
-            if ($(this).scrollTop() > 55) {
+            if ($(this).scrollTop() > 5) {
                 $('.fixed-top').addClass('shadow');
             } else {
                 $('.fixed-top').removeClass('shadow');
             }
         } else {
-            if ($(this).scrollTop() > 55) {
-                $('.fixed-top').addClass('shadow').css('top', -55);
+            if ($(this).scrollTop() > 5) {
+                $('.fixed-top').addClass('shadow').css('top', -5);
             } else {
                 $('.fixed-top').removeClass('shadow').css('top', 0);
             }
@@ -110,26 +110,14 @@
             }
         }
     });
-
-
-    // Modal Video
-    $(document).ready(function () {
-        var $videoSrc;
-        $('.btn-play').click(function () {
-            $videoSrc = $(this).data("src");
+  
+    // Search Table
+    $("#search").on("keyup change", function () {
+        var value = $(this).val().toLowerCase(); // Get the input value in lowercase
+        $("#usersTable tbody tr").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
         });
-        console.log($videoSrc);
-
-        $('#videoModal').on('shown.bs.modal', function (e) {
-            $("#video").attr('src', $videoSrc + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0");
-        })
-
-        $('#videoModal').on('hide.bs.modal', function (e) {
-            $("#video").attr('src', $videoSrc);
-        })
     });
-
-
 
     // Product Quantity
     $('.quantity button').on('click', function () {
@@ -147,5 +135,6 @@
         button.parent().parent().find('input').val(newVal);
     });
 
+    
 })(jQuery);
 
