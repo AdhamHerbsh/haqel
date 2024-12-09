@@ -50,6 +50,7 @@ if (isset($_POST['register_submit'])) {
             $user_id = $stmt->insert_id; // Get the inserted user ID
             
             $_SESSION['user_id'] = $user_id; // Store user ID in session
+            $_SESSION['username'] = $username; // Store user ID in session
             $_SESSION['user_type'] = $user_type; // Store user ID in session
 
             // Redirect based on user type
@@ -98,7 +99,7 @@ if (isset($_POST['register_submit'])) {
                 $_SESSION['username'] = $username; // Store username in session
                 $_SESSION['user_type'] = $user_type; // Store username in session
 
-                $user_type == "admin" ? header("Location: ../../admin.php") : header("Location: ../../index.php"); // Redirect to dashboard or homepage
+                $user_type == "admin" ? header("Location: ../../admin.php") : header("Location: ../../home.php"); // Redirect to dashboard or homepage
                 exit();
             } else {
                 die("Invalid password. Please try again.");

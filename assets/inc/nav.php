@@ -9,7 +9,7 @@ $user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : null;
 <div class="container-fluid fixed-top shadow">
     <div class="container px-0">
         <nav class="navbar navbar-light bg-white navbar-expand-xl">
-            <a href="index.php" class="navbar-brand">
+            <a href="home.php" class="navbar-brand">
                 <img class="img-fluid" src="assets/img/logo/haqel-logo-thumbnail.png" alt="image not found">
             </a>
             <button class="navbar-toggler py-1 px-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
@@ -17,7 +17,7 @@ $user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : null;
             </button>
             <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
                 <div class="navbar-nav mx-auto">
-                    <a href="index.php" class="nav-item nav-link active">Home</a>
+                    <a href="home.php" class="nav-item nav-link active">Home</a>
                     <?php if ($user_type == null) { ?>
                         <a href="#about" class="nav-item nav-link">About</a>
                         <a href="#categories" class="nav-item nav-link">Categories</a>
@@ -26,13 +26,13 @@ $user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : null;
                     <?php } else { ?>
                         <?php if ($user_type == "wholesaler") { ?>
                             <a href="predictive.php" class="nav-item nav-link">Predictive</a>
-                            <a href="predictive.php" class="nav-item nav-link">My Products</a>
-                            <a href="predictive.php" class="nav-item nav-link">Requests</a>
+                            <a href="add-product.php" class="nav-item nav-link">My Products</a>
+                            <a href="requests.php" class="nav-item nav-link">Requests</a>
                             
                             <?php } elseif ($user_type == "retailer") { ?>
                             <a href="predictive.php" class="nav-item nav-link">Predictive</a>
-                            <a href="predictive.php" class="nav-item nav-link">My Orders</a>
-                            <a href="predictive.php" class="nav-item nav-link">Special Order</a>
+                            <a href="my-orders.php" class="nav-item nav-link">My Orders</a>
+                            <a href="special-order.php" class="nav-item nav-link">Special Order</a>
 
                         <?php } else { ?>
                             <a href="users-list.php" class="nav-item nav-link">Users</a>
@@ -66,7 +66,7 @@ $user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : null;
 
                         <?php } elseif ($user_type == "retailer") { ?>
                             <!--    Retailer Navbar Start  -->
-                            <a href="shop.php" class="position-relative me-4 my-auto text-black">
+                            <a href="cart.php" class="position-relative me-4 my-auto text-black">
                                 <i class="bx bx-basket bx-md"></i>
                             </a>
                             <!--    Retailer Navbar End  -->

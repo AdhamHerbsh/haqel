@@ -15,6 +15,7 @@
     if ($user_id === null) {
         header("Location: 404.php"); // Redirect to 404 page if user is not logged in
         exit();
+        
     } else {
         // Prepare SQL to fetch user and account data
         $stmt = $conn->prepare("

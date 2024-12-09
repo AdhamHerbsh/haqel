@@ -13,7 +13,7 @@
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
 // Check if the user ID is valid
-if ($user_id === null | $user_type != "admin") {
+if ($user_id === null | $user_type != "retailer") {
     header("Location: 404.php"); // Redirect to 404 page if user is not logged in
     exit();
 }
@@ -47,7 +47,7 @@ $stmt->execute();
 
 // Fetch data as an associative array
 $result = $stmt->get_result();
-$users = $result->fetch_all(MYSQLI_ASSOC);
+$orders = $result->fetch_all(MYSQLI_ASSOC);
 
 // Close the statement and connection
 $stmt->close();
@@ -60,11 +60,29 @@ $conn->close();
         <div class="container-fluid py-5">
             <div class="container">
                 <div class="section-title mb-3">
-                    <h1>Users</h1>
-                    <h3 class="text-muted">All Users List</h3>
+                    <h1> My Orders</h1>
+                    <h3 class="text-muted">Track Your Order Until Receive It</h3>
+                </div>
+                <div class="col-12">
+                    <div class="text-end">
+                        <a class="btn btn-primary" href="special-order.php">Create Special Order <i class="bx bx-plus"></i></a>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 justify-content-center">
+                    <?php if (isset($_GET['action'])) { ?>
+                        <!--    Created Message Start    -->
+                        <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <i class="bx bx-check-circle bx-sm"></i>
+                            <strong>Special Order Created Successfully</strong>
+                            <a href="providers.php" class="alert-link"><i class="bx bx-support bx-sm"></i></a>
+                        </div>
+                        <!--    Created Message End    -->
+                    <?php } ?>
+
                 </div>
                 <div class="table-responsive">
-                    <table class="table"  id="usersTable">
+                    <table class="table" id="ordersTable">
                         <thead>
                             <tr>
                                 <div class="row text-black-50 border-bottom border-1">
@@ -78,38 +96,38 @@ $conn->close();
                                 </div>
                             </tr>
                             <tr>
-                                <th scope="col">Full Name</th>
-                                <th scope="col">Phone</th>
-                                <th scope="col">Email</th>
-                                <th scope="col">Type</th>
-                                <th scope="col">Password</th>
-                                <th scope="col">###</th>
+                                <th scope="col">Order Number</th>
+                                <th scope="col">Order Type</th>
+                                <th scope="col">Product Name</th>
+                                <th scope="col">Product Category</th>
+                                <th scope="col">Order Price</th>
+                                <th scope="col">Status</th>
                                 <th scope="col">###</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($users as $user): ?>
+                            <?php foreach ($orders as $order): ?>
                                 <tr>
                                     <td>
-                                        <p class="mb-0 mt-4"><?= htmlspecialchars($user['FNAME'] . " " . $user['LNAME']); ?></p>
+                                        <p class="mb-0 mt-4"><?= htmlspecialchars($order['FNAME'] . " " . $order['LNAME']); ?></p>
                                     </td>
                                     <td>
-                                        <p class="mb-0 mt-4"><?= htmlspecialchars($user['PHONE']); ?></p>
+                                        <p class="mb-0 mt-4">Standard</p>
                                     </td>
                                     <td>
-                                        <p class="mb-0 mt-4"><?= htmlspecialchars($user['USERNAME']); ?></p>
+                                        <p class="mb-0 mt-4"><?= htmlspecialchars($order['PHONE']); ?></p>
                                     </td>
                                     <td>
-                                        <p class="mb-0 mt-4"><?= htmlspecialchars($user['USER_TYPE']); ?></p>
+                                        <p class="mb-0 mt-4"><?= htmlspecialchars($order['USERNAME']); ?></p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 mt-4"><?= htmlspecialchars($order['USER_TYPE']); ?></p>
                                     </td>
                                     <td>
                                         <p class="mb-0 mt-4">••••••••••••</p>
                                     </td>
                                     <td>
-                                        <a class="btn btn-primary" href="view-file.php?file=<?= urlencode($user['commercial_register_file']); ?>">View</a>
-                                    </td>
-                                    <td>
-                                        <a class="btn btn-danger" href="assets/php/order.php?orderid=<?= htmlspecialchars($user['ID']); ?>">Delete</a>
+                                        <a class="btn btn-secondary" href="view-file.php?file=<?= urlencode($order['commercial_register_file']); ?>">Details <i class="bx bx-right-arrow-alt"></i></a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

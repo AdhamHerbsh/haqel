@@ -2077,6 +2077,9 @@ textarea.form-control-lg {
   padding-left: 1.5em;
   margin-bottom: 0.125rem;
 }
+.cart form .form-check {
+  flex-basis: 150px;
+}
 .form-check .form-check-input {
   float: left;
   margin-left: -1.5em;
@@ -6226,6 +6229,9 @@ fieldset:disabled .btn {
 .border-white {
   border-color: var(--bs-white) !important;
 }
+.border-gray {
+  border-color: var(--bs-gray) !important;
+}
 .border-1 {
   border-width: 1px !important;
 }
@@ -6974,6 +6980,12 @@ fieldset:disabled .btn {
 .text-white {
   color: var(--bs-white) !important;
 }
+.text-orange {
+  color: var(--bs-orange) !important;
+}
+.text-yellow {
+  color: var(--bs-yellow) !important;
+}
 .text-body {
   color: #747d88 !important;
 }
@@ -7004,11 +7016,17 @@ fieldset:disabled .btn {
 .bg-primary {
   background-color: var(--bs-primary) !important;
 }
+.bg-primary-50 {
+  background-color: var(--bs-primary-50) !important;
+}
 .bg-secondary {
   background-color: var(--bs-secondary) !important;
 }
 .bg-accent {
   background-color: var(--bs-accent) !important;
+}
+.bg-background {
+  background-color: var(--bs-background) !important;
 }
 .bg-gray {
   background-color: var(--bs-gray) !important;
@@ -7092,20 +7110,20 @@ fieldset:disabled .btn {
   border-radius: 50rem !important;
 }
 .rounded-top {
-  border-top-left-radius: 10px !important;
-  border-top-right-radius: 10px !important;
+  border-top-left-radius: 20px !important;
+  border-top-right-radius: 20px !important;
 }
 .rounded-end {
-  border-top-right-radius: 10px !important;
-  border-bottom-right-radius: 10px !important;
+  border-top-right-radius: 20px !important;
+  border-bottom-right-radius: 20px !important;
 }
 .rounded-bottom {
-  border-bottom-right-radius: 10px !important;
-  border-bottom-left-radius: 10px !important;
+  border-bottom-right-radius: 20px !important;
+  border-bottom-left-radius: 20px !important;
 }
 .rounded-start {
-  border-bottom-left-radius: 10px !important;
-  border-top-left-radius: 10px !important;
+  border-bottom-left-radius: 20px !important;
+  border-top-left-radius: 20px !important;
 }
 .visible {
   visibility: visible !important;

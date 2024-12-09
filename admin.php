@@ -13,11 +13,10 @@
     $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
     // Check if the user ID is valid
-    if ($user_id === null & $user_type === "admin") {
+    if ($user_id === null | $user_type != "admin") {
         header("Location: 404.php"); // Redirect to 404 page if user is not logged in
         exit();
     }
-
     ?>
 
     <!--    User Profile Section Start     -->

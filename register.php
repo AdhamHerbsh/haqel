@@ -30,7 +30,7 @@
                         <label class="form-label text-white">ACCOUNT TYPE:</label>
                         <div class="mb-3">
                             <div class="form-check form-check-inline"> <input class="form-check-input" type="radio" name="user_type" id="radio-wholesaler" value="wholesaler" /> <label class="form-check-label fw-bold text-white" for="radio-wholesaler">Wholesaler</label> </div>
-                            <div class="form-check form-check-inline"> <input class="form-check-input" type="radio" name="user_type" id="radio-retailer" value="retailer" /> <label class="form-check-label fw-bold text-white" for="radio-retai">Retailer</label> </div>
+                            <div class="form-check form-check-inline"> <input class="form-check-input" type="radio" name="user_type" id="radio-retailer" value="retailer" /> <label class="form-check-label fw-bold text-white" for="radio-retailer">Retailer</label> </div>
                         </div>
                     </div>
                     <div class="mb-3">
