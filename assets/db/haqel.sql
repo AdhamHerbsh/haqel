@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 09, 2024 at 02:48 PM
+-- Generation Time: Dec 09, 2024 at 06:46 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -79,6 +79,34 @@ INSERT INTO `products` (`PID`, `PNAME`, `PCATEGORY`, `PPRICE`, `PSTATUS`, `PKEYW
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `special_orders`
+--
+
+CREATE TABLE `special_orders` (
+  `SOID` int(11) NOT NULL,
+  `SOPNAME` varchar(100) NOT NULL,
+  `SOPCATEGORY` enum('fruits','vegetables') NOT NULL,
+  `SOPPRICE` decimal(10,2) NOT NULL,
+  `SOPQUANTITY` int(11) NOT NULL DEFAULT 1,
+  `SORECIVED_DATE` date NOT NULL,
+  `SOSCHEDULE` enum('day','week','month') NOT NULL,
+  `SODESCRIPTION` text DEFAULT NULL,
+  `USER_ID` int(11) NOT NULL,
+  `CREATED_DATE` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `special_orders`
+--
+
+INSERT INTO `special_orders` (`SOID`, `SOPNAME`, `SOPCATEGORY`, `SOPPRICE`, `SOPQUANTITY`, `SORECIVED_DATE`, `SOSCHEDULE`, `SODESCRIPTION`, `USER_ID`, `CREATED_DATE`) VALUES
+(1, 'apple', 'fruits', 30.00, 10, '0000-00-00', 'week', 'Description', 2024, '0000-00-00 00:00:00'),
+(2, 'orange', 'fruits', 15.00, 15, '2025-01-25', 'month', 'DescriptionDescriptionDescription', 2024, '0000-00-00 00:00:00'),
+(3, 'orange', 'fruits', 15.00, 15, '2025-01-25', 'month', 'DescriptionDescriptionDescription', 2024, '0000-00-00 00:00:00');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -122,6 +150,12 @@ ALTER TABLE `products`
   ADD PRIMARY KEY (`PID`);
 
 --
+-- Indexes for table `special_orders`
+--
+ALTER TABLE `special_orders`
+  ADD PRIMARY KEY (`SOID`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -142,6 +176,12 @@ ALTER TABLE `account`
 --
 ALTER TABLE `products`
   MODIFY `PID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+
+--
+-- AUTO_INCREMENT for table `special_orders`
+--
+ALTER TABLE `special_orders`
+  MODIFY `SOID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
