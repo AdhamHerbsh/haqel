@@ -26,7 +26,7 @@
                     </h1>
                     <br>
                     <h2 class="text-white">We Offer Predictive Pricing and Special Orders</h2>
-                    <a class="col-12 col-md-3 btn btn-primary py-2 px-3 fw-bold text-white fs-4" href="predictive.php">
+                    <a class="col btn btn-primary py-2 px-3 fw-bold text-white fs-4" href="predictive.php">
                         Know More
                         <i class="bx bx-right-arrow-alt bx-sm"></i>
                     </a>
@@ -37,10 +37,10 @@
     </div>
     <!-- Hero End -->
 
-    <!-- Retailer Home Start -->
-    <?php if ($user_type == "retailer") { ?>
-        <!-- Products Start -->
-        <main>
+    <main>
+        <!-- Retailer Home Start -->
+        <?php if ($user_type == "retailer") { ?>
+            <!-- Products Start -->
             <section id="shop" class="shop">
                 <div class="container-fluid">
                     <div class="container py-5">
@@ -52,7 +52,7 @@
                         <div class="container-fluid product py-5">
                             <div class="container py-5">
                                 <div class="tab-class">
-                                    <?php if (isset($_GET['action'])) { ?>
+                                    <?php if (isset($_GET['action']) && $_GET['action'] === 'added') { ?>
                                         <!--    Added Message Start    -->
                                         <div class="alert alert-primary alert-dismissible fade show" role="alert">
                                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -310,7 +310,12 @@
                                 <ul class="nav nav-pills text-center mb-5">
                                     <div class="btn-group">
                                         <li class="nav-item">
-                                            <a class="d-flex py-2 px-2 fw-bold bg-light active" data-bs-toggle="pill" href="#shipping-tab">
+                                            <a class="d-flex py-2 px-2 fw-bold bg-light active" data-bs-toggle="pill" href="#requests-tab">
+                                                <span class="text-dark">Requests Area</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="d-flex py-2 px-2 fw-bold bg-light" data-bs-toggle="pill" href="#shipping-tab">
                                                 <span class="text-dark">Shipping Stage</span>
                                             </a>
                                         </li>
@@ -330,63 +335,212 @@
                         </div>
 
                         <div class="tab-content">
-                            <div id="shipping-tab" class="tab-pane fade show p-0 active">
+                            <div id="requests-tab" class="tab-pane fade show p-0 active">
                                 <div class="row g-4">
                                     <div class="col-lg-12">
-                                        <div class="row g-4" style="min-height: 400px; max-height:800px; overflow-y: auto;">
-                                            <div class="col-12 col-md-4">
-                                                <div class="position-relative">
-                                                    <div class="order-number text-center p-2 border border-primary border-1 rounded-2 mb-3">
-                                                        <span><strong>Order Number:</strong> #<?= "2365488" ?></span>
-                                                    </div>
-                                                    <div class="order-details border border-gray border-1 rounded-2 p-3">
-                                                        <div class="row">
-                                                            <div class="col-12 col-md-6 mb-3">
-                                                                <label class="form-label">PRODUCT NAME:</label>
-                                                                <p>Green Capsicum</p>
-                                                            </div>
-                                                            <div class="col-12 col-md-6 mb-3">
-                                                                <label class="form-label">PRODUCT CATEGORY:</label>
-                                                                <p>Vegetables</p>
+                                        <div class="row g-4" style="min-height: 600px; max-height:800px; overflow-y: auto;">
+                                            <?php
+                                            // Prepare SQL to fetch orders data
+                                            $stmt = $conn->prepare("SELECT * FROM `orders` WHERE OSTATUS = 'unapproved' AND OSTAGE = '' ");
 
-                                                            </div>
+                                            $stmt->execute();
+
+                                            // Fetch data as an associative array
+                                            $result = $stmt->get_result();
+                                            $orders = $result->fetch_all(MYSQLI_ASSOC);
+
+                                            ?>
+                                            <?php foreach ($orders as $order) : ?>
+                                                <div class="col-12 col-md-6">
+                                                    <div class="position-relative">
+                                                        <div class="order-number text-center p-2 border border-primary border-1 rounded-2 mb-3">
+                                                            <span><strong>Request Number:</strong> #<?= $order['ONUMBER'] ?></span>
                                                         </div>
-                                                        <div class="row">
-                                                            <div class="col-12 col-md-6 mb-3">
-                                                                <label class="form-label"> DESIRED PRICE:</label>
-                                                                <p> 14.00</p>
+                                                        <div class="order-details border border-gray border-1 rounded-2 p-3">
 
+                                                            <div class="row m-2">
+                                                                <div class="col mb-3">
+                                                                    <label class="form-label">NAME:</label>
+                                                                </div>
+                                                                <div class="col mb-3">
+                                                                    <label class="form-label">CATEGORY:</label>
+                                                                </div>
+                                                                <div class="col mb-3">
+                                                                    <label class="form-label">PRICE:</label>
+                                                                </div>
+                                                                <div class="col mb-3">
+                                                                    <label class="form-label">QUANTITY:</label>
+                                                                </div>
                                                             </div>
-                                                            <div class="col-12 col-md-6 mb-3">
-                                                                <label class="form-label">QUANTITY:</label>
-                                                                <p>200</p>
+                                                            <?php
+                                                            $stmt = $conn->prepare("SELECT * FROM `order_items` WHERE OIOID = ?");
+                                                            $stmt->bind_param('i', $order['OID']);
+                                                            $stmt->execute();
+                                                            $result = $stmt->get_result();
+                                                            $order_items = $result->fetch_all(MYSQLI_ASSOC);
 
-                                                            </div>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col-12 col-md-6 mb-3">
-                                                                <label class="form-label">RE-RECEIVED DATE:</label>
-                                                                <p> 25/12/2024</p>
+                                                            foreach ($order_items as $orderitem) :
+                                                                $stmt = $conn->prepare("SELECT PNAME, PCATEGORY FROM `products` WHERE PID = ?");
+                                                                $stmt->bind_param('i', $orderitem['OIPID']);
+                                                                $stmt->execute();
+                                                                $stmt->store_result();
+                                                                $stmt->bind_result($pname, $pcategory);
+                                                                $stmt->fetch();
+                                                            ?>
+                                                                <?php foreach ($order_items as $orderitem) ?>
+                                                                <div class="row border border-warning rounded-pill p-2 m-2">
+                                                                    <div class="col">
+                                                                        <p class="p-0 m-0"><?= $pname ?></p>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        <p class="p-0 m-0"><?= $pcategory ?></p>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        <p class="p-0 m-0"><?= $orderitem['OIPRICE'] ?></p>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        <p class="p-0 m-0"><?= $orderitem['OIQUANTITY'] ?></p>
+                                                                    </div>
+                                                                </div>
+                                                            <?php endforeach; ?>
 
-                                                            </div>
-                                                            <div class="col-12 col-md-6 mb-3">
-                                                                <label class="form-label">SCHEDULE OPTION:</label>
-                                                                <p>Weekly</p>
+                                                            <div class="row">
+                                                                <div class="col-12 col-md-4 mb-3">
+                                                                    <label class="form-label">PAYMENT METHOD:</label>
+                                                                    <p><?= $order['OPAYMETHOD'] ?></p>
+                                                                </div>
+                                                                <div class="col-12 col-md-4 mb-3">
+                                                                    <label class="form-label">DELIVER OPTION:</label>
+                                                                    <p><?= $order['ODELIVERY'] ?></p>
 
+                                                                </div>
+                                                                <div class="col-12 col-md-4 mb-3">
+                                                                    <label class="form-label">DELIVERY SCHEDULE:</label>
+                                                                    <p><?= $order['OSCHEDULE'] ?></p>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <label class="form-label">DESCRIPTION:</label>
-                                                            <p> The product should be in medium size and the color be good</p>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <button type="button" class="btn btn-accent">Issues</button>
-                                                            <button type="button" class="btn btn-secondary">Send Message</button>
-                                                            <button type="button" class="btn btn-primary">Go To Delivary</button>
+                                                            <div class="col-12">
+                                                                <label class="form-label">DAYS:</label>
+                                                                <p><?= $order['ODAYS'] ?></p>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <label class="form-label">TOTAL PRICE:</label>
+                                                                <p><?= $order['OTOTALPRICE'] ?></p>
+                                                            </div>
+                                                            <div class="col-12 text-end">
+                                                                <button type="button" class="btn btn-danger fw-blod">Reject</button>
+                                                                <button type="button" class="btn btn-primary fw-blod">Approve</button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-content">
+                            <div id="shipping-tab" class="tab-pane fade show p-0">
+                                <div class="row g-4">
+                                    <div class="col-lg-12">
+                                    <div class="row g-4" style="min-height: 600px; max-height:800px; overflow-y: auto;">
+                                            <?php
+                                            // Prepare SQL to fetch orders data
+                                            $stmt = $conn->prepare("SELECT * FROM `orders` WHERE OSTATUS = 'approved' AND OSTAGE = 'shipping' ");
+
+                                            $stmt->execute();
+
+                                            // Fetch data as an associative array
+                                            $result = $stmt->get_result();
+                                            $orders = $result->fetch_all(MYSQLI_ASSOC);
+
+                                            ?>
+                                            <?php foreach ($orders as $order) : ?>
+                                                <div class="col-12 col-md-6">
+                                                    <div class="position-relative">
+                                                        <div class="order-number text-center p-2 border border-primary border-1 rounded-2 mb-3">
+                                                            <span><strong>Request Number:</strong> #<?= $order['ONUMBER'] ?></span>
+                                                        </div>
+                                                        <div class="order-details border border-gray border-1 rounded-2 p-3">
+
+                                                            <div class="row m-2">
+                                                                <div class="col mb-3">
+                                                                    <label class="form-label">NAME:</label>
+                                                                </div>
+                                                                <div class="col mb-3">
+                                                                    <label class="form-label">CATEGORY:</label>
+                                                                </div>
+                                                                <div class="col mb-3">
+                                                                    <label class="form-label">PRICE:</label>
+                                                                </div>
+                                                                <div class="col mb-3">
+                                                                    <label class="form-label">QUANTITY:</label>
+                                                                </div>
+                                                            </div>
+                                                            <?php
+                                                            $stmt = $conn->prepare("SELECT * FROM `order_items` WHERE OIOID = ?");
+                                                            $stmt->bind_param('i', $order['OID']);
+                                                            $stmt->execute();
+                                                            $result = $stmt->get_result();
+                                                            $order_items = $result->fetch_all(MYSQLI_ASSOC);
+
+                                                            foreach ($order_items as $orderitem) :
+                                                                $stmt = $conn->prepare("SELECT PNAME, PCATEGORY FROM `products` WHERE PID = ?");
+                                                                $stmt->bind_param('i', $orderitem['OIPID']);
+                                                                $stmt->execute();
+                                                                $stmt->store_result();
+                                                                $stmt->bind_result($pname, $pcategory);
+                                                                $stmt->fetch();
+                                                            ?>
+                                                                <?php foreach ($order_items as $orderitem) ?>
+                                                                <div class="row border border-warning rounded-pill p-2 m-2">
+                                                                    <div class="col">
+                                                                        <p class="p-0 m-0"><?= $pname ?></p>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        <p class="p-0 m-0"><?= $pcategory ?></p>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        <p class="p-0 m-0"><?= $orderitem['OIPRICE'] ?></p>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        <p class="p-0 m-0"><?= $orderitem['OIQUANTITY'] ?></p>
+                                                                    </div>
+                                                                </div>
+                                                            <?php endforeach; ?>
+
+                                                            <div class="row">
+                                                                <div class="col-12 col-md-4 mb-3">
+                                                                    <label class="form-label">PAYMENT METHOD:</label>
+                                                                    <p><?= $order['OPAYMETHOD'] ?></p>
+                                                                </div>
+                                                                <div class="col-12 col-md-4 mb-3">
+                                                                    <label class="form-label">DELIVER OPTION:</label>
+                                                                    <p><?= $order['ODELIVERY'] ?></p>
+
+                                                                </div>
+                                                                <div class="col-12 col-md-4 mb-3">
+                                                                    <label class="form-label">DELIVERY SCHEDULE:</label>
+                                                                    <p><?= $order['OSCHEDULE'] ?></p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <label class="form-label">DAYS:</label>
+                                                                <p><?= $order['ODAYS'] ?></p>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <label class="form-label">TOTAL PRICE:</label>
+                                                                <p><?= $order['OTOTALPRICE'] ?></p>
+                                                            </div>
+                                                            <div class="col-12 text-end">
+                                                                <button type="button" class="btn btn-danger fw-blod">Reject</button>
+                                                                <button type="button" class="btn btn-primary fw-blod">Approve</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <?php endforeach; ?>
                                         </div>
                                     </div>
                                 </div>
@@ -396,124 +550,209 @@
                             <div id="delivary-tab" class="tab-pane fade show p-0">
                                 <div class="row g-4">
                                     <div class="col-lg-12">
-                                        <div class="row g-4" style="min-height: 400px; max-height:800px; overflow-y: auto;">
-                                            <div class="col-12 col-md-4">
-                                                <div class="position-relative">
-                                                    <div class="order-number text-center p-2 border border-primary border-1 rounded-2 mb-3">
-                                                        <span><strong>Order Number:</strong> #<?= "2365488" ?></span>
-                                                    </div>
-                                                    <div class="order-details border border-gray border-1 rounded-2 p-3">
-                                                        <div class="row">
-                                                            <div class="col-12 col-md-6 mb-3">
-                                                                <label class="form-label">PRODUCT NAME:</label>
-                                                                <p>Green Capsicum</p>
-                                                            </div>
-                                                            <div class="col-12 col-md-6 mb-3">
-                                                                <label class="form-label">PRODUCT CATEGORY:</label>
-                                                                <p>Vegetables</p>
+                                    <div class="row g-4" style="min-height: 600px; max-height:800px; overflow-y: auto;">
+                                            <?php
+                                            // Prepare SQL to fetch orders data
+                                            $stmt = $conn->prepare("SELECT * FROM `orders` WHERE OSTATUS = 'approved' AND OSTAGE = 'delivery' ");
 
-                                                            </div>
+                                            $stmt->execute();
+
+                                            // Fetch data as an associative array
+                                            $result = $stmt->get_result();
+                                            $orders = $result->fetch_all(MYSQLI_ASSOC);
+
+                                            ?>
+                                            <?php foreach ($orders as $order) : ?>
+                                                <div class="col-12 col-md-6">
+                                                    <div class="position-relative">
+                                                        <div class="order-number text-center p-2 border border-primary border-1 rounded-2 mb-3">
+                                                            <span><strong>Request Number:</strong> #<?= $order['ONUMBER'] ?></span>
                                                         </div>
-                                                        <div class="row">
-                                                            <div class="col-12 col-md-6 mb-3">
-                                                                <label class="form-label"> DESIRED PRICE:</label>
-                                                                <p> 14.00</p>
+                                                        <div class="order-details border border-gray border-1 rounded-2 p-3">
 
+                                                            <div class="row m-2">
+                                                                <div class="col mb-3">
+                                                                    <label class="form-label">NAME:</label>
+                                                                </div>
+                                                                <div class="col mb-3">
+                                                                    <label class="form-label">CATEGORY:</label>
+                                                                </div>
+                                                                <div class="col mb-3">
+                                                                    <label class="form-label">PRICE:</label>
+                                                                </div>
+                                                                <div class="col mb-3">
+                                                                    <label class="form-label">QUANTITY:</label>
+                                                                </div>
                                                             </div>
-                                                            <div class="col-12 col-md-6 mb-3">
-                                                                <label class="form-label">QUANTITY:</label>
-                                                                <p>200</p>
+                                                            <?php
+                                                            $stmt = $conn->prepare("SELECT * FROM `order_items` WHERE OIOID = ?");
+                                                            $stmt->bind_param('i', $order['OID']);
+                                                            $stmt->execute();
+                                                            $result = $stmt->get_result();
+                                                            $order_items = $result->fetch_all(MYSQLI_ASSOC);
 
-                                                            </div>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col-12 col-md-6 mb-3">
-                                                                <label class="form-label">RE-RECEIVED DATE:</label>
-                                                                <p> 25/12/2024</p>
+                                                            foreach ($order_items as $orderitem) :
+                                                                $stmt = $conn->prepare("SELECT PNAME, PCATEGORY FROM `products` WHERE PID = ?");
+                                                                $stmt->bind_param('i', $orderitem['OIPID']);
+                                                                $stmt->execute();
+                                                                $stmt->store_result();
+                                                                $stmt->bind_result($pname, $pcategory);
+                                                                $stmt->fetch();
+                                                            ?>
+                                                                <?php foreach ($order_items as $orderitem) ?>
+                                                                <div class="row border border-warning rounded-pill p-2 m-2">
+                                                                    <div class="col">
+                                                                        <p class="p-0 m-0"><?= $pname ?></p>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        <p class="p-0 m-0"><?= $pcategory ?></p>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        <p class="p-0 m-0"><?= $orderitem['OIPRICE'] ?></p>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        <p class="p-0 m-0"><?= $orderitem['OIQUANTITY'] ?></p>
+                                                                    </div>
+                                                                </div>
+                                                            <?php endforeach; ?>
 
-                                                            </div>
-                                                            <div class="col-12 col-md-6 mb-3">
-                                                                <label class="form-label">SCHEDULE OPTION:</label>
-                                                                <p>Weekly</p>
+                                                            <div class="row">
+                                                                <div class="col-12 col-md-4 mb-3">
+                                                                    <label class="form-label">PAYMENT METHOD:</label>
+                                                                    <p><?= $order['OPAYMETHOD'] ?></p>
+                                                                </div>
+                                                                <div class="col-12 col-md-4 mb-3">
+                                                                    <label class="form-label">DELIVER OPTION:</label>
+                                                                    <p><?= $order['ODELIVERY'] ?></p>
 
+                                                                </div>
+                                                                <div class="col-12 col-md-4 mb-3">
+                                                                    <label class="form-label">DELIVERY SCHEDULE:</label>
+                                                                    <p><?= $order['OSCHEDULE'] ?></p>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <label class="form-label">DESCRIPTION:</label>
-                                                            <p> The product should be in medium size and the color be good</p>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <button type="button" class="btn btn-accent">Issues</button>
-                                                            <button type="button" class="btn btn-secondary">Send Message</button>
-                                                            <button type="button" class="btn btn-primary">Go To Delivary</button>
+                                                            <div class="col-12">
+                                                                <label class="form-label">DAYS:</label>
+                                                                <p><?= $order['ODAYS'] ?></p>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <label class="form-label">TOTAL PRICE:</label>
+                                                                <p><?= $order['OTOTALPRICE'] ?></p>
+                                                            </div>
+                                                            <div class="col-12 text-end">
+                                                                <button type="button" class="btn btn-danger fw-blod">Reject</button>
+                                                                <button type="button" class="btn btn-primary fw-blod">Approve</button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            <?php endforeach; ?>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="tab-content">
-
                             <div id="receive-tab" class="tab-pane fade show p-0">
                                 <div class="row g-4">
                                     <div class="col-lg-12">
-                                        <div class="row g-4" style="min-height: 400px; max-height:800px; overflow-y: auto;">
-                                            <div class="col-12 col-md-4">
-                                                <div class="position-relative">
-                                                    <div class="order-number text-center p-2 border border-primary border-1 rounded-2 mb-3">
-                                                        <span><strong>Order Number:</strong> #<?= "2365488" ?></span>
-                                                    </div>
-                                                    <div class="order-details border border-gray border-1 rounded-2 p-3">
-                                                        <div class="row">
-                                                            <div class="col-12 col-md-6 mb-3">
-                                                                <label class="form-label">PRODUCT NAME:</label>
-                                                                <p>Green Capsicum</p>
-                                                            </div>
-                                                            <div class="col-12 col-md-6 mb-3">
-                                                                <label class="form-label">PRODUCT CATEGORY:</label>
-                                                                <p>Vegetables</p>
+                                    <div class="row g-4" style="min-height: 600px; max-height:800px; overflow-y: auto;">
+                                            <?php
+                                            // Prepare SQL to fetch orders data
+                                            $stmt = $conn->prepare("SELECT * FROM `orders` WHERE OSTATUS = 'approved' AND OSTAGE = 'receive' ");
 
-                                                            </div>
+                                            $stmt->execute();
+
+                                            // Fetch data as an associative array
+                                            $result = $stmt->get_result();
+                                            $orders = $result->fetch_all(MYSQLI_ASSOC);
+
+                                            ?>
+                                            <?php foreach ($orders as $order) : ?>
+                                                <div class="col-12 col-md-6">
+                                                    <div class="position-relative">
+                                                        <div class="order-number text-center p-2 border border-primary border-1 rounded-2 mb-3">
+                                                            <span><strong>Request Number:</strong> #<?= $order['ONUMBER'] ?></span>
                                                         </div>
-                                                        <div class="row">
-                                                            <div class="col-12 col-md-6 mb-3">
-                                                                <label class="form-label"> DESIRED PRICE:</label>
-                                                                <p> 14.00</p>
+                                                        <div class="order-details border border-gray border-1 rounded-2 p-3">
 
+                                                            <div class="row m-2">
+                                                                <div class="col mb-3">
+                                                                    <label class="form-label">NAME:</label>
+                                                                </div>
+                                                                <div class="col mb-3">
+                                                                    <label class="form-label">CATEGORY:</label>
+                                                                </div>
+                                                                <div class="col mb-3">
+                                                                    <label class="form-label">PRICE:</label>
+                                                                </div>
+                                                                <div class="col mb-3">
+                                                                    <label class="form-label">QUANTITY:</label>
+                                                                </div>
                                                             </div>
-                                                            <div class="col-12 col-md-6 mb-3">
-                                                                <label class="form-label">QUANTITY:</label>
-                                                                <p>200</p>
+                                                            <?php
+                                                            $stmt = $conn->prepare("SELECT * FROM `order_items` WHERE OIOID = ?");
+                                                            $stmt->bind_param('i', $order['OID']);
+                                                            $stmt->execute();
+                                                            $result = $stmt->get_result();
+                                                            $order_items = $result->fetch_all(MYSQLI_ASSOC);
 
-                                                            </div>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col-12 col-md-6 mb-3">
-                                                                <label class="form-label">RE-RECEIVED DATE:</label>
-                                                                <p> 25/12/2024</p>
+                                                            foreach ($order_items as $orderitem) :
+                                                                $stmt = $conn->prepare("SELECT PNAME, PCATEGORY FROM `products` WHERE PID = ?");
+                                                                $stmt->bind_param('i', $orderitem['OIPID']);
+                                                                $stmt->execute();
+                                                                $stmt->store_result();
+                                                                $stmt->bind_result($pname, $pcategory);
+                                                                $stmt->fetch();
+                                                            ?>
+                                                                <?php foreach ($order_items as $orderitem) ?>
+                                                                <div class="row border border-warning rounded-pill p-2 m-2">
+                                                                    <div class="col">
+                                                                        <p class="p-0 m-0"><?= $pname ?></p>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        <p class="p-0 m-0"><?= $pcategory ?></p>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        <p class="p-0 m-0"><?= $orderitem['OIPRICE'] ?></p>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        <p class="p-0 m-0"><?= $orderitem['OIQUANTITY'] ?></p>
+                                                                    </div>
+                                                                </div>
+                                                            <?php endforeach; ?>
 
-                                                            </div>
-                                                            <div class="col-12 col-md-6 mb-3">
-                                                                <label class="form-label">SCHEDULE OPTION:</label>
-                                                                <p>Weekly</p>
+                                                            <div class="row">
+                                                                <div class="col-12 col-md-4 mb-3">
+                                                                    <label class="form-label">PAYMENT METHOD:</label>
+                                                                    <p><?= $order['OPAYMETHOD'] ?></p>
+                                                                </div>
+                                                                <div class="col-12 col-md-4 mb-3">
+                                                                    <label class="form-label">DELIVER OPTION:</label>
+                                                                    <p><?= $order['ODELIVERY'] ?></p>
 
+                                                                </div>
+                                                                <div class="col-12 col-md-4 mb-3">
+                                                                    <label class="form-label">DELIVERY SCHEDULE:</label>
+                                                                    <p><?= $order['OSCHEDULE'] ?></p>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <label class="form-label">DESCRIPTION:</label>
-                                                            <p> The product should be in medium size and the color be good</p>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <button type="button" class="btn btn-accent">Issues</button>
-                                                            <button type="button" class="btn btn-secondary">Send Message</button>
-                                                            <button type="button" class="btn btn-primary">Go To Delivary</button>
+                                                            <div class="col-12">
+                                                                <label class="form-label">DAYS:</label>
+                                                                <p><?= $order['ODAYS'] ?></p>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <label class="form-label">TOTAL PRICE:</label>
+                                                                <p><?= $order['OTOTALPRICE'] ?></p>
+                                                            </div>
+                                                            <div class="col-12 text-end">
+                                                                <button type="button" class="btn btn-danger fw-blod">Reject</button>
+                                                                <button type="button" class="btn btn-primary fw-blod">Approve</button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            <?php endforeach; ?>
                                         </div>
                                     </div>
                                 </div>
@@ -544,9 +783,9 @@
 
         <?php } ?>
 
-        </main>
+    </main>
 
 
-        <!--    Include Footer   -->
+    <!--    Include Footer   -->
 
-        <?php include('assets/inc/footer.php') ?>
+    <?php include('assets/inc/footer.php') ?>

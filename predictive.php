@@ -20,9 +20,103 @@ if ($user_id === null) {
     exit();
 }
 ?>
+
+
+
 <main>
 
     <?php if (isset($_GET['pid'])) { ?>
+    <?php
+    // Group items by food category
+    $categories = [
+        'Fruits' => [
+            'Apple',
+            'Banana',
+            'Pomegranate',
+            'Pear',
+            'Strawberry',
+            'Grape',
+            'Mango',
+            'Orange',
+            'Kiwi',
+            'Watermelon'
+        ],
+        'Vegetables' => [
+            'Green Pepper',
+            'Parsley',
+            'Eggplant',
+            'Carrot',
+            'Cucumber',
+            'Green Chili',
+            'Tomato',
+            'Potato',
+            'Onion',
+            'Cilantro'
+        ]
+    ];
+
+    // Define price equations
+    $equations = [
+        'Apple' => [-0.0155, 0.0017, 0.0001, 37.8609],
+        'Green Pepper' => [-0.1034, -0.0093, -0.0010, 213.2446],
+        'Parsley' => [-0.0553, -0.0073, -0.0008, 114.0728],
+        'Watermelon' => [-0.0565, 0.0014, 0.0043, 117.4567],
+        'Eggplant' => [0.1305, 0.0171, 0.0022, -259.7177],
+        'Pomegranate' => [-0.1766, -0.0153, 0.0054, 365.2753],
+        'Carrot' => [-0.1648, -0.0162, 0.0050, 336.6688],
+        'Strawberry' => [-0.0220, 0.0026, 0.0019, 52.3071],
+        'Cucumber' => [-0.0868, -0.0087, 0.0032, 179.4543],
+        'Green Chili' => [-0.1269, -0.0099, -0.0013, 261.4601],
+        'Cilantro' => [0.0853, 0.0038, 0.0028, -169.5646],
+        'Banana' => [0.0626, 0.0025, -0.0054, -121.7326],
+        'Tomato' => [0.0247, 0.0067, 0.0010, -44.7497],
+        'Pear' => [0.0188, -0.0028, -0.0083, -31.2665],
+        'Grape' => [-0.0322, -0.0066, -0.0025, 71.8295],
+        'Mango' => [-0.0404, 0.0040, -0.0003, 88.9800],
+        'Potato' => [-0.0968, -0.0086, -0.0034, 199.5570],
+        'Onion' => [0.0818, 0.0060, -0.0058, -161.7872],
+        'Orange' => [0.1314, 0.0083, 0.0033, -259.4723],
+        'Kiwi' => [0.0797, 0.0012, -0.0048, -152.1228]
+    ];
+
+    // Get product ID from URL
+    $productID = $_GET['pid'] ?? '';
+
+    // Validate product ID
+    if (!array_key_exists($productID, $equations)) {
+        die("Invalid Product ID.");
+    }
+
+    // Define function to calculate price
+    function calculatePrice($coefficients, $year, $month, $day)
+    {
+        [$a, $b, $c, $d] = $coefficients;
+        return ($a * $year) + ($b * $month) + ($c * $day) + $d;
+    }
+
+    // Generate table for the next 10 days
+    $today = new DateTime();
+    $priceTable = [];
+
+    for ($i = 0; $i < 10; $i++) {
+        $date = clone $today;
+        $date->modify("+$i days");
+        $year = (int) $date->format('Y');
+        $month = (int) $date->format('m');
+        $day = (int) $date->format('d');
+
+        $price = calculatePrice($equations[$productID], $year, $month, $day);
+        $percentageChange = $i === 0 ? 0 : (($price - $priceTable[$i - 1]['Price']) / $priceTable[$i - 1]['Price']) * 100;
+
+        $priceTable[] = [
+            'Date' => $date->format('Y-m-d'),
+            'Price' => number_format($price, 2),
+            'Percentage' => number_format($percentageChange, 2) . '%'
+        ];
+    }
+
+    // Display the table
+    ?>
         <!--    Predictive Section Start     -->
         <section id="predictive" class="predictive">
             <div class="container-fluid">
@@ -32,7 +126,7 @@ if ($user_id === null) {
                         <h3 class="text-muted">See Best Wholesalers On Website</h3>
                     </div>
                     <div class="prodcut">
-                        <h2>Chinese Cabbage</h2>
+                        <h2><?= htmlspecialchars($productID) ?></h2>
                     </div>
                     <hr>
                     <div class="table-responsive my-5 rounded-2 shadow" style="max-height: 60vh; overflow-y:auto;">
@@ -46,30 +140,15 @@ if ($user_id === null) {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>1/1/2025</td>
-                                    <td>10.50 <small>SAR</small></td>
-                                    <td>30%</td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>2/1/2025</td>
-                                    <td>10.40 <small>SAR</small></td>
-                                    <td>-10%</td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>3/1/2025</td>
-                                    <td>11.50 <small>SAR</small></td>
-                                    <td>30%</td>
-                                </tr>
-                                <tr>
-                                    <td>4</td>
-                                    <td>4/1/2025</td>
-                                    <td>10.30 <small>SAR</small></td>
-                                    <td>-60%</td>
-                                </tr>
+                                <?php $i = 0;
+                                foreach ($priceTable as $row): ?>
+                                    <tr>
+                                        <td><?= $i += 1; ?></td>
+                                        <td><?= $row['Date'] ?></td>
+                                        <td><small>SAR</small> <?= $row['Price'] ?></td>
+                                        <td><?= $row['Percentage'] ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
@@ -111,7 +190,7 @@ if ($user_id === null) {
                                             </div>
                                             <div class="p-4">
                                                 <div class="d-md-flex justify-content-center">
-                                                    <a href="predictive.php?pid=<?= $vegetable['PID'] ?>" class="btn btn-secondary rounded-pill">More Details</a>
+                                                    <a href="predictive.php?pid=<?= ucfirst($vegetable['PNAME']) ?>" class="btn btn-secondary rounded-pill">More Details</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -158,7 +237,7 @@ if ($user_id === null) {
                                             </div>
                                             <div class="p-4">
                                                 <div class="d-md-flex justify-content-center">
-                                                    <a href="predictive.php?pid=<?= $fruit['PID'] ?>" class="btn btn-secondary rounded-pill">More Details</a>
+                                                    <a href="predictive.php?pid=<?= ucfirst($fruit['PNAME']) ?>" class="btn btn-secondary rounded-pill">More Details</a>
                                                 </div>
                                             </div>
                                         </div>

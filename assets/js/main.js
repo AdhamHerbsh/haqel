@@ -115,22 +115,6 @@
     });
   });
 
-  // Product Quantity
-  $(".quantity button").on("click", function () {
-    var button = $(this);
-    var oldValue = button.parent().parent().find("input").val();
-    if (button.hasClass("btn-plus")) {
-      var newVal = parseFloat(oldValue) + 1;
-    } else {
-      if (oldValue > 0) {
-        var newVal = parseFloat(oldValue) - 1;
-      } else {
-        newVal = 0;
-      }
-    }
-    button.parent().parent().find("input").val(newVal);
-  });
-
   // Four objects of interest: drop zones, input elements, gallery elements, and the files.
   // dataRefs = {files: [image files], input: element ref, gallery: element ref}
 
@@ -264,14 +248,107 @@
     });
   });
 
-  // Add Products To Cart
   $(".qty-btn").on("click", function () {
-    const productid = $("#pid-input").val();
-    const quantity = $("#qty-input").val();
-  
-    $(".add-to-cart").attr("href", "assets/php/cart.php?pid=" + productid + "&qty=" + quantity);
-    
+    // Get the closest parent element containing the inputs (specific to this row)
+    const parentRow = $(this).closest(".quantity");
+
+    // // Retrieve the product ID and current quantity
+    const productid = parentRow.find("input[name='pid']").val(); // Find the PID input in this row
+    let quantity = parseInt(parentRow.find("input[name='quantity']").val()); // Get the current quantity as an integer
+
+    // // Check if it's a plus or minus button
+    if ($(this).hasClass("btn-plus")) {
+      quantity += 1; // Increment quantity
+    } else if ($(this).hasClass("btn-minus") && quantity > 1) {
+      quantity -= 1; // Decrement quantity, but ensure it stays above 1
+    }
+
+    // // Update the quantity input value in the UI
+    parentRow.find("input[name='quantity']").val(quantity);
+
+    $(".add-to-cart").attr(
+      "href",
+      "assets/php/cart.php?action=added&pid=" +
+        productid +
+        "&qty=" +
+        quantity +
+        ""
+    );
   });
+
+  // jQuery function to handle the "Update Cart" button
+  $(".update-cart").on("click", function (e) {
+    e.preventDefault(); // Prevent the default link behavior
+
+    // Collect product data from the table
+    const cartData = [];
+    $("table tbody tr").each(function () {
+      const row = $(this);
+      const pid = row.find("input[name='pid']").val();
+      const pname = row.find("input[name='pname']").val();
+      const price = row.find("input[name='pprice']").val();
+      const pimage = row.find("input[name='pimage']").val();
+      const quantity = row.find("input[name='quantity']").val();
+
+      if (pid && quantity) {
+        cartData.push({
+          PID: pid,
+          PNAME: pname,
+          PPRICE: price,
+          PIMAGE: pimage,
+          QUANTITY: parseInt(quantity, 10),
+        });
+      }
+    });
+
+    // Send the cart data to the PHP file via AJAX
+    $.ajax({
+      url: "assets/php/cart.php", // PHP file to handle the request
+      type: "POST",
+      data: {
+        action: "updateCart",
+        cart: cartData,
+      },
+      success: function (response) {
+        // Handle the success response
+        sessionStorage["response"] = response;
+        location.reload(); // Optionally reload the page to reflect updates
+      },
+      error: function (xhr, status, error) {
+        // Handle errors
+        console.error("An error occurred:", error);
+        alert("Failed to update cart. Please try again.");
+      },
+    });
+  });
+  // When any checkbox (other than "One Time") is clicked
+  $(".days-select input.form-check-input:not(#one-time)").on("change", function () {
+    if ($(this).is(":checked")) {
+      $("#one-time").attr("checked", false); // Uncheck "One Time"
+    }
+  });
+
+  // When the "One Time" checkbox is clicked
+  $("#one-time").on("change", function () {
+    if ($(this).is(":checked")) {
+      // Uncheck all other checkboxes
+      $(".days-select input.form-check-input:not(#one-time)").attr("checked", false);
+    }
+  });
+
+  // Stars of Wholesaler Rate 
+  $('.star-rating').each(function () {
+    // Get the number of stars from the data-stars attribute
+    const numberOfStars = $(this).data('stars');
+    
+    // Clear the content in case of re-execution
+    $(this).empty();
+
+    // Loop to add stars
+    for (let i = 0; i < numberOfStars; i++) {
+        $(this).append('<i class="bx bxs-star text-yellow"></i>'); // You can replace this with any star icon
+    }
+});
 
 
 })(jQuery);

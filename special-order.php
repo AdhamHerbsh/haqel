@@ -34,12 +34,13 @@
                 </div>
                 <div class="row">
                     <div class="col-12 col-md-8">
-                        <form class="p-4 border border-1 rounded-2" action="assets/php/special-order.php" method="POST" enctype="multipart/form-data">
+                        <form class="p-4 border border-1 rounded-2" action="assets/php/order.php" method="POST" enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-12 col-md-6">
+                                    <input type="hidden" name="otype" value="special">
                                     <div class="mb-3">
-                                        <label for="sopname" class="form-label">PRODUCT:</label>
-                                        <select class="form-select form-select-lg" name="sopname" id="sopname" required>
+                                        <label for="pname" class="form-label">PRODUCT:</label>
+                                        <select class="form-select form-select-lg" name="pname" id="pname" required>
                                             <option disabled selected value>Select Product:</option>
                                             <option value="apple">Apple</option>
                                             <option value="mango">Mango</option>
@@ -66,8 +67,8 @@
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <div class="mb-3">
-                                        <label for="sopcategory" class="form-label">CATEGORY:</label>
-                                        <select class="form-select form-select-lg" name="sopcategory" id="sopcategory" required>
+                                        <label for="pcategory" class="form-label">CATEGORY:</label>
+                                        <select class="form-select form-select-lg" name="pcategory" id="pcategory" required>
                                             <option disabled selected value>Select Category:</option>
                                             <option value="fruits">Fruits</option>
                                             <option value="vegetables">Vegetables</option>
@@ -78,23 +79,23 @@
                             <div class="row">
                                 <div class="col-12 col-md-6">
                                     <div class="mb-3">
-                                        <label for="sopprice" class="form-label">DESIRED PRICE:</label>
-                                        <input type="number" class="form-control" name="sopprice" id="sopprice" placeholder="00" required />
+                                        <label for="pprice" class="form-label">DESIRED PRICE:</label>
+                                        <input type="number" class="form-control" name="pprice" id="pprice" placeholder="00" required />
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label">QUANTITY:</label>
                                         <div class="mb-3">
-                                            <div class="input-group quantity bg-white rounded-pill" style="width: 100px;">
+                                            <div class="input-group quantity bg-white rounded-pill py-3" style="width: 100px;">
                                                 <div class="input-group-btn">
-                                                    <button class="btn btn-sm btn-minus rounded-circle bg-light border" type="button">
+                                                    <button class="btn btn-sm btn-minus rounded-circle bg-light border qty-btn" type="button">
                                                         <i class="bx bx-minus"></i>
                                                     </button>
                                                 </div>
-                                                <input type="text" class="form-control form-control-sm text-center border-0" name="sopquantity" value="1" min="1" required />
+                                                <input id="qty-input" type="text" class="form-control form-control-sm text-center border-0" name="quantity" value="1">
                                                 <div class="input-group-btn">
-                                                    <button class="btn btn-sm btn-plus rounded-circle bg-light border" type="button">
+                                                    <button class="btn btn-sm btn-plus rounded-circle bg-light border qty-btn" type="button">
                                                         <i class="bx bx-plus"></i>
                                                     </button>
                                                 </div>
@@ -106,17 +107,17 @@
                             <div class="row">
                                 <div class="col-12 col-md-6">
                                     <div class="mb-3">
-                                        <label for="sorecived_date" class="form-label">RECEIVED DATE:</label>
-                                        <input type="date" class="form-control" name="sorecived_date" id="sorecived_date" placeholder="Write Keywords About Product" min="<?= date('Y-m-d') ?>" required />
+                                        <label for="received_date" class="form-label">RECEIVED DATE:</label>
+                                        <input type="date" class="form-control" name="received_date" id="received_date" placeholder="Write Keywords About Product" min="<?= date('Y-m-d') ?>" required />
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <div class="mb-3">
-                                        <label for="soschedule_option" class="form-label">SCHEDULE OPTIONS:</label>
+                                        <label for="schedule_option" class="form-label">SCHEDULE OPTIONS:</label>
                                         <div class="mb-3">
-                                            <div class="form-check form-check-inline"> <input class="form-check-input" type="radio" name="soschedule_option" id="radio-soschedule_option_daily" value="day" required /> <label class="form-check-label" for="radio-soschedule_option_daily">Daily</label> </div>
-                                            <div class="form-check form-check-inline"> <input class="form-check-input" type="radio" name="soschedule_option" id="radio-soschedule_option_weekly" value="week" required /> <label class="form-check-label" for="radio-soschedule_option_weekly">Weekly</label> </div>
-                                            <div class="form-check form-check-inline"> <input class="form-check-input" type="radio" name="soschedule_option" id="radio-soschedule_option_monthly" value="month" required /> <label class="form-check-label" for="radio-soschedule_option_monthly">Monthly</label> </div>
+                                            <div class="form-check form-check-inline"> <input class="form-check-input" type="radio" name="schedule_option" id="radio-schedule_option_daily" value="day" required /> <label class="form-check-label" for="radio-schedule_option_daily">Daily</label> </div>
+                                            <div class="form-check form-check-inline"> <input class="form-check-input" type="radio" name="schedule_option" id="radio-schedule_option_weekly" value="week" required /> <label class="form-check-label" for="radio-schedule_option_weekly">Weekly</label> </div>
+                                            <div class="form-check form-check-inline"> <input class="form-check-input" type="radio" name="schedule_option" id="radio-schedule_option_monthly" value="month" required /> <label class="form-check-label" for="radio-schedule_option_monthly">Monthly</label> </div>
                                         </div>
                                     </div>
                                 </div>
@@ -124,15 +125,15 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="mb-3">
-                                        <label for="sodescription" class="form-label">DESCRIPTION:</label>
-                                        <textarea class="form-control" name="sodescription" id="sodescription" rows="3" placeholder="Write Product Description"></textarea>
+                                        <label for="description" class="form-label">DESCRIPTION:</label>
+                                        <textarea class="form-control" name="description" id="description" rows="3" placeholder="Write Product Description"></textarea>
                                     </div>
                                 </div>
                             </div>
                             <div class="d-flex justify-content-end mb-3">
                                 <button type="reset" name="cancel" id="cancel" class="btn btn-accent"> Cancel </button>
                                 <span class="m-2"></span>
-                                <button type="submit" name="create" id="create" class="btn btn-primary"> Create </button>
+                                <button type="submit" name="special-order" id="create" class="btn btn-primary"> Create </button>
                             </div>
                         </form>
                     </div>

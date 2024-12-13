@@ -45,7 +45,6 @@
                             <h1>Our Organic Products</h1>
                             <h3 class="text-muted">See Products From Different Wholesalers</h3>
                         </div>
-                        <input id="pid-input" type="hidden" value="<?= $pid ?>">
                         <div class="row">
                             <div class="col-12 col-md-6 rounded-2">
                                 <img class="w-100" src="<?= $pimage ?>" alt="image not found">
@@ -100,42 +99,43 @@
                                                         <i class="bx bx-minus"></i>
                                                     </button>
                                                 </div>
-                                                <input id="qty-input" type="text" class="form-control form-control-sm text-center border-0" value="1">
+                                                <input id="pid-input" type="hidden" name="pid" value="<?= $pid ?>">
+                                                <input id="qty-input" type="text" class="form-control form-control-sm text-center border-0" name="quantity" value="<?= isset($_SESSION['cart'][$pid]['QUANTITY']) ? $_SESSION['cart'][$pid]['QUANTITY'] : 1 ?>">
                                                 <div class="input-group-btn">
                                                     <button class="btn btn-sm btn-plus rounded-circle bg-light border qty-btn">
                                                         <i class="bx bx-plus"></i>
                                                     </button>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-12 col-md-10">
-                                            <a class="col-12 btn btn-primary py-3 rounded-pill fw-bold add-to-cart" href="assets/php/cart.php?pid=<?= $pid ?>&qty=1">Add To Cart <i class="bx bx-shopping-bag bx-sm"></i></a>
+                                            </div>
+                                            <div class="col-12 col-md-10">
+                                                <a class="col-12 btn btn-primary py-3 rounded-pill fw-bold add-to-cart" href="assets/php/cart.php?pid=<?= $pid ?>&qty=<?= isset($_SESSION['cart'][$pid]['QUANTITY']) ? $_SESSION['cart'][$pid]['QUANTITY'] : 1 ?>">Add To Cart <i class="bx bx-shopping-bag bx-sm"></i></a>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <hr>
-                                <div class="mb-3">
-                                    <div class="row">
-                                        <p><strong>Category:</strong> <?= $pcategory ?></p>
-                                    </div>
-                                    <div class="row">
-                                        <p><strong>Keywords:</strong> <?= $pkeywords ?></p>
+                                    <hr>
+                                    <div class="mb-3">
+                                        <div class="row">
+                                            <p><strong>Category:</strong> <?= $pcategory ?></p>
+                                        </div>
+                                        <div class="row">
+                                            <p><strong>Keywords:</strong> <?= $pkeywords ?></p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row d-flex justify-content-end">
-                            <div class="card col-12 col-md-6 pt-5 text-center">
-                                <i class="bx bx-bar-chart bx-lg text-primary"></i>
-                                <div class="card-body">
-                                    <h4 class="card-title text-primary mb-3">PREDICTIVE PRODUCT PRICE</h4>
-                                    <a class="col-12 btn btn-primary rounded-pill fw-bold" href="predictive.php">See Now <i class="bx bx-right-arrow-alt bx-sm"></i></a>
+                            <div class="row d-flex justify-content-end">
+                                <div class="card col-12 col-md-6 pt-5 text-center">
+                                    <i class="bx bx-bar-chart bx-lg text-primary"></i>
+                                    <div class="card-body">
+                                        <h4 class="card-title text-primary mb-3">PREDICTIVE PRODUCT PRICE</h4>
+                                        <a class="col-12 btn btn-primary rounded-pill fw-bold" href="predictive.php">See Now <i class="bx bx-right-arrow-alt bx-sm"></i></a>
+                                    </div>
                                 </div>
-                            </div>
 
+                            </div>
                         </div>
                     </div>
-                </div>
             </section>
             <!--    Product End   -->
 

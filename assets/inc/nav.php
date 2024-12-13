@@ -59,7 +59,7 @@ $user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : null;
                     <div class="d-flex m-3 me-0">
                         <?php if ($user_type == "wholesaler") { ?>
                             <!--    Wholesaler Navbar Start  -->
-                            <a href="requests.php" class="position-relative me-4 my-auto text-black">
+                            <a href="chat.php" class="position-relative me-4 my-auto text-black">
                                 <i class="bx bx-message-detail bx-md"></i>
                             </a>
                             <!--    Wholesaler Navbar End  -->
@@ -68,16 +68,19 @@ $user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : null;
                             <!--    Retailer Navbar Start  -->
                             <a href="cart.php" class="position-relative me-4 my-auto text-black">
                                 <i class="bx bx-basket bx-md"></i>
-                            </a>
-                            <!--    Retailer Navbar End  -->
-
-                        <?php } else { ?>
-                        <?php } ?>
-                        <!--    Account Navbar Start  -->
-                        <a href="user-profile.php" class="my-auto text-black">
-                            <i class="bx bx-user-circle bx-md"></i>
-                        </a>
-                        <!--    Account Navbar End  -->
+                                <?php if(isset($_SESSION['cartCount'])){ ?>
+                                    <span class="d-inline-block btn-primary rounded-circle text-center fw-bold" style="position: relative; width: 17px; height: 17px; right: 20px; top: 10px; font-size: 0.75rem;"><?=  $_SESSION['cartCount'] ?></span>
+                                    <?php } ?>
+                                </a>
+                                <!--    Retailer Navbar End  -->
+                                
+                                <?php } else { ?>
+                                    <?php } ?>
+                                    <!--    Account Navbar Start  -->
+                                    <a href="user-profile.php" class="my-auto text-black">
+                                        <i class="bx bx-user-circle bx-md"></i>
+                                    </a>
+                                    <!--    Account Navbar End  -->
                         <!--    User Navbar End  -->
                     <?php } ?>
                     </div>

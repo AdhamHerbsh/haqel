@@ -8,14 +8,12 @@
 <?php include('assets/inc/nav.php'); ?>
 
 <?php
-// Start session
-session_start();
 
 // Get UserID from session
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
 // Check if the user ID is valid
-if ($user_id === null | $user_type != "admin") {
+if ($user_id === null) {
     header("Location: 404.php"); // Redirect to 404 page if user is not logged in
     exit();
 }
@@ -31,8 +29,12 @@ if ($user_id === null | $user_type != "admin") {
                     <h1>View Commerical Register File</h1>
                     <h3 class="text-muted">See User Commerical Register File</h3>
                 </div>
-                <?php if ($_GET['file'] != null) { ?>
+                <?php if (isset($_GET['file'])) { ?>
+                    <!-- View File -->
                     <iframe src="assets/php/<?= $_GET['file'] ?>" frameborder="0" width="100%" height="800"></iframe>
+                    <?php } elseif (isset($_GET['contract'])) { ?>
+                        <!-- View File -->
+                        <iframe src="assets/php/<?= $_GET['contract'] ?>" frameborder="0" width="100%" height="800"></iframe>
                 <?php } else { ?>
                     <!--    Alter Warning Start  -->
                     <div class="container py-5">

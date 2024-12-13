@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Prepare SQL statement
     $stmt = $conn->prepare(
         "INSERT INTO account 
-            ( business_name, business_email, business_type, coverage_areas, business_segment, commercial_register_file, user_id) 
+            (BUSINESS_NAME, BUSINESS_EMAIL, BUSINESS_TYPE, COVERAGE_AREAS, BUSINESS_SEGMENT, COMMERCIAL_REGISTER_FILE, USER_ID) 
             VALUES ( ?, ?, ?, ?, ?, ?, ?)"
     );
     $stmt->bind_param(

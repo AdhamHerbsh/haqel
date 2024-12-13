@@ -27,16 +27,37 @@
                     <h3 class="text-muted">Make Deal With Retailers</h3>
                 </div>
                 <div class="container py-5">
+
+                    <!--    Users Chat Section    -->
+                    <div class="card-container">
+                    <div class="card col-12 border border-1 border-white-50 mb-3 p-3">
+                            <div class="row">
+                                <div class="col-12 col-md-4">
+                                    <div class="card-body">
+                                        <h4 class="card-title">Joud Abdelrahman</h4>
+                                        <p class="card-title"><span class="fw-bold"><i class="bx bx-package bx-sm"></i> Order Number:</span> #<?= "236598" ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-8 align-content-center">
+                                    <div class="text-end">
+                                        <a class="btn btn-primary" href="">Chat</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--    Users Chat Section  -->
+
                     <div class="row justify-content-center">
                         <div class="col-12 col-md-10">
                             <!-- Chat Header -->
-                                        <div class="chat-info text-center p-2 border border-primary border-2 rounded-2 mb-3">
-                                            <p>
-                                                <span class="fw-bold"><i class="bx bx-user bx-sm"></i> Retailer Name:</span> <?= " Mohamed Ahmed" ?>
-                                                <span class="mx-2"></span>
-                                                <span class="fw-bold"><i class="bx bx-package bx-sm"></i> Order Number:</span> #<?= "236598" ?>
-                                            </p>
-                                        </div>
+                            <div class="chat-info text-center p-2 border border-primary border-2 rounded-2 mb-3">
+                                <p>
+                                    <span class="fw-bold"><i class="bx bx-user bx-sm"></i> Retailer Name:</span> <?= " Mohamed Ahmed" ?>
+                                    <span class="mx-2"></span>
+                                    <span class="fw-bold"><i class="bx bx-package bx-sm"></i> Order Number:</span> #<?= "236598" ?>
+                                </p>
+                            </div>
 
                             <!-- Chat Body -->
                             <div class="chat-body border border-gray border-1 border-bottom-0 p-3 rounded-top" style="min-height: 400px; max-height:800px; overflow-y: auto;">
