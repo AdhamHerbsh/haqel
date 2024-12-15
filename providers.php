@@ -48,11 +48,7 @@
     // Fetch data as an associative array
     $result = $stmt->get_result();
     $users = $result->fetch_all(MYSQLI_ASSOC);
-
-    // Close the statement and connection
-    $stmt->close();
-    $conn->close();
-    ?>
+?>
 
     <!--    User Profile Section Start     -->
     <main>
@@ -65,8 +61,18 @@
                     </div>
                     <div class="card-container">
                         <div class="row">
-
                             <?php foreach ($users as $user) : ?>
+                                <?php
+                                    // Prepare SQL to get rate of wholesaler
+                                    $stmt = $conn->prepare("SELECT COALESCE(r.RATE, 'Not Reviewed Yet!') AS RATE FROM (SELECT ? AS WS_ID) AS ws LEFT JOIN reviews r ON ws.WS_ID = r.WS_ID   ");
+                                    $stmt->bind_param("s", $user['ID']);
+                                    $stmt->execute();
+                                    $stmt->store_result();    
+                                    // Bind the result
+                                    $stmt->bind_result($rate);
+                                    $stmt->fetch();
+                                ?>
+
                                 <div class="col-12 col-md-4">
                                     <div class="card border-primary text-center mb-2">
                                         <div class="card-icon mb-3">
@@ -80,12 +86,16 @@
                                                 <p class="card-title"><?= htmlspecialchars($user['COVERAGE_AREAS']); ?></p>
                                             </div>
                                             <div class="mb-3">
-                                                <div class="star-rating" data-stars="3"></div>
+                                                <?php if($rate !== 'Not Reviewed Yet!'){ ?>
+                                                    <div class="star-rating" data-stars="<?= isset($rate)? $rate : "0" ?>"></div>
+                                                <?php }else{ ?>
+                                                    <p class="card-title"><?= htmlspecialchars($rate); ?></p>
+                                                <?php } ?>
                                             </div>
                                             <div class="my-3">
                                                 <div class="d-flex justify-content-evenly">
                                                     <a class="btn btn-accent fs-6 fw-bold" href="users-list.php">More Info</a>
-                                                    <a class="btn btn-primary fs-6 fw-bold" href="chat.php?wsid=<?= $user['ID'] ?>">Chat</a>
+                                                    <a class="btn btn-primary fs-6 fw-bold" href="chat.php?wsid=<?= $user['ID'] ?>&soid=000">Chat</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -102,6 +112,11 @@
     </main>
     <!--    User Profile Section End     -->
 
+<?php
+    // Close the statement and connection
+    $stmt->close();
+    $conn->close();
+    ?>
 
     <!--    Include Footer   -->
 

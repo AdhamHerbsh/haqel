@@ -31,10 +31,10 @@ $result = $stmt->get_result();
 $orders = $result->fetch_all(MYSQLI_ASSOC);
 
 // Prepare SQL to fetch special orders data
-$stmt = $conn->prepare("SELECT * FROM `special_orders` WHERE USER_ID = ?");
-
+$stmt = $conn->prepare("SELECT * FROM `special_orders` WHERE USER_ID = ? AND SOSTATUS NOT LIKE ? ");
+$x = 'closed';
 // Bind user_id as an integer
-$stmt->bind_param('i', $user_id);
+$stmt->bind_param('is', $user_id, $x);
 
 $stmt->execute();
 
@@ -120,7 +120,9 @@ $special_orders = $result->fetch_all(MYSQLI_ASSOC);
                                         </a>
                                     </td>
                                     <td>
-                                        <a class="btn btn-secondary" href="order.php?oid=<?= $order['OID'] ?>">Details <i class="bx bx-right-arrow-alt"></i></a>
+                                        <?php if($order['OSTATUS'] !== 'closed'){ ?>
+                                            <a class="btn btn-secondary" href="order.php?oid=<?= $order['OID'] ?>">Details <i class="bx bx-right-arrow-alt"></i></a>
+                                        <?php } ?>
                                     </td>
                                 </tr>
                                 <tr>
@@ -181,7 +183,9 @@ $special_orders = $result->fetch_all(MYSQLI_ASSOC);
                                         </a>
                                     </td>
                                     <td>
+                                    <?php if($specialorder['SOSTATUS'] !== 'closed'){ ?>
                                         <a class="btn btn-secondary" href="order.php?soid=<?= $specialorder['SOID'] ?>">Details <i class="bx bx-right-arrow-alt"></i></a>
+                                    <?php } ?>
                                     </td>
                                 </tr>
                                 <tr>

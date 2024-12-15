@@ -16,6 +16,56 @@
         header("Location: 404.php"); // Redirect to 404 page if user is not logged in
         exit();
     }
+
+
+
+    $sender_id = $user_id ?? null;
+    $receiver_id = $_GET['wsid'] ?? $_GET['rtid'];
+    $soid = $_GET['soid'] ?? null;
+    
+
+    // Special Order ID Unset
+    if (!isset($soid)) {
+
+        $stmt = $conn->prepare("SELECT SOID, SONUMBER, USER_ID FROM special_orders WHERE WS_ID = ? AND SOSTATUS LIKE 'applied'");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $specialOrders = $result->fetch_all(MYSQLI_ASSOC);
+
+        $stmt = $conn->prepare("SELECT CSENDER, CSOID, CDATE FROM chats WHERE CRECEIVER = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $chats = $result->fetch_all(MYSQLI_ASSOC);
+
+        // Special Order ID Set
+    } else {
+
+        $stmt = $conn->prepare("SELECT SONUMBER FROM special_orders WHERE SOID = ?");
+        $stmt->bind_param("i", $soid);
+        $stmt->execute();
+        $stmt->store_result();
+        // Bind the result
+        $stmt->bind_result($sonumber);
+        $stmt->fetch();
+    }
+
+    $stmt = $conn->prepare("SELECT FNAME, LNAME FROM users WHERE ID = ?");
+    $stmt->bind_param("i", $receiver_id);
+    $stmt->execute();
+    $stmt->store_result();
+    // Bind the result
+    $stmt->bind_result($fname, $lname);
+    $stmt->fetch();
+
+    $stmt->close();
+
+
+
+    $_SESSION['chatSender'] = $sender_id ?? null;
+    $_SESSION['chatReceiver'] = $receiver_id ?? null;
+    $_SESSION['chatSoid'] = $soid ?? null;
     ?>
 
     <main>
@@ -27,89 +77,113 @@
                     <h3 class="text-muted">Make Deal With Retailers</h3>
                 </div>
                 <div class="container py-5">
+                    <?php if (isset($_GET['wsid']) | isset($_GET['rtid'])) { ?>
+                        <!--    Chat Region Start -->
+                        <div class="row justify-content-center">
+                            <div class="col-12 col-md-10">
+                                <form id="chat-form" action="#">
+                                    <!-- Chat Header -->
+                                    <div class="chat-info text-center p-2 border border-primary border-2 rounded-2 mb-3">
+                                        <p>
+                                            <span class="fw-bold"><i class="bx bx-user bx-sm"></i> <?= ucfirst($user_type === 'retailer'? 'wholesaler' : 'retailer') ?> Name: <?= ucfirst($fname) . " " . ucfirst($lname) ?>
+                                                <span class="mx-2 d-block d-sm-inline"></span>
+                                                <span class="fw-bold"><i class="bx bx-package bx-sm"></i> Order Number:</span> #<?= $sonumber ?>
+                                        </p>
+                                        <?= isset($_GET['wsid']) ? '<a href="my-orders.php">Back</a>' : '<a href="chat.php">Back</a>' ?>
+                                    </div>
 
-                    <!--    Users Chat Section    -->
-                    <div class="card-container">
-                    <div class="card col-12 border border-1 border-white-50 mb-3 p-3">
-                            <div class="row">
-                                <div class="col-12 col-md-4">
-                                    <div class="card-body">
-                                        <h4 class="card-title">Joud Abdelrahman</h4>
-                                        <p class="card-title"><span class="fw-bold"><i class="bx bx-package bx-sm"></i> Order Number:</span> #<?= "236598" ?></p>
+                                    <!-- Chat Body -->
+                                    <div id="chat-body" class="border border-gray border-1 border-bottom-0 p-3 rounded-top" style="min-height: 400px; max-height:800px; overflow-y: auto;">
+
                                     </div>
-                                </div>
-                                <div class="col-12 col-md-8 align-content-center">
-                                    <div class="text-end">
-                                        <a class="btn btn-primary" href="">Chat</a>
-                                    </div>
-                                </div>
+
+                                    <!-- Chat Input -->
+                                    <div class="bg-white p-3 pt-0 border border-gray border-1 border-top-0 rounded-bottom">
+                                        <div class="d-flex">
+                                            <div id="typing-area" class="flex-grow-1 me-2">
+                                                <input id="chat-sender" type="hidden" name="chat-sender" value="<?= $sender_id ?>" />
+                                                <input id="chat-receiver" type="hidden" name="chat-receiver" value="<?= $receiver_id ?>" />
+                                                <input id="chat-soid" type="hidden" name="chat-soid" value="<?= $soid ?>" />
+                                                <input id="chat-input" class="form-control rounded-pill" type="text" name="chat-input" placeholder="Type a message..." />
+                                            </div>
+                                            <button id="send-btn" class="btn btn-primary rounded-pill" type="submit" name="send" disabled>
+                                                <span class="d-none d-md-inline">Send</span>
+                                                <i class="bx bx-paper-plane bx-sm"></i>
+                                            </button>
+                                        </div>
+                                </form>
                             </div>
                         </div>
-                    </div>
-                    <!--    Users Chat Section  -->
-
-                    <div class="row justify-content-center">
-                        <div class="col-12 col-md-10">
-                            <!-- Chat Header -->
-                            <div class="chat-info text-center p-2 border border-primary border-2 rounded-2 mb-3">
-                                <p>
-                                    <span class="fw-bold"><i class="bx bx-user bx-sm"></i> Retailer Name:</span> <?= " Mohamed Ahmed" ?>
-                                    <span class="mx-2"></span>
-                                    <span class="fw-bold"><i class="bx bx-package bx-sm"></i> Order Number:</span> #<?= "236598" ?>
-                                </p>
+                </div>
+            </div>
+        </div>
+        </div>
+        <!--    Chat Region End -->
+    <?php } elseif ($user_type === 'wholesaler') { ?>
+        <!--    Users Chat Section    -->
+        <div class="card-container">
+            <?php $counter = 0 ?>
+            <?php foreach ($specialOrders as $specialOrder) : ?>
+                <?php
+                            $stmt = $conn->prepare("SELECT FNAME, LNAME, USER_TYPE FROM users WHERE ID = ?");
+                            $retailer_id = $specialOrder['USER_ID'];
+                            $stmt->bind_param("i", $retailer_id);
+                            $stmt->execute();
+                            $stmt->store_result();
+                            // Bind the result
+                            $stmt->bind_result($fname, $lname, $user_type);
+                            $stmt->fetch();
+                            $counter++;
+                ?>
+                <div class="card col-12 border border-1 border-white-50 mb-3 p-3" data-aos="slide-right" data-aos-duration="<?= $counter ?>000">
+                    <div class="row">
+                        <div class="col-12 col-md-4">
+                            <div class="card-body">
+                                <h4 class="card-title"><?= ucfirst($fname) . " " . ucfirst($lname) ?></h4>
+                                <p class="card-title"><span class="fw-bold"><i class="bx bx-package bx-sm"></i> Order Number:</span> #<?= $specialOrder['SONUMBER'] ?></p>
                             </div>
-
-                            <!-- Chat Body -->
-                            <div class="chat-body border border-gray border-1 border-bottom-0 p-3 rounded-top" style="min-height: 400px; max-height:800px; overflow-y: auto;">
-                                <!-- Incoming Message -->
-                                <div class="d-flex align-items-start mb-3">
-                                    <div>
-                                        <p class="bg-white p-3 rounded-pill shadow-sm mb-1">
-                                            Hello, how are you?
-                                        </p>
-                                        <small class="text-muted">01:22 PM</small>
-                                    </div>
-                                </div>
-
-                                <!-- Outgoing Message -->
-                                <div class="d-flex justify-content-end mb-3">
-                                    <div>
-                                        <p class="bg-primary text-white p-3 rounded-pill shadow-sm mb-1">
-                                            I'm good, thank you!
-                                        </p>
-                                        <small class="text-muted">01:23 PM</small>
-                                    </div>
-                                </div>
-
-                                <!-- Another Incoming Message -->
-                                <div class="d-flex align-items-start mb-3">
-                                    <div>
-                                        <p class="bg-white p-3 rounded-pill shadow-sm mb-1">
-                                            Can we talk about the order?
-                                        </p>
-                                        <small class="text-muted">01:24 PM</small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Chat Input -->
-                            <div class="chat-input bg-white p-3 pt-0 border border-gray border-1 border-top-0 rounded-bottom">
-                                <form class="d-flex">
-                                    <div class="flex-grow-1 me-2">
-                                        <input type="text" name="chat-input" id="chat-input" class="form-control rounded-pill" placeholder="Type a message..." />
-                                    </div>
-                                    <button type="submit" class="btn btn-primary rounded-pill">
-                                        Send
-                                        <i class="bx bx-paper-plane bx-sm"></i>
-                                    </button>
-                                </form>
+                        </div>
+                        <div class="col-12 col-md-8 align-content-center">
+                            <div class="text-center text-md-end">
+                                <a class="btn btn-primary" href="chat.php?rtid=<?= $retailer_id ?>&soid=<?= $specialOrder['SOID'] ?>">Chat</a>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+                <?php endforeach; ?>
+                <?php foreach ($chats as $chat) : ?>
+                    <?php
+                            $stmt = $conn->prepare("SELECT FNAME, LNAME, USER_TYPE FROM users WHERE ID = ?");
+                            $retailer_id = $chat['CSENDER'];
+                            $stmt->bind_param("i", $retailer_id);
+                            $stmt->execute();
+                            $stmt->store_result();
+                            // Bind the result
+                            $stmt->bind_result($fname, $lname, $user_type);
+                            $stmt->fetch();
+                            $counter++;
+                ?>
+                <div class="card col-12 border border-1 border-white-50 mb-3 p-3" data-aos="slide-right" data-aos-duration="<?= $counter ?>000">
+                    <div class="row">
+                        <div class="col-12 col-md-4">
+                            <div class="card-body">
+                                <h4 class="card-title"><?= ucfirst($fname) . " " . ucfirst($lname) ?></h4>
+                                <p class="card-title"><span class="fw-bold"><i class="bx bx-calendar bx-sm"></i> Date:</span> #<?= $chat['CDATE'] ?></p>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-8 align-content-center">
+                            <div class="text-center text-md-end">
+                                <a class="btn btn-primary" href="chat.php?rtid=<?= $retailer_id ?>&soid=<?= $chat['CSOID'] ?>">Chat</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
         </div>
-        <!--    Chat Section End -->
+        <!--    Users Chat Section  -->
+
+    <?php } ?>
+    <!--    Chat Section End -->
     </main>
 
     <!--    Include Footer   -->

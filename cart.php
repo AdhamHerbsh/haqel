@@ -31,7 +31,7 @@ if ($user_id === null | $user_type != "retailer") {
                 </div>
                 <div class="row">
                     <div class="col-12 col-md-6">
-                        <div class="table-responsive p-4 my-2 rounded-2 border border-1 border-white-50">
+                        <div class="table-responsive p-4 my-2 rounded-2 border border-1 border-white-50 overflow-hidden">
                             <table class="table">
                                 <thead>
                                     <tr>
@@ -48,8 +48,8 @@ if ($user_id === null | $user_type != "retailer") {
                                         <?php foreach ($_SESSION['cart'] as $pid => $item) : ?>
                                             <tr>
                                                 <th scope="row">
-                                                    <div class="d-flex align-items-center">
-                                                        <img src="<?= $item['PIMAGE'] ?>" class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;" alt="<?= $item['PNAME'] ?>">
+                                                    <div class="d-flex align-items-center" style="max-width: 80px;">
+                                                        <img src="<?= $item['PIMAGE'] ?>" class="img-fluid me-5 rounded-circle p-2" alt="<?= $item['PNAME'] ?>">
                                                     </div>
                                                 </th>
                                                 <td>
@@ -61,7 +61,7 @@ if ($user_id === null | $user_type != "retailer") {
                                                 <td>
                                                     <div class="input-group quantity bg-white rounded-pill py-3" style="width: 100px;">
                                                         <div class="input-group-btn">
-                                                            <button class="btn btn-sm btn-minus rounded-circle bg-light border qty-btn">
+                                                            <button class="btn btn-sm btn-minus rounded-circle bg-light border qty-btn" type="button">
                                                                 <i class="bx bx-minus"></i>
                                                             </button>
                                                         </div>
@@ -71,7 +71,7 @@ if ($user_id === null | $user_type != "retailer") {
                                                         <input id="pimage-input" type="hidden" name="pimage" value="<?= $item['PIMAGE'] ?>">
                                                         <input id="qty-input" type="text" class="form-control form-control-sm text-center border-0" name="quantity" value="<?= $item['QUANTITY'] ?>">
                                                         <div class="input-group-btn">
-                                                            <button class="btn btn-sm btn-plus rounded-circle bg-light border qty-btn">
+                                                            <button class="btn btn-sm btn-plus rounded-circle bg-light border qty-btn" type="button">
                                                                 <i class="bx bx-plus"></i>
                                                             </button>
                                                         </div>
@@ -184,11 +184,15 @@ if ($user_id === null | $user_type != "retailer") {
                                 </div>
                             </div>
                             <div class="d-flex justify-content-between my-5">
-                                <p class="fs-4 fw-bold">Total Price</p>
-                                <span>
-                                    <small>SAR</small>
-                                    <input type="text" class="fs-4 fw-bold border-0 bg-transparent" name="total_price" value="<?= isset($totalPrice) ? (float)$totalPrice : 0.00 ?>" step="0.01" readonly />
-                                </span>
+                                <div class="col-6">
+                                    <p class="fs-4 fw-bold">Total Price</p>
+                                </div>
+                                <div class="col-6">
+                                    <span>
+                                        <small>SAR</small>
+                                        <input type="text" class="fs-4 fw-bold border-0 bg-transparent w-75 w-25" name="totalprice" value="<?= isset($totalPrice) ? (float)$totalPrice : 0.00 ?>" step="0.01" readonly />
+                                    </span>
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <a class="col-12 btn btn-primary <?= isset($_SESSION['cart']) ? "" : "disabled" ?>" data-bs-toggle="modal" href="#checkout" role="button">Proceed To Checkout</a>

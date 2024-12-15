@@ -17,7 +17,7 @@ if (isset($_POST['create'])) {
         $pprice = $_POST['pprice'];
         $pstatus = $_POST['pstatus'];
         $pkeywords = $_POST['pkeywords'];
-        $pquantity = (int)$_POST['pquantity'];
+        $pquantity = (int)$_POST['quantity'];
         $pdescription = $_POST['pdescription'];
         $pimage = "assets/img/" . $pcategory . "/" . $pname . ".png";
 
@@ -44,7 +44,7 @@ if (isset($_POST['save'])) {
         $pprice = floatval($_POST['pprice']); // Convert to float for price
         $pstatus = $_POST['pstatus'];
         $pkeywords = $_POST['pkeywords'];
-        $pquantity = intval($_POST['pquantity']); // Convert to integer
+        $pquantity = intval($_POST['quantity']); // Convert to integer
         $pdescription = $_POST['pdescription'];
 
         // Ensure PID is not null

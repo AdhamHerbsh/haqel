@@ -127,15 +127,15 @@
                                 <div class="mb-3">
                                     <label class="form-label">QUANTITY:</label>
                                     <div class="mb-3">
-                                        <div class="input-group quantity bg-white rounded-pill" style="width: 150px;">
+                                        <div class="input-group w-50 w-md-25 quantity bg-white rounded-pill py-3">
                                             <div class="input-group-btn">
-                                                <button type="button" class="btn btn-sm btn-minus rounded-circle bg-light border">
+                                                <button class="btn btn-sm btn-minus rounded-circle bg-light border qty-btn" type="button">
                                                     <i class="bx bx-minus"></i>
                                                 </button>
                                             </div>
-                                            <input type="text" class="form-control form-control py-1 mx-2 text-center border-0" name="pquantity" value="<?= $pquantity?>" min="1" required>
+                                            <input id="qty-input" type="text" class="form-control form-control-sm text-center border-0" name="quantity" value="<?= $pquantity?>" min="1" required>
                                             <div class="input-group-btn">
-                                                <button type="button" class="btn btn-sm btn-plus rounded-circle bg-light border">
+                                                <button class="btn btn-sm btn-plus rounded-circle bg-light border qty-btn" type="button">
                                                     <i class="bx bx-plus"></i>
                                                 </button>
                                             </div>

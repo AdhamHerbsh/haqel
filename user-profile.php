@@ -63,7 +63,6 @@
             );
             $stmt->fetch();
         } else {
-            echo "<script>alert('User profile not found. Redirecting to 404 page.');</script>";
             header("Location: 404.php");
             exit();
         }

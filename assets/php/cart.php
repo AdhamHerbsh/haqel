@@ -58,6 +58,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     // Update the session cart
     $_SESSION['cart'] = [];
+  
+    foreach($cartData as $data) {
+        echo $data['PID'];
+        echo $data['PNAME'];
+        echo $data['PRICE'];
+        echo $data['QUANTITY'];
+    }
+
     foreach ($cartData as $item) {
         $pid = $item['PID'];
         $pname = $item['PNAME'];

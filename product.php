@@ -52,7 +52,7 @@
                             <div class="col-12 col-md-6 position-relative">
                                 <div class="mb-3">
                                     <h1><?= ucfirst($pname) ?></h1>
-                                    <div class="text-white bg-primary-50 px-3 py-1 rounded position-absolute" style="top: 0%; left: 25%;"><span class="text-secondary"><?= ucfirst($pstatus) ?></span></div>
+                                    <div class="px-3 py-1 rounded position-absolute  <?= ($pstatus === 'available') ? "bg-primary-50" : "bg-gray text-white" ?>" style="top: 0%; left: 25%;"><span><?= ucfirst($pstatus) ?></span></div>
                                 </div>
                                 <div class="mb-3">
                                     <p class="text-primary fs-4"> <small class="text-black fs-6">SAR</small> <?= $pprice ?></p>
@@ -116,7 +116,7 @@
                                     <hr>
                                     <div class="mb-3">
                                         <div class="row">
-                                            <p><strong>Category:</strong> <?= $pcategory ?></p>
+                                            <p><strong>Category:</strong> <?= ucfirst($pcategory) ?></p>
                                         </div>
                                         <div class="row">
                                             <p><strong>Keywords:</strong> <?= $pkeywords ?></p>

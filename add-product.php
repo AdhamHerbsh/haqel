@@ -82,6 +82,7 @@
                                     <label for="pname" class="form-label">PRODUCT:</label>
                                     <select class="form-select form-select-lg" name="pname" id="pname" required>
                                         <option disabled selected value>Select Product</option>
+                                        <!-- Fruits -->
                                         <option value="apple">Apple</option>
                                         <option value="mango">Mango</option>
                                         <option value="banana">Banana</option>
@@ -92,6 +93,7 @@
                                         <option value="strawberry">Strawberry</option>
                                         <option value="pomegranate">Pomegranate</option>
                                         <option value="kiwi">Kiwi</option>
+                                        <!-- Vegetables -->
                                         <option value="green-papper">Green Pepper</option>
                                         <option value="cucumber">Cucumber</option>
                                         <option value="onion">Onion</option>
@@ -128,7 +130,7 @@
                                     <label class="form-label">STOCK STATUS:</label>
                                     <div class="my-3">
                                         <div class="form-check form-check-inline"> <input class="form-check-input" type="radio" name="pstatus" id="radio-not-available" value="unvailable" /> <label class="form-check-label" for="radio-not-available">Not Available</label> </div>
-                                        <div class="form-check form-check-inline"> <input class="form-check-input" type="radio" name="pstatus" id="radio-available" value="available"  checked /> <label class="form-check-label" for="radio-available">Available</label> </div>
+                                        <div class="form-check form-check-inline"> <input class="form-check-input" type="radio" name="pstatus" id="radio-available" value="available" checked /> <label class="form-check-label" for="radio-available">Available</label> </div>
                                     </div>
                                 </div>
                             </div>
@@ -137,7 +139,7 @@
                             <div class="col-12 col-md-6">
                                 <div class="mb-3">
                                     <label for="pkeywords" class="form-label">KEYWORDS:</label>
-                                    <input type="text" class="form-control" name="pkeywords" id="pkeywords" placeholder="Write Keywords About Product"/>
+                                    <input type="text" class="form-control" name="pkeywords" id="pkeywords" placeholder="Write Keywords About Product" />
                                     <div id="highlighted-keywords" class="mt-3"></div>
                                 </div>
                             </div>
@@ -145,15 +147,15 @@
                                 <div class="mb-3">
                                     <label class="form-label">QUANTITY:</label>
                                     <div class="mb-3">
-                                        <div class="input-group quantity bg-white rounded-pill" style="width: 150px;">
+                                        <div class="input-group w-50 w-md-25 quantity bg-white rounded-pill py-3">
                                             <div class="input-group-btn">
-                                                <button type="button" class="btn btn-sm btn-minus rounded-circle bg-light border">
+                                                <button class="btn btn-sm btn-minus rounded-circle bg-light border qty-btn" type="button">
                                                     <i class="bx bx-minus"></i>
                                                 </button>
                                             </div>
-                                            <input type="text" class="form-control form-control py-1 mx-2 text-center border-0" name="pquantity" value="1" min="1" required>
+                                            <input id="qty-input" type="text" class="form-control form-control-sm text-center border-0" name="quantity" value="1">
                                             <div class="input-group-btn">
-                                                <button type="button" class="btn btn-sm btn-plus rounded-circle bg-light border">
+                                                <button class="btn btn-sm btn-plus rounded-circle bg-light border qty-btn" type="button">
                                                     <i class="bx bx-plus"></i>
                                                 </button>
                                             </div>
@@ -198,13 +200,13 @@
                                             </div>
                                             <div class="p-4">
                                                 <p><?= $product['PNAME'] ?></p>
-                                                <div class="d-md-flex justify-content-between flex-lg-wrap">
-                                                    <div class="details">
+                                                <div class="row">
+                                                    <div class="col-6">
                                                         <p class="text-dark fs-5 fw-bold"><small>SAR</small> <?= $product['PPRICE'] ?></p>
                                                         <p class="mb-0"><?= $product['PCATEGORY'] ?></p>
                                                         <p class="mb-0"><?= $product['PSTATUS'] ?></p>
                                                     </div>
-                                                    <div class="d-md-flex justify-content-space align-items-center product-btn">
+                                                    <div class="col-6 d-flex justify-content-end align-items-center product-btn">
                                                         <a href="update-product.php?pid=<?= $product['PID'] ?>" class="btn btn-secondary rounded-circle"><i class="bx bx-edit bx-sm"></i></a>
                                                         <div class="mx-2"></div>
                                                         <a href="assets/php/product.php?pid=<?= $product['PID'] ?>&action=delete" class="btn btn-danger rounded-circle"><i class="bx bx-trash bx-sm"></i></a>

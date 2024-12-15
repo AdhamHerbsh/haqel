@@ -19,17 +19,17 @@
                             <div class="col-6 text-center">
                                 <h5 class="text-primary">About</h5>
                                 <ul class="list-unstyled">
-                                    <li><a href="">Home</a></li>
-                                    <li><a href="">About us</a></li>
-                                    <li><a href="">Contact us</a></li>
+                                    <li><a href="home.php">Home</a></li>
+                                    <li><a href="index.php#about">About us</a></li>
+                                    <li><a href="index.php#contact">Contact us</a></li>
                                 </ul>
                             </div>
                             <div class="col-6 text-center">
                                 <h5 class="text-primary">Customer Support</h5>
                                 <ul class="list-unstyled">
-                                    <li><a href="">Shipping</a></li>
-                                    <li><a href="">Product</a></li>
-                                    <li><a href="">Orders</a></li>
+                                    <li><a href="home.php">Shipping</a></li>
+                                    <li><a href="home.php">Predictive</a></li>
+                                    <li><a href="home.php">Orders</a></li>
                                 </ul>
                             </div>
                             </div>
@@ -39,10 +39,10 @@
                         <div class="container">
                             <!-- Horizontal under breakpoint -->
                             <ul class="list-unstyled d-flex social-list">
-                                <li class="me-2"><a class="btn btn-primary rounded-circle" href=""><i class="bx bxl-instagram text-white bx-sm"></i></a></li>
-                                <li class="me-2"><a class="btn btn-primary rounded-circle" href=""><i class="bx bxl-twitter text-white bx-sm"></i></a></li>
-                                <li class="me-2"><a class="btn btn-primary rounded-circle" href=""><i class="bx bxl-pinterest text-white bx-sm"></i></a></li>
-                                <li class="me-2"><a class="btn btn-primary rounded-circle" href=""><i class="bx bxl-facebook text-white bx-sm"></i></a></li>
+                                <li class="me-2"><a class="btn btn-primary rounded-circle" href="#"><i class="bx bxl-instagram text-white bx-sm"></i></a></li>
+                                <li class="me-2"><a class="btn btn-primary rounded-circle" href="#"><i class="bx bxl-twitter text-white bx-sm"></i></a></li>
+                                <li class="me-2"><a class="btn btn-primary rounded-circle" href="#"><i class="bx bxl-pinterest text-white bx-sm"></i></a></li>
+                                <li class="me-2"><a class="btn btn-primary rounded-circle" href="#"><i class="bx bxl-facebook text-white bx-sm"></i></a></li>
                             </ul>
                         </div>
                     </div>

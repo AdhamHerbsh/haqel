@@ -1,6 +1,8 @@
 (function ($) {
   "use strict";
 
+  AOS.init();
+
   // Spinner
   var spinner = function () {
     setTimeout(function () {
@@ -107,14 +109,9 @@
     },
   });
 
-  // Search Table
-  $("#search").on("keyup change", function () {
-    var value = $(this).val().toLowerCase(); // Get the input value in lowercase
-    $("#usersTable tbody tr, #ordersTable tbody tr").filter(function () {
-      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-    });
-  });
 
+
+  
   // Four objects of interest: drop zones, input elements, gallery elements, and the files.
   // dataRefs = {files: [image files], input: element ref, gallery: element ref}
 
@@ -321,6 +318,7 @@
       },
     });
   });
+  
   // When any checkbox (other than "One Time") is clicked
   $(".days-select input.form-check-input:not(#one-time)").on("change", function () {
     if ($(this).is(":checked")) {
@@ -348,7 +346,92 @@
     for (let i = 0; i < numberOfStars; i++) {
         $(this).append('<i class="bx bxs-star text-yellow"></i>'); // You can replace this with any star icon
     }
-});
+  });
 
+
+  // Search Table
+  $("#search").on("keyup change", function () {
+    var value = $(this).val().toLowerCase(); // Get the input value in lowercase
+    $("#usersTable tbody tr, #ordersTable tbody tr").filter(function () {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+    });
+  });
+
+  // Chat Functions
+  // Cache jQuery selectors for better performance
+  const form = $("#chat-form");
+  const chatBody = $("#chat-body");
+  const chatInput = $("#chat-input");
+  const sendBtn = $("#send-btn");
+
+  /**
+   * Scroll to the bottom of the chat body.
+   */
+  function scrollToBottom() {
+    chatBody.scrollTop(chatBody[0].scrollHeight);
+  }
+
+  /**
+   * Fetch chat messages from the server at regular intervals.
+   */
+  function fetchMessages() {
+        // Create FormData from the form
+        const formData = new FormData(form[0]);
+
+    $.ajax({
+      url: "assets/php/chat.php", // Replace with your backend endpoint
+      type: "POST",
+      data: { action: "fetch" }, // Example parameter, modify based on your backend
+      success: function (response) {
+        chatBody.html(response); // Replace the chat body content
+        scrollToBottom(); // Ensure it scrolls to the bottom
+      },
+      error: function (xhr, status, error) {
+        console.error("Failed to fetch messages:", error);
+      },
+    });
+  }
+
+  /**
+   * Send a chat message to the server.
+   */
+  function sendMessage() {
+    // Create FormData from the form
+    const formData = new FormData(form[0]);
+
+    // Send the message via AJAX
+    $.ajax({
+      url: "assets/php/chat.php", // Replace with your backend endpoint
+      type: "POST",
+      data: formData,
+      processData: false, // Prevent jQuery from auto-processing FormData
+      contentType: false, // Correctly handle FormData content type
+      success: function (response) {
+        chatInput.val(""); // Clear the input field
+        fetchMessages(); // Refresh the chat after sending
+      },
+      error: function (xhr, status, error) {
+        console.error("Failed to send message:", error);
+        alert("An error occurred while sending the message. Please try again.");
+      },
+    });
+  }
+
+  // Prevent the form from refreshing the page
+  form.on("submit", function (e) {
+    e.preventDefault();
+    sendMessage();
+  });
+
+  // Enable/disable send button based on input content
+  chatInput.on("input", function () {
+    sendBtn.prop("disabled", !$(this).val().trim());
+  });
+
+  // Fetch messages at regular intervals
+  setInterval(fetchMessages, 3000); // Fetch every 3 seconds
+
+  // Scroll to the bottom when the page loads
+  scrollToBottom();
 
 })(jQuery);

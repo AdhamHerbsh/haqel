@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $comm_file = $old_file_name; // Default to the old file if no new file is uploaded
     if (isset($_FILES['comm_file']) && $_FILES['comm_file']['error'] == UPLOAD_ERR_OK) {
         $upload_dir = ($user_type == "retailer") ? "../files/accounts/retailers/" : "../files/accounts/wholesalers/";
-        
+
         // Generate new file name
         $new_file_name = $bname . "-" . time() . "_" . basename($_FILES['comm_file']['name']);
         $target_file = $upload_dir . $new_file_name;
@@ -70,19 +70,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($check_account_stmt->num_rows > 0) {
             // Update account details
+            // Update account details
             $update_account_stmt = $conn->prepare("
                 UPDATE account 
-                `BUSINESS_NAME`, `BUSINESS_EMAIL`, `BUSINESS_TYPE`, `COVERAGE_AREAS`, `BUSINESS_SEGMENT`, `COMMERCIAL_REGISTER_FILE`, `USER_ID`
-                SET BUSINESS_NAME = ?, BUSINESS_EMAIL = ?, BUSINESS_TYPE = ?, COVERAGE_AREAS = ?, BUSINESS_SEGMENT = ?, COMMERCIAL_REGISTER_FILE = ?
+                SET BUSINESS_NAME = ?, BUSINESS_EMAIL = ?, BUSINESS_TYPE = ?, COVERAGE_AREAS = ?, BUSINESS_SEGMENT = ?, COMMERCIAL_REGISTER_FILE = ? 
                 WHERE user_id = ?
             ");
             $update_account_stmt->bind_param("ssssssi", $bname, $bemail, $btype, $cov_area, $business_segment, $comm_file, $user_id);
             $update_account_stmt->execute();
             $update_account_stmt->close();
+            
         } else {
             // Insert new account details
             $insert_account_stmt = $conn->prepare("
-                INSERT INTO account (business_name, BUSINESS_EMAIL, BUSINESS_TYPE, COVERAGE_AREAS, BUSINESS_SEGMENT, COMMERCIAL_REGISTER_FILE, USER_ID) 
+                INSERT INTO account (BUSINESS_NAME, BUSINESS_EMAIL, BUSINESS_TYPE, COVERAGE_AREAS, BUSINESS_SEGMENT, COMMERCIAL_REGISTER_FILE, USER_ID) 
                 VALUES (?, ?, ?, ?, ?, ?, ?)
             ");
             $insert_account_stmt->bind_param("ssssssi", $bname, $bemail, $btype, $cov_area, $business_segment, $comm_file, $user_id);

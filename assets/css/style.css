@@ -72,6 +72,31 @@
   font-weight: 500;
   font-style: normal;
 }
+/* ScrollBar Start */
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 20px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: var(--bs-gray);
+  border-radius: 20px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--bs-primary-50);
+  border-radius: 20px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bs-primary);
+  border-radius: 20px;
+}
+/* ScrollBar End */
 
 /*** Spinner Start ***/
 #spinner {

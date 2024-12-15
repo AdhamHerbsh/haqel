@@ -87,7 +87,7 @@
                                     <div class="mb-3">
                                         <label class="form-label">QUANTITY:</label>
                                         <div class="mb-3">
-                                            <div class="input-group quantity bg-white rounded-pill py-3" style="width: 100px;">
+                                            <div class="input-group w-50 w-md-25 quantity bg-white rounded-pill py-3">
                                                 <div class="input-group-btn">
                                                     <button class="btn btn-sm btn-minus rounded-circle bg-light border qty-btn" type="button">
                                                         <i class="bx bx-minus"></i>

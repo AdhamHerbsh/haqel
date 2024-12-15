@@ -25,7 +25,6 @@ if ($user_id === null) {
 
 <main>
 
-    <?php if (isset($_GET['pid'])) { ?>
     <?php
     // Group items by food category
     $categories = [
@@ -43,7 +42,7 @@ if ($user_id === null) {
         ],
         'Vegetables' => [
             'Green Pepper',
-            'Parsley',
+            'Peas',
             'Eggplant',
             'Carrot',
             'Cucumber',
@@ -54,69 +53,71 @@ if ($user_id === null) {
             'Cilantro'
         ]
     ];
-
-    // Define price equations
-    $equations = [
-        'Apple' => [-0.0155, 0.0017, 0.0001, 37.8609],
-        'Green Pepper' => [-0.1034, -0.0093, -0.0010, 213.2446],
-        'Parsley' => [-0.0553, -0.0073, -0.0008, 114.0728],
-        'Watermelon' => [-0.0565, 0.0014, 0.0043, 117.4567],
-        'Eggplant' => [0.1305, 0.0171, 0.0022, -259.7177],
-        'Pomegranate' => [-0.1766, -0.0153, 0.0054, 365.2753],
-        'Carrot' => [-0.1648, -0.0162, 0.0050, 336.6688],
-        'Strawberry' => [-0.0220, 0.0026, 0.0019, 52.3071],
-        'Cucumber' => [-0.0868, -0.0087, 0.0032, 179.4543],
-        'Green Chili' => [-0.1269, -0.0099, -0.0013, 261.4601],
-        'Cilantro' => [0.0853, 0.0038, 0.0028, -169.5646],
-        'Banana' => [0.0626, 0.0025, -0.0054, -121.7326],
-        'Tomato' => [0.0247, 0.0067, 0.0010, -44.7497],
-        'Pear' => [0.0188, -0.0028, -0.0083, -31.2665],
-        'Grape' => [-0.0322, -0.0066, -0.0025, 71.8295],
-        'Mango' => [-0.0404, 0.0040, -0.0003, 88.9800],
-        'Potato' => [-0.0968, -0.0086, -0.0034, 199.5570],
-        'Onion' => [0.0818, 0.0060, -0.0058, -161.7872],
-        'Orange' => [0.1314, 0.0083, 0.0033, -259.4723],
-        'Kiwi' => [0.0797, 0.0012, -0.0048, -152.1228]
-    ];
-
-    // Get product ID from URL
-    $productID = $_GET['pid'] ?? '';
-
-    // Validate product ID
-    if (!array_key_exists($productID, $equations)) {
-        die("Invalid Product ID.");
-    }
-
-    // Define function to calculate price
-    function calculatePrice($coefficients, $year, $month, $day)
-    {
-        [$a, $b, $c, $d] = $coefficients;
-        return ($a * $year) + ($b * $month) + ($c * $day) + $d;
-    }
-
-    // Generate table for the next 10 days
-    $today = new DateTime();
-    $priceTable = [];
-
-    for ($i = 0; $i < 10; $i++) {
-        $date = clone $today;
-        $date->modify("+$i days");
-        $year = (int) $date->format('Y');
-        $month = (int) $date->format('m');
-        $day = (int) $date->format('d');
-
-        $price = calculatePrice($equations[$productID], $year, $month, $day);
-        $percentageChange = $i === 0 ? 0 : (($price - $priceTable[$i - 1]['Price']) / $priceTable[$i - 1]['Price']) * 100;
-
-        $priceTable[] = [
-            'Date' => $date->format('Y-m-d'),
-            'Price' => number_format($price, 2),
-            'Percentage' => number_format($percentageChange, 2) . '%'
-        ];
-    }
-
-    // Display the table
     ?>
+    <?php if (isset($_GET['pid'])) { ?>
+        <?php
+        // Define price equations
+        $equations = [
+            'Apple' => [-0.0155, 0.0017, 0.0001, 37.8609],
+            'Green Pepper' => [-0.1034, -0.0093, -0.0010, 213.2446],
+            'Peas' => [-0.0553, -0.0073, -0.0008, 114.0728],
+            'Watermelon' => [-0.0565, 0.0014, 0.0043, 117.4567],
+            'Eggplant' => [0.1305, 0.0171, 0.0022, -259.7177],
+            'Pomegranate' => [-0.1766, -0.0153, 0.0054, 365.2753],
+            'Carrot' => [-0.1648, -0.0162, 0.0050, 336.6688],
+            'Strawberry' => [-0.0220, 0.0026, 0.0019, 52.3071],
+            'Cucumber' => [-0.0868, -0.0087, 0.0032, 179.4543],
+            'Green Chili' => [-0.1269, -0.0099, -0.0013, 261.4601],
+            'Cilantro' => [0.0853, 0.0038, 0.0028, -169.5646],
+            'Banana' => [0.0626, 0.0025, -0.0054, -121.7326],
+            'Tomato' => [0.0247, 0.0067, 0.0010, -44.7497],
+            'Pear' => [0.0188, -0.0028, -0.0083, -31.2665],
+            'Grape' => [-0.0322, -0.0066, -0.0025, 71.8295],
+            'Mango' => [-0.0404, 0.0040, -0.0003, 88.9800],
+            'Potato' => [-0.0968, -0.0086, -0.0034, 199.5570],
+            'Onion' => [0.0818, 0.0060, -0.0058, -161.7872],
+            'Orange' => [0.1314, 0.0083, 0.0033, -259.4723],
+            'Kiwi' => [0.0797, 0.0012, -0.0048, -152.1228]
+        ];
+
+        // Get product ID from URL
+        $productID = $_GET['pid'] ?? '';
+
+        // Validate product ID
+        if (!array_key_exists($productID, $equations)) {
+            die("Invalid Product ID.");
+        }
+
+        // Define function to calculate price
+        function calculatePrice($coefficients, $year, $month, $day)
+        {
+            [$a, $b, $c, $d] = $coefficients;
+            return ($a * $year) + ($b * $month) + ($c * $day) + $d;
+        }
+
+        // Generate table for the next 10 days
+        $today = new DateTime();
+        $priceTable = [];
+
+        for ($i = 0; $i < 10; $i++) {
+            $date = clone $today;
+            $date->modify("+$i days");
+            $year = (int) $date->format('Y');
+            $month = (int) $date->format('m');
+            $day = (int) $date->format('d');
+
+            $price = calculatePrice($equations[$productID], $year, $month, $day);
+            $percentageChange = $i === 0 ? 0 : (($price - $priceTable[$i - 1]['Price']) / $priceTable[$i - 1]['Price']) * 100;
+
+            $priceTable[] = [
+                'Date' => $date->format('Y-m-d'),
+                'Price' => number_format($price, 2),
+                'Percentage' => number_format($percentageChange, 2) . '%'
+            ];
+        }
+
+        // Display the table
+        ?>
         <!--    Predictive Section Start     -->
         <section id="predictive" class="predictive">
             <div class="container-fluid">
@@ -145,7 +146,7 @@ if ($user_id === null) {
                                     <tr>
                                         <td><?= $i += 1; ?></td>
                                         <td><?= $row['Date'] ?></td>
-                                        <td><small>SAR</small> <?= $row['Price'] ?></td>
+                                        <td><?= $row['Price'] ?> <small>SAR</small></td>
                                         <td><?= $row['Percentage'] ?></td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -165,109 +166,55 @@ if ($user_id === null) {
                         <h1>Predictive Price</h1>
                         <h3 class="text-muted">Know More About Predictive Pricing Products</h3>
                     </div>
-                    <?php
-                    // Prepare SQL to fetch user and account data
-                    $stmt = $conn->prepare("SELECT * FROM products WHERE PCATEGORY = 'vegetables'");
-
-                    // Bind user_id as an integer
-                    $stmt->execute();
-
-                    // Fetch data as an associative array
-                    $result = $stmt->get_result();
-                    $vegetables = $result->fetch_all(MYSQLI_ASSOC);
-
-                    ?>
                     <div class="vegetables">
                         <h2>Vegetables</h2>
                         <div class="row g-4">
-                            <?php if ($result->num_rows > 0) { ?>
-                                <?php foreach ($vegetables as $vegetable) : ?>
-                                    <div class="col-12 col-md-4 p-4">
-                                        <div class="text-center border border-white-50 rounded-2 position-relative product-item">
-                                            <h2><?= ucfirst($vegetable['PNAME']) ?></h2>
-                                            <div class="product-img">
-                                                <img src="<?= $vegetable['PIMAGE'] ?>" class="img-fluid w-100 rounded-top" alt="<?= ucfirst($vegetable['PNAME']) ?>">
-                                            </div>
-                                            <div class="p-4">
-                                                <div class="d-md-flex justify-content-center">
-                                                    <a href="predictive.php?pid=<?= ucfirst($vegetable['PNAME']) ?>" class="btn btn-secondary rounded-pill">More Details</a>
-                                                </div>
+                            <?php foreach ($categories['Vegetables'] as $category) : ?>
+                                <div class="col-12 col-md-4 p-4">
+                                    <div class="text-center border border-white-50 rounded-2 position-relative product-item">
+                                        <h2><?= htmlspecialchars($category) ?></h2>
+                                        <div class="product-img">
+                                            <img src="assets/img/vegetables/<?= strtolower(str_replace(' ', '-', $category)) ?>.png"
+                                                class="img-fluid w-100 rounded-top"
+                                                alt="<?= htmlspecialchars($category) ?>">
+                                        </div>
+                                        <div class="p-4">
+                                            <div class="d-md-flex justify-content-center">
+                                                <a href="predictive.php?pid=<?= urlencode($category) ?>"
+                                                    class="btn btn-secondary rounded-pill">More Details</a>
                                             </div>
                                         </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            <?php } else { ?>
-                                <!--    Alter Warning Start  -->
-                                <div class="container py-5">
-                                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                                        <div class="d-flex flex-column align-items-center">
-                                            <i class="bx bx-data bx-lg"></i>
-                                            <p><strong>No Data Found Enter At Late Time</strong></p>
-                                            <a class="mb-3 btn btn-primary" href="special-order.php">Special Order</a>
-                                        </div>
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                     </div>
                                 </div>
-                                <!--    Alter Warning End   -->
-
-                            <?php } ?>
+                            <?php endforeach; ?>
                         </div>
                     </div>
-                    <?php
-                    // Prepare SQL to fetch user and account data
-                    $stmt = $conn->prepare("SELECT * FROM products WHERE PCATEGORY = 'fruits'");
-
-                    // Bind user_id as an integer
-                    $stmt->execute();
-
-                    // Fetch data as an associative array
-                    $result = $stmt->get_result();
-                    $fruits = $result->fetch_all(MYSQLI_ASSOC);
-                    ?>
                     <div class="fruits">
                         <h2>Fruits</h2>
                         <div class="row g-4">
-                            <?php if ($result->num_rows > 0) { ?>
-                                <?php foreach ($fruits as $fruit) : ?>
-                                    <div class="col-12 col-md-4 p-4">
-                                        <div class="text-center border border-white-50 rounded-2 position-relative product-item">
-                                            <h2><?= ucfirst($fruit['PNAME']) ?></h2>
-                                            <div class="product-img">
-                                                <img src="<?= $fruit['PIMAGE'] ?>" class="img-fluid w-100 rounded-top" alt="<?= ucfirst($fruit['PNAME']) ?>">
-                                            </div>
-                                            <div class="p-4">
-                                                <div class="d-md-flex justify-content-center">
-                                                    <a href="predictive.php?pid=<?= ucfirst($fruit['PNAME']) ?>" class="btn btn-secondary rounded-pill">More Details</a>
-                                                </div>
+                            <?php foreach ($categories['Fruits'] as $category) : ?>
+                                <div class="col-12 col-md-4 p-4">
+                                    <div class="text-center border border-white-50 rounded-2 position-relative product-item">
+                                        <h2><?= htmlspecialchars($category) ?></h2>
+                                        <div class="product-img">
+                                            <img src="assets/img/fruits/<?= strtolower(str_replace(' ', '-', $category)) ?>.png"
+                                                class="img-fluid w-100 rounded-top"
+                                                alt="<?= htmlspecialchars($category) ?>">
+                                        </div>
+                                        <div class="p-4">
+                                            <div class="d-md-flex justify-content-center">
+                                                <a href="predictive.php?pid=<?= urlencode($category) ?>"
+                                                    class="btn btn-secondary rounded-pill">More Details</a>
                                             </div>
                                         </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            <?php } else { ?>
-                                <!--    Alter Warning Start  -->
-                                <div class="container py-5">
-                                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                                        <div class="d-flex flex-column align-items-center">
-                                            <i class="bx bx-data bx-lg"></i>
-                                            <p><strong>No Data Found Enter At Late Time</strong></p>
-                                            <a class="mb-3 btn btn-primary" href="special-order.php">Special Order</a>
-                                        </div>
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                     </div>
                                 </div>
-                                <!--    Alter Warning End   -->
-
-                            <?php } ?>
+                            <?php endforeach; ?>
                         </div>
                     </div>
                 </div>
         </section>
         <!--    Predictive Products End     -->
-        <?php
-        // Close the statement and connection
-        $stmt->close();
-        $conn->close();
-        ?>
     <?php } ?>
 
 
