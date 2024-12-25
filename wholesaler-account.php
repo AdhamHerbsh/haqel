@@ -31,18 +31,14 @@
                                         <label class="form-check-label" for="radio-farm">Farm</label>
                                     </div>
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="btype" id="radio-provider" value="provider" />
+                                        <input class="form-check-input" type="radio" name="btype" id="radio-provider" value="provider" checked/>
                                         <label class="form-check-label" for="radio-provider">Provider</label>
                                     </div>
                                 </div>
                             </div>
-                            <div class="mb-3">
-                                <label for="cov_area" class="form-label">COVERAGE AREAS:</label>
-                                <input type="text" class="form-control" name="cov_area" id="cov_area" placeholder="Enter Coverage Areas" />
-                            </div>
-                            <div class="mb-3">
+                            <div id="comm_field" class="mb-3">
                                 <label for="comm_file" class="form-label">UPLOAD COMMERCIAL REGISTER FILE:</label>
-                                <input type="file" class="form-control" name="comm_file" id="comm_file" placeholder="No File Chosen" />
+                                <input type="file" class="form-control" name="comm_file" id="comm_file" placeholder="No File Chosen"/>
                             </div>
                         </div>
 

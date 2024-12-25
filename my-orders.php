@@ -18,11 +18,13 @@ if ($user_id === null | $user_type != "retailer") {
     exit();
 }
 
+$status_closed = 'closed';
+
 // Prepare SQL to fetch orders data
-$stmt = $conn->prepare("SELECT * FROM `orders` WHERE USER_ID = ?");
+$stmt = $conn->prepare("SELECT * FROM `orders` WHERE USER_ID = ? AND OSTATUS NOT LIKE ?");
 
 // Bind user_id as an integer
-$stmt->bind_param('i', $user_id);
+$stmt->bind_param('is', $user_id, $status_closed);
 
 $stmt->execute();
 
@@ -32,9 +34,9 @@ $orders = $result->fetch_all(MYSQLI_ASSOC);
 
 // Prepare SQL to fetch special orders data
 $stmt = $conn->prepare("SELECT * FROM `special_orders` WHERE USER_ID = ? AND SOSTATUS NOT LIKE ? ");
-$x = 'closed';
+
 // Bind user_id as an integer
-$stmt->bind_param('is', $user_id, $x);
+$stmt->bind_param('is', $user_id, $status_closed);
 
 $stmt->execute();
 
@@ -80,7 +82,7 @@ $special_orders = $result->fetch_all(MYSQLI_ASSOC);
                         <!-- Welcome Message End -->
                     <?php } ?>
                 </div>
-                <div class="table-responsive">
+                <div class="table-responsive overflow-md-hidden mb-3">
                     <table class="table table-hover" id="ordersTable">
                         <thead>
                             <tr>
@@ -101,7 +103,6 @@ $special_orders = $result->fetch_all(MYSQLI_ASSOC);
                                 <th scope="col">Order Date</th>
                                 <th scope="col">Order Days</th>
                                 <th scope="col">Status</th>
-                                <th scope="col">###</th>
                                 <th scope="col">######</th>
                             </tr>
                         </thead>
@@ -115,56 +116,9 @@ $special_orders = $result->fetch_all(MYSQLI_ASSOC);
                                     <td><?= htmlspecialchars($order['ODAYS']); ?></td>
                                     <td><?= htmlspecialchars($order['OSTATUS']); ?></td>
                                     <td>
-                                        <a data-bs-toggle="collapse" href="#<?= $order['ONUMBER'] ?>" role="button" aria-expanded="false" aria-controls="<?= $order['ONUMBER'] ?>">
-                                            <i class="bx bx-chevron-down-circle"></i>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <?php if($order['OSTATUS'] !== 'closed'){ ?>
+                                        <?php if ($order['OSTATUS'] !== 'closed') { ?>
                                             <a class="btn btn-secondary" href="order.php?oid=<?= $order['OID'] ?>">Details <i class="bx bx-right-arrow-alt"></i></a>
                                         <?php } ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="8" class="m-0 p-0 border-0">
-                                        <div class="collapse" id="<?= $order['ONUMBER'] ?>">
-                                            <div class="p-3">
-                                                <table class="table table-striped table-hover w-100">
-                                                    <thead>
-                                                        <tr>
-                                                            <th scope="col">Product Name</th>
-                                                            <th scope="col">Product Category</th>
-                                                            <th scope="col">Product Price</th>
-                                                            <th scope="col">Product Quantity</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <?php
-                                                        $stmt = $conn->prepare("SELECT * FROM `order_items` WHERE OIOID = ?");
-                                                        $stmt->bind_param('i', $order['OID']);
-                                                        $stmt->execute();
-                                                        $result = $stmt->get_result();
-                                                        $order_items = $result->fetch_all(MYSQLI_ASSOC);
-
-                                                        foreach ($order_items as $orderitem) :
-                                                            $stmt = $conn->prepare("SELECT PNAME, PCATEGORY FROM `products` WHERE PID = ?");
-                                                            $stmt->bind_param('i', $orderitem['OIPID']);
-                                                            $stmt->execute();
-                                                            $stmt->store_result();
-                                                            $stmt->bind_result($pname, $pcategory);
-                                                            $stmt->fetch();
-                                                        ?>
-                                                            <tr>
-                                                                <td><?= htmlspecialchars($pname); ?></td>
-                                                                <td><?= htmlspecialchars($pcategory); ?></td>
-                                                                <td><?= htmlspecialchars($orderitem['OIQUANTITY']); ?></td>
-                                                                <td><?= htmlspecialchars($orderitem['OIPRICE']); ?></td>
-                                                            </tr>
-                                                        <?php endforeach; ?>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -178,40 +132,97 @@ $special_orders = $result->fetch_all(MYSQLI_ASSOC);
                                     <td><?= htmlspecialchars($specialorder['SOSCHEDULEOPTION']); ?></td>
                                     <td><?= htmlspecialchars($specialorder['SOSTATUS']); ?></td>
                                     <td>
-                                        <a data-bs-toggle="collapse" href="#<?= $specialorder['SONUMBER'] ?>" role="button" aria-expanded="false" aria-controls="<?= $specialorder['SONUMBER'] ?>">
-                                            <i class="bx bx-chevron-down-circle"></i>
-                                        </a>
-                                    </td>
-                                    <td>
-                                    <?php if($specialorder['SOSTATUS'] !== 'closed'){ ?>
-                                        <a class="btn btn-secondary" href="order.php?soid=<?= $specialorder['SOID'] ?>">Details <i class="bx bx-right-arrow-alt"></i></a>
-                                    <?php } ?>
+                                        <?php if ($specialorder['SOSTATUS'] !== 'closed') { ?>
+                                            <a class="btn btn-secondary" href="order.php?soid=<?= $specialorder['SOID'] ?>">Details <i class="bx bx-right-arrow-alt"></i></a>
+                                        <?php } ?>
                                     </td>
                                 </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <?php
+                // Prepare SQL to fetch orders data
+                $stmt = $conn->prepare("SELECT * FROM `orders` WHERE USER_ID = ? AND OSTATUS LIKE ?");
+
+                // Bind user_id as an integer
+                $stmt->bind_param('is', $user_id, $status_closed);
+
+                $stmt->execute();
+
+                // Fetch data as an associative array
+                $result = $stmt->get_result();
+                $old_orders = $result->fetch_all(MYSQLI_ASSOC);
+
+                // Prepare SQL to fetch special orders data
+                $stmt = $conn->prepare("SELECT * FROM `special_orders` WHERE USER_ID = ? AND SOSTATUS LIKE ? ");
+                // Bind user_id as an integer
+                $stmt->bind_param('is', $user_id, $status_closed);
+
+                $stmt->execute();
+
+                // Fetch data as an associative array
+                $result = $stmt->get_result();
+                $old_special_orders = $result->fetch_all(MYSQLI_ASSOC);
+
+                ?>
+
+
+                <!--    Old Orders Title Start    -->
+                <div class="mb-3">
+                    <h2>Old Orders History</h2>
+                </div>
+                <!--    Old Orders Title End    -->
+                <div class="table-responsive overflow-md-hidden">
+                    <table class="table table-hover" id="ordersTable">
+                        <thead>
+                            <tr>
+                                <div class="row text-black-50 border-bottom border-1">
+                                    <div class="col-1 text-center align-content-center">
+                                        <i class="bx bx-search-alt bx-md"></i>
+                                    </div>
+                                    <div class="col-11 form-floating">
+                                        <input type="text" class="form-control border-0 text-black" name="search" id="search" placeholder="">
+                                        <label for="search">Search</label>
+                                    </div>
+                                </div>
+                            </tr>
+                            <tr>
+                                <th scope="col">Order Number</th>
+                                <th scope="col">Order Type</th>
+                                <th scope="col">Order Total Price</th>
+                                <th scope="col">Order Date</th>
+                                <th scope="col">Order Days</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">######</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($old_orders as $old_order) : ?>
                                 <tr>
-                                    <td colspan="8" class="m-0 p-0 border-0">
-                                        <div class="collapse" id="<?= $specialorder['SONUMBER'] ?>">
-                                            <div class="p-3">
-                                                <table class="table table-striped table-hover w-100">
-                                                    <thead>
-                                                        <tr>
-                                                            <th scope="col">Product Name</th>
-                                                            <th scope="col">Product Category</th>
-                                                            <th scope="col">Product Price</th>
-                                                            <th scope="col">Product Quantity</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td><?= htmlspecialchars($specialorder['PNAME']); ?></td>
-                                                            <td><?= htmlspecialchars($specialorder['PCATEGORY']); ?></td>
-                                                            <td><?= htmlspecialchars($specialorder['PPRICE']); ?></td>
-                                                            <td><?= htmlspecialchars($specialorder['SOQUANTITY']); ?></td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
+                                    <td><?= htmlspecialchars($old_order['ONUMBER']); ?></td>
+                                    <td><?= htmlspecialchars($old_order['OTYPE']); ?></td>
+                                    <td><?= htmlspecialchars($old_order['OTOTALPRICE']); ?></td>
+                                    <td><?= htmlspecialchars($old_order['ODATE']); ?></td>
+                                    <td><?= htmlspecialchars($old_order['ODAYS']); ?></td>
+                                    <td><?= htmlspecialchars($old_order['OSTATUS']); ?></td>
+                                    <td>
+                                        <a class="btn btn-secondary" href="order.php?oid=<?= $old_order['OID'] ?>">Details <i class="bx bx-right-arrow-alt"></i></a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+
+                            <?php foreach ($old_special_orders as $old_specialorder) : ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($old_specialorder['SONUMBER']); ?></td>
+                                    <td><?= htmlspecialchars($old_specialorder['SOTYPE']); ?></td>
+                                    <td><?= htmlspecialchars($old_specialorder['SOTOTALPRICE']); ?></td>
+                                    <td><?= htmlspecialchars($old_specialorder['SORECEIVEDDATE']); ?></td>
+                                    <td><?= htmlspecialchars($old_specialorder['SOSCHEDULEOPTION']); ?></td>
+                                    <td><?= htmlspecialchars($old_specialorder['SOSTATUS']); ?></td>
+                                    <td>
+                                        <a class="btn btn-secondary" href="order.php?soid=<?= $old_specialorder['SOID'] ?>">Details <i class="bx bx-right-arrow-alt"></i></a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

@@ -6,7 +6,9 @@
 
     <!--    Include Navbar File     -->
     <?php include('assets/inc/nav.php') ?>
-    <?php
+
+
+<?php
     // Get UserID from session
     $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
@@ -310,12 +312,7 @@
                                 <ul class="nav nav-pills text-center mb-5">
                                     <div class="btn-group">
                                         <li class="nav-item">
-                                            <a class="d-flex py-2 px-2 fw-bold bg-light active" data-bs-toggle="pill" href="#requests-tab">
-                                                <span class="text-dark">Requests Area</span>
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="d-flex py-2 px-2 fw-bold bg-light" data-bs-toggle="pill" href="#shipping-tab">
+                                            <a class="d-flex py-2 px-2 fw-bold bg-light active" data-bs-toggle="pill" href="#shipping-tab">
                                                 <span class="text-dark">Shipping Stage</span>
                                             </a>
                                         </li>
@@ -335,136 +332,13 @@
                         </div>
 
                         <div class="tab-content">
-                            <div id="requests-tab" class="tab-pane fade show p-0 active">
+                            <div id="shipping-tab" class="tab-pane fade show p-0 active">
                                 <div class="row g-4">
                                     <div class="col-lg-12">
                                         <div class="row g-4" style="min-height: 800px; max-height:1400px; overflow-y: auto;">
                                             <?php
                                             // Prepare SQL to fetch orders data
-                                            $stmt = $conn->prepare("SELECT * FROM `orders` WHERE OSTATUS = 'unapproved' AND OSTAGE = '' ");
-
-                                            $stmt->execute();
-
-                                            // Fetch data as an associative array
-                                            $result = $stmt->get_result();
-                                            $orders = $result->fetch_all(MYSQLI_ASSOC);
-
-                                            ?>
-                                            <?php if ($result->num_rows > 0) { ?>
-                                                <?php foreach ($orders as $order) : ?>
-                                                    <div class="col-12 col-md-6">
-                                                        <div class="position-relative">
-                                                            <div class="order-number text-center p-2 border border-primary border-1 rounded-2 mb-3">
-                                                                <span><strong>Request Number:</strong> #<?= $order['ONUMBER'] ?></span>
-                                                            </div>
-                                                            <div class="order-details border border-gray border-1 rounded-2 p-3">
-
-                                                                <div class="row m-2">
-                                                                    <div class="col mb-3">
-                                                                        <label class="form-label">NAME:</label>
-                                                                    </div>
-                                                                    <div class="col mb-3">
-                                                                        <label class="form-label">CATEGORY:</label>
-                                                                    </div>
-                                                                    <div class="col mb-3">
-                                                                        <label class="form-label">PRICE:</label>
-                                                                    </div>
-                                                                    <div class="col mb-3">
-                                                                        <label class="form-label">QUANTITY:</label>
-                                                                    </div>
-                                                                </div>
-                                                                <?php
-                                                                $stmt = $conn->prepare("SELECT * FROM `order_items` WHERE OIOID = ?");
-                                                                $stmt->bind_param('i', $order['OID']);
-                                                                $stmt->execute();
-                                                                $result = $stmt->get_result();
-                                                                $order_items = $result->fetch_all(MYSQLI_ASSOC);
-
-                                                                foreach ($order_items as $orderitem) :
-                                                                    $stmt = $conn->prepare("SELECT PNAME, PCATEGORY FROM `products` WHERE PID = ?");
-                                                                    $stmt->bind_param('i', $orderitem['OIPID']);
-                                                                    $stmt->execute();
-                                                                    $stmt->store_result();
-                                                                    $stmt->bind_result($pname, $pcategory);
-                                                                    $stmt->fetch();
-                                                                ?>
-                                                                    <?php foreach ($order_items as $orderitem) ?>
-                                                                    <div class="row border border-warning rounded-pill p-2 m-2">
-                                                                        <div class="col">
-                                                                            <p class="p-0 m-0"><?= $pname ?></p>
-                                                                        </div>
-                                                                        <div class="col">
-                                                                            <p class="p-0 m-0"><?= $pcategory ?></p>
-                                                                        </div>
-                                                                        <div class="col">
-                                                                            <p class="p-0 m-0"><?= $orderitem['OIPRICE'] ?></p>
-                                                                        </div>
-                                                                        <div class="col">
-                                                                            <p class="p-0 m-0"><?= $orderitem['OIQUANTITY'] ?></p>
-                                                                        </div>
-                                                                    </div>
-                                                                <?php endforeach; ?>
-                                                                <div class="row">
-                                                                    <div class="col-12 col-md-4 mb-3">
-                                                                        <label class="form-label">PAYMENT METHOD:</label>
-                                                                        <p><?= $order['OPAYMETHOD'] ?></p>
-                                                                    </div>
-                                                                    <div class="col-12 col-md-4 mb-3">
-                                                                        <label class="form-label">DELIVER OPTION:</label>
-                                                                        <p><?= $order['ODELIVERY'] ?></p>
-
-                                                                    </div>
-                                                                    <div class="col-12 col-md-4 mb-3">
-                                                                        <label class="form-label">DELIVERY SCHEDULE:</label>
-                                                                        <p><?= $order['OSCHEDULE'] ?></p>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-12">
-                                                                    <label class="form-label">DAYS:</label>
-                                                                    <p><?= $order['ODAYS'] ?></p>
-                                                                </div>
-                                                                <div class="col-12">
-                                                                    <label class="form-label">TOTAL PRICE:</label>
-                                                                    <p><?= $order['OTOTALPRICE'] ?></p>
-                                                                </div>
-                                                                <div class="col-12 text-end">
-                                                                    <button class="btn btn-danger fw-blod" type="button">Reject</button>
-                                                                    <form class="d-inline" action="assets/php/request.php" method="POST">
-                                                                        <input type="hidden" name="oid" value="<?= $order['OID'] ?>" />
-                                                                        <button class="btn btn-primary fw-blod" type="submit" name="approve-submit">Approve</button>
-                                                                    </form>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                <?php endforeach; ?>
-                                            <?php } else { ?>
-                                                <!--    Alter Warning Start  -->
-                                                <div class="container py-5">
-                                                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                                                        <div class="d-flex flex-column align-items-center">
-                                                            <i class="bx bx-data bx-lg"></i>
-                                                            <p><strong>No Data Found Enter At Later Time</strong></p>
-                                                            <a class="mb-3 btn btn-primary" href="requests.php">See Requests</a>
-                                                        </div>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                                    </div>
-                                                </div>
-                                                <!--    Alter Warning End   -->
-                                            <?php } ?>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tab-content">
-                            <div id="shipping-tab" class="tab-pane fade show p-0">
-                                <div class="row g-4">
-                                    <div class="col-lg-12">
-                                        <div class="row g-4" style="min-height: 800px; max-height:1400px; overflow-y: auto;">
-                                            <?php
-                                            // Prepare SQL to fetch orders data
-                                            $stmt = $conn->prepare("SELECT * FROM `orders` WHERE OSTATUS = 'approved' AND OSTAGE = 'shipping' ");
+                                            $stmt = $conn->prepare("SELECT * FROM `orders` WHERE OSTAGE = 'shipping'");
 
                                             $stmt->execute();
 
@@ -552,7 +426,6 @@
                                                                 <p><?= $order['OTOTALPRICE'] ?></p>
                                                             </div>
                                                             <div class="col-12 text-end">
-                                                                <button class="btn btn-accent fw-blod" type="button">Issue</button>
                                                                 <form class="d-inline" action="assets/php/request.php" method="POST">
                                                                     <input type="hidden" name="oid" value="<?= $order['OID'] ?>" />
                                                                     <input type="hidden" name="ostage" value="delivery" />
@@ -581,8 +454,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="tab-content">
                             <div id="delivary-tab" class="tab-pane fade show p-0">
                                 <div class="row g-4">
                                     <div class="col-lg-12">
@@ -677,7 +548,6 @@
                                                                 <p><?= $order['OTOTALPRICE'] ?></p>
                                                             </div>
                                                             <div class="col-12 text-end">
-                                                                <button class="btn btn-accent fw-blod" type="button">Issue</button>
                                                                 <form class="d-inline" action="assets/php/request.php" method="POST">
                                                                     <input type="hidden" name="oid" value="<?= $order['OID'] ?>" />
                                                                     <input type="hidden" name="ostage" value="receive" />
@@ -706,8 +576,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="tab-content">
                             <div id="receive-tab" class="tab-pane fade show p-0">
                                 <div class="row g-4">
                                     <div class="col-lg-12">
@@ -802,7 +670,6 @@
                                                                 <p><?= $order['OTOTALPRICE'] ?></p>
                                                             </div>
                                                             <div class="col-12 text-end">
-                                                                <button class="btn btn-accent fw-blod" type="button">Issue</button>
                                                                 <form class="d-inline" action="assets/php/request.php" method="POST">
                                                                     <input type="hidden" name="oid" value="<?= $order['OID'] ?>" />
                                                                     <input type="hidden" name="ostage" value="done" />
@@ -830,7 +697,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -846,8 +713,8 @@
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
                     <div class="d-flex flex-column align-items-center">
                         <i class="bx bx-data bx-lg"></i>
-                        <p><strong>No Data Found Enter At Later Time</strong></p>
-                        <a class="mb-3 btn btn-primary" href="special-order.php">Special Order</a>
+                        <p><strong>No Data Found Go To Login</strong></p>
+                        <a class="mb-3 btn btn-primary" href="login.php">Login</a>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>

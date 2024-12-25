@@ -9,7 +9,7 @@
 <section id="register" class="register">
     <div class="bg-image">
         <div class="row m-0">
-            <div class="col-12 col-md-4 bg-secondary py-4 px-5 vh-100">
+            <div class="col-12 col-md-4 bg-secondary py-4 px-5 vh-100" data-aos="slide-right" data-aos-duration="1000">
                 <div class="mb-3 text-center">
                     <h1 class="text-white">Register</h1>
                 </div>
@@ -50,9 +50,7 @@
                     </div>
                 </form>
                 <div class="text-center">
-                    <h6>
-                        <a class="text-blue text-decoration-underline" href="login.php">I Already Have Account</a>
-                    </h6>
+                        <a class="text-decoration-underline" href="login.php">I Already Have Account</a>
                 </div>
             </div>
             <div class="col-12 col-md-7 align-content-center">

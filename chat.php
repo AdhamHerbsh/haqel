@@ -20,7 +20,7 @@
 
 
     $sender_id = $user_id ?? null;
-    $receiver_id = $_GET['wsid'] ?? $_GET['rtid'];
+    $receiver_id = $_GET['wsid'] ?? $_GET['rtid'] ?? null;
     $soid = $_GET['soid'] ?? null;
     
 
@@ -77,7 +77,7 @@
                     <h3 class="text-muted">Make Deal With Retailers</h3>
                 </div>
                 <div class="container py-5">
-                    <?php if (isset($_GET['wsid']) | isset($_GET['rtid'])) { ?>
+                    <?php if (isset($receiver_id)) { ?>
                         <!--    Chat Region Start -->
                         <div class="row justify-content-center">
                             <div class="col-12 col-md-10">
@@ -93,7 +93,7 @@
                                     </div>
 
                                     <!-- Chat Body -->
-                                    <div id="chat-body" class="border border-gray border-1 border-bottom-0 p-3 rounded-top" style="min-height: 400px; max-height:800px; overflow-y: auto;">
+                                    <div id="chat-body" class="border border-gray border-1 border-bottom-0 p-3 rounded-top" style="min-height: 40vh; max-height: 60vh; overflow-y: auto;">
 
                                     </div>
 

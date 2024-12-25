@@ -27,7 +27,7 @@ $_SESSION['wholesaler'] = $_SESSION['wholesaler'] ?? [];
 
 
 if ($order_id > 0) {
-    $stmt = $conn->prepare("SELECT OID, OSTATUS, OSTAGE, WS_ID FROM orders WHERE OID = ?");
+    $stmt = $conn->prepare("SELECT OID, ONUMBER, OSTATUS, OSTAGE, WS_ID FROM orders WHERE OID = ?");
     $stmt->bind_param('i', $order_id);
 
     if ($stmt->execute()) {
@@ -39,7 +39,7 @@ if ($order_id > 0) {
     }
     $stmt->close();
 } elseif ($special_order_id > 0) {
-    $stmt = $conn->prepare("SELECT SOID, SONUMBER, SOSTATUS, CONTRACT_FILE, WS_ID FROM special_orders WHERE SOID = ?");
+    $stmt = $conn->prepare("SELECT SOID, SONUMBER, SOTYPE, SOSTATUS, PNAME, PCATEGORY, PPRICE, SOQUANTITY, SORECEIVEDDATE, SOSCHEDULEOPTION, SODESCRIPTION, SOTOTALPRICE, SODATE, CONTRACT_FILE, USER_ID, WS_ID FROM special_orders WHERE SOID = ?");
     $stmt->bind_param('i', $special_order_id);
 
     if ($stmt->execute()) {
@@ -50,7 +50,7 @@ if ($order_id > 0) {
 
             $wholesaler_id = (int)$special_order['WS_ID'];
             if ($wholesaler_id > 0) {
-                $stmt_wholesaler = $conn->prepare("SELECT BUSINESS_NAME, COVERAGE_AREAS FROM account WHERE user_id = ?");
+                $stmt_wholesaler = $conn->prepare("SELECT BUSINESS_NAME, BUSINESS_TYPE FROM account WHERE user_id = ?");
                 $stmt_wholesaler->bind_param('i', $wholesaler_id);
 
                 if ($stmt_wholesaler->execute()) {
@@ -64,7 +64,7 @@ if ($order_id > 0) {
                 $stmt = $conn->prepare("SELECT RATE FROM reviews WHERE WS_ID = ?");
                 $stmt->bind_param("s", $wholesaler_id);
                 $stmt->execute();
-                $stmt->store_result();    
+                $stmt->store_result();
                 // Bind the result
                 $stmt->bind_result($rate);
                 $stmt->fetch();
@@ -73,10 +73,9 @@ if ($order_id > 0) {
             }
         }
     }
-    
-    
-    $stmt->close();
 
+
+    $stmt->close();
 }
 
 ?>
@@ -90,6 +89,81 @@ if ($order_id > 0) {
                     <h1>Order Details</h1>
                     <h3 class="text-muted">Apply Offers and Track Order</h3>
                 </div>
+                <?php if ($order_id > 0) { ?>
+                    <!-- Standard Order Start -->
+                    <div class="container mb-3">
+                        <!--    Special Order Title Start    -->
+                        <div class="text-center">
+                            <h2>Standard Order</h2>
+                            <h6>Order ID: <?= $_SESSION['standardOrder'][$order_id]['ONUMBER']; ?></h6>
+                        </div>
+                        <!--    Special Order Title End    -->
+                        <table class="table table-striped table-hover w-100">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Product Name</th>
+                                    <th scope="col">Product Category</th>
+                                    <th scope="col">Product Price</th>
+                                    <th scope="col">Product Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                $stmt = $conn->prepare("SELECT * FROM order_items WHERE OIOID = ?");
+                                $stmt->bind_param('i', $order_id);
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+                                $order_items = $result->fetch_all(MYSQLI_ASSOC);
+
+                                foreach ($order_items as $orderitem) :
+                                    $stmt = $conn->prepare("SELECT PNAME, PCATEGORY FROM products WHERE PID = ?");
+                                    $stmt->bind_param('i', $orderitem['OIPID']);
+                                    $stmt->execute();
+                                    $stmt->store_result();
+                                    $stmt->bind_result($pname, $pcategory);
+                                    $stmt->fetch();
+                                ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars(ucfirst($pname)); ?></td>
+                                        <td><?= htmlspecialchars(ucfirst($pcategory)); ?></td>
+                                        <td><?= htmlspecialchars($orderitem['OIQUANTITY']); ?></td>
+                                        <td><?= htmlspecialchars($orderitem['OIPRICE']); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Standard Order End -->
+                <?php } else { ?>
+                    <!-- Special Order Start -->
+                    <div class="container mb-3">
+                        <!--    Special Order Title Start    -->
+                        <div class="text-center">
+                            <h2>Special Order</h2>
+                            <h6>Special Order ID: <?= $_SESSION['specialOrder'][$special_order_id]['SONUMBER']; ?></h6>
+                        </div>
+                        <!--    Special Order Title End    -->
+                        <table class="table table-striped table-hover w-100">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Product Name</th>
+                                    <th scope="col">Product Category</th>
+                                    <th scope="col">Product Price</th>
+                                    <th scope="col">Product Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><?= htmlspecialchars(ucfirst($_SESSION['specialOrder'][$special_order_id]['PNAME'])); ?></td>
+                                    <td><?= htmlspecialchars(ucfirst($_SESSION['specialOrder'][$special_order_id]['PCATEGORY'])); ?></td>
+                                    <td><?= htmlspecialchars($_SESSION['specialOrder'][$special_order_id]['PPRICE']); ?></td>
+                                    <td><?= htmlspecialchars($_SESSION['specialOrder'][$special_order_id]['SOQUANTITY']); ?></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Special Order End -->
+                <?php } ?>
                 <?php if ($special_order_id > 0) { ?>
                     <div class="card-container">
                         <?php $status = $_SESSION['specialOrder'][$special_order_id]['SOSTATUS'] ?? ''; ?>
@@ -99,8 +173,8 @@ if ($order_id > 0) {
                                     <div class="col-12 col-md-4">
                                         <div class="card-body">
                                             <h4 class="card-title"><?= htmlspecialchars($_SESSION['wholesaler'][$wholesaler_id]['BUSINESS_NAME'] ?? 'Unknown Wholesaler') ?></h4>
-                                            <p><?= htmlspecialchars($_SESSION['wholesaler'][$wholesaler_id]['COVERAGE_AREAS'] ?? 'Unknown Coverage Area') ?></p>
-                                            <div class="d-flex star-rating" data-stars="<?= isset($rate)? $rate : "" ?>"></div>
+                                            <p><?= htmlspecialchars(ucfirst($_SESSION['wholesaler'][$wholesaler_id]['BUSINESS_TYPE'] ?? 'Unknown Business Type')) ?></p>
+                                            <div class="d-flex star-rating" data-stars="<?= isset($rate) ? $rate : "" ?>"></div>
                                         </div>
                                     </div>
                                     <div class="col-12 col-md-8 align-content-center">
@@ -109,7 +183,7 @@ if ($order_id > 0) {
                                             <a class="btn btn-danger m-1" href="">Reject</a>
                                             <form class="d-flex" action="assets/php/request.php" method="POST" enctype="multipart/form-data">
                                                 <input type="hidden" name="soid" value="<?= htmlspecialchars($_SESSION['specialOrder'][$special_order_id]['SOID'] ?? 0) ?>">
-                                                <input type="file" class="form-control" name="contract_file" id="contract_file" placeholder="No File Chosen" required/>
+                                                <input type="file" class="form-control" name="contract_file" id="contract_file" placeholder="No File Chosen" required />
                                                 <span class="mx-2"></span>
                                                 <button class="btn btn-primary m-1" type="submit" name="apply-submit">Apply</button>
                                             </form>
@@ -125,8 +199,8 @@ if ($order_id > 0) {
                                             <h4 class="card-title">
                                                 <p><?= htmlspecialchars($_SESSION['wholesaler'][$wholesaler_id]['BUSINESS_NAME'] ?? 'Unknown Wholersaler') ?></p>
                                             </h4>
-                                            <p><?= htmlspecialchars($_SESSION['wholesaler'][$wholesaler_id]['COVERAGE_AREAS'] ?? 'Unknown Coverage Area') ?></p>
-                                            <div class="d-flex star-rating" data-stars="<?= isset($rate)? $rate : "" ?>"></div>
+                                            <p><?= htmlspecialchars(ucfirst($_SESSION['wholesaler'][$wholesaler_id]['BUSINESS_TYPE'] ?? 'Unknown Business Type')) ?></p>
+                                            <div class="d-flex star-rating" data-stars="<?= isset($rate) ? $rate : "" ?>"></div>
                                         </div>
                                     </div>
                                     <div class="col-4 col-md-2 align-content-center">
@@ -172,7 +246,11 @@ if ($order_id > 0) {
                     <?php $status = $_SESSION['standardOrder'][$order_id]['OSTATUS'] ?? ''; ?>
                     <?php $stage = $_SESSION['standardOrder'][$order_id]['OSTAGE'] ?? ''; ?>
                     <?php if ($status === 'approved') { ?>
-
+                        <!--    Track Order Section  -->
+                        <div class="text-center">
+                            <h2>Track Order</h2>
+                            <h6>See the status of your order</h6>
+                        </div>
                         <!--    Track Order Section  -->
                         <div class="row text-center justify-content-evenly align-items-center">
                             <div class="col-12 col-md-3 position-relative p-5">
@@ -232,7 +310,7 @@ if ($order_id > 0) {
                             </div>
                         </div>
                         <!--    Track Order Section  -->
-                    <?php } else { ?>
+                    <?php } elseif ($status !== 'closed') { ?>
                         <!-- Order Not Found Start -->
                         <!--    Alter Warning Start  -->
                         <div class="container py-5">

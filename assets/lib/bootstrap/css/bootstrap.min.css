@@ -7135,6 +7135,18 @@ fieldset:disabled .btn {
   visibility: hidden !important;
 }
 @media (min-width: 576px) {
+  .overflow-sm-auto {
+    overflow: auto !important;
+  }
+  .overflow-sm-hidden {
+    overflow: hidden !important;
+  }
+  .overflow-sm-visible {
+    overflow: visible !important;
+  }
+  .overflow-sm-scroll {
+    overflow: scroll !important;
+  }
   .w-sm-25 {
     width: 25% !important;
   }
@@ -7770,6 +7782,18 @@ fieldset:disabled .btn {
   }
 }
 @media (min-width: 768px) {
+  .overflow-md-auto {
+    overflow: auto !important;
+  }
+  .overflow-md-hidden {
+    overflow: hidden !important;
+  }
+  .overflow-md-visible {
+    overflow: visible !important;
+  }
+  .overflow-md-scroll {
+    overflow: scroll !important;
+  }
   .w-md-25 {
     width: 25% !important;
   }
@@ -8405,6 +8429,18 @@ fieldset:disabled .btn {
   }
 }
 @media (min-width: 992px) {
+  .overflow-lg-auto {
+    overflow: auto !important;
+  }
+  .overflow-lg-hidden {
+    overflow: hidden !important;
+  }
+  .overflow-lg-visible {
+    overflow: visible !important;
+  }
+  .overflow-lg-scroll {
+    overflow: scroll !important;
+  }
   .w-lg-25 {
     width: 25% !important;
   }
@@ -9040,6 +9076,18 @@ fieldset:disabled .btn {
   }
 }
 @media (min-width: 1200px) {
+  .overflow-xl-auto {
+    overflow: auto !important;
+  }
+  .overflow-xl-hidden {
+    overflow: hidden !important;
+  }
+  .overflow-xl-visible {
+    overflow: visible !important;
+  }
+  .overflow-xl-scroll {
+    overflow: scroll !important;
+  }
   .float-xl-start {
     float: left !important;
   }

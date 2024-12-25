@@ -30,7 +30,6 @@ $stmt = $conn->prepare("
         a.business_name, 
         a.business_email, 
         a.business_type, 
-        a.coverage_areas, 
         a.business_segment, 
         a.commercial_register_file
     FROM 

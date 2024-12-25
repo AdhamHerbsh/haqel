@@ -32,12 +32,9 @@
                 <div class="mb-3 text-center">
                     <button class="col-8 btn btn-primary shadow fw-bold" type="submit" name="login_submit">Login</button>
                 </div>
-
             </form>
             <div class="text-center">
-                <h6>
-                    <a class="text-blue text-decoration-underline" href="register.php">I Don’t Have Account!</a>
-                </h6>
+                <a class="text-decoration-underline" href="register.php">I Don’t Have Account!</a>
             </div>
         </div>
     </section>

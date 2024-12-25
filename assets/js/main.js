@@ -43,75 +43,6 @@
     return false;
   });
 
-  // Testimonial carousel
-  $(".testimonial-carousel").owlCarousel({
-    autoplay: true,
-    smartSpeed: 2000,
-    center: false,
-    dots: true,
-    loop: true,
-    margin: 25,
-    nav: true,
-    navText: [
-      '<i class="bi bi-arrow-left"></i>',
-      '<i class="bi bi-arrow-right"></i>',
-    ],
-    responsiveClass: true,
-    responsive: {
-      0: {
-        items: 1,
-      },
-      576: {
-        items: 1,
-      },
-      768: {
-        items: 1,
-      },
-      992: {
-        items: 2,
-      },
-      1200: {
-        items: 2,
-      },
-    },
-  });
-
-  // vegetable carousel
-  $(".vegetable-carousel").owlCarousel({
-    autoplay: true,
-    smartSpeed: 1500,
-    center: false,
-    dots: true,
-    loop: true,
-    margin: 25,
-    nav: true,
-    navText: [
-      '<i class="bi bi-arrow-left"></i>',
-      '<i class="bi bi-arrow-right"></i>',
-    ],
-    responsiveClass: true,
-    responsive: {
-      0: {
-        items: 1,
-      },
-      576: {
-        items: 1,
-      },
-      768: {
-        items: 2,
-      },
-      992: {
-        items: 3,
-      },
-      1200: {
-        items: 4,
-      },
-    },
-  });
-
-
-
-  
   // Four objects of interest: drop zones, input elements, gallery elements, and the files.
   // dataRefs = {files: [image files], input: element ref, gallery: element ref}
 
@@ -318,36 +249,41 @@
       },
     });
   });
-  
+
   // When any checkbox (other than "One Time") is clicked
-  $(".days-select input.form-check-input:not(#one-time)").on("change", function () {
-    if ($(this).is(":checked")) {
-      $("#one-time").attr("checked", false); // Uncheck "One Time"
+  $(".days-select input.form-check-input:not(#one-time)").on(
+    "change",
+    function () {
+      if ($(this).is(":checked")) {
+        $("#one-time").attr("checked", false); // Uncheck "One Time"
+      }
     }
-  });
+  );
 
   // When the "One Time" checkbox is clicked
   $("#one-time").on("change", function () {
     if ($(this).is(":checked")) {
       // Uncheck all other checkboxes
-      $(".days-select input.form-check-input:not(#one-time)").attr("checked", false);
+      $(".days-select input.form-check-input:not(#one-time)").attr(
+        "checked",
+        false
+      );
     }
   });
 
-  // Stars of Wholesaler Rate 
-  $('.star-rating').each(function () {
+  // Stars of Wholesaler Rate
+  $(".star-rating").each(function () {
     // Get the number of stars from the data-stars attribute
-    const numberOfStars = $(this).data('stars');
-    
+    const numberOfStars = $(this).data("stars");
+
     // Clear the content in case of re-execution
     $(this).empty();
 
     // Loop to add stars
     for (let i = 0; i < numberOfStars; i++) {
-        $(this).append('<i class="bx bxs-star text-yellow"></i>'); // You can replace this with any star icon
+      $(this).append('<i class="bx bxs-star text-yellow"></i>'); // You can replace this with any star icon
     }
   });
-
 
   // Search Table
   $("#search").on("keyup change", function () {
@@ -356,6 +292,14 @@
       $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
     });
   });
+
+  // Toggle visibility based on radio button selection
+  $("input[name='btype']").on("change", function () {
+    const isFarmer = $("#radio-farm").is(":checked");
+    $("#comm_field").toggleClass("d-none", isFarmer);
+  });
+
+
 
   // Chat Functions
   // Cache jQuery selectors for better performance
@@ -368,15 +312,18 @@
    * Scroll to the bottom of the chat body.
    */
   function scrollToBottom() {
-    chatBody.scrollTop(chatBody[0].scrollHeight);
+    if (chatBody && chatBody[0]) {
+      // Check if chatBody exists and is defined
+      chatBody.scrollTop(chatBody[0].scrollHeight);
+    }
   }
 
   /**
    * Fetch chat messages from the server at regular intervals.
    */
   function fetchMessages() {
-        // Create FormData from the form
-        const formData = new FormData(form[0]);
+    // Create FormData from the form
+    const formData = new FormData(form[0]);
 
     $.ajax({
       url: "assets/php/chat.php", // Replace with your backend endpoint
@@ -434,4 +381,64 @@
   // Scroll to the bottom when the page loads
   scrollToBottom();
 
+  // Filter products based on category selection
+  $("#pcategory").on("change", function () {
+    const selectedCategory = $(this).val(); // Get the selected category
+    const $pnameSelect = $("#pname"); // Product dropdown
+    const $optgroups = $pnameSelect.find("optgroup"); // All optgroups
+
+    // Show/hide optgroups based on the selected category
+    $optgroups.each(function () {
+      const $optgroup = $(this);
+      const groupLabel = $optgroup.attr("label");
+
+      // Check if the optgroup matches the selected category
+      if (
+        groupLabel &&
+        groupLabel.toLowerCase() === selectedCategory.toLowerCase()
+      ) {
+        $optgroup.show(); // Show the matching optgroup
+      } else {
+        $optgroup.hide(); // Hide non-matching optgroups
+      }
+    });
+
+    // Reset the product dropdown value and placeholder
+    $pnameSelect.val("").trigger("change");
+  });
+
+  // Initialize Select2 for searchable dropdown
+  $(".searchable-select").select2({
+    width: "100%", // Ensure proper alignment
+  });
+
+  // Initialize Select2 for searchable dropdowns within modals
+  $("body").on("shown.bs.modal", ".modal", function () {
+    const $modal = $(this); // Reference to the current modal
+    $modal.find("select.searchable-select").each(function () {
+      $(this).select2({
+        dropdownParent: $modal, // Ensures the dropdown is correctly contained within the modal
+        placeholder: "Select Product", // Placeholder for Select2
+        allowClear: true, // Allows clearing of selected value
+        width: "100%", // Ensures proper alignment
+      });
+    });
+  });
+
+  // Initially hide the days-select input
+  $(".days-select").hide();
+
+  // Handle the change event on the radio buttons
+  $("input[name='delivery_schedule']").on("change", function () {
+    if ($(this).val() === "week") {
+      $(".days-select").slideDown(); // Show days-select input
+    } else {
+      $(".days-select").slideUp(); // Hide days-select input
+      $(".days-select input[type='checkbox']").prop("checked", false); // Uncheck all checkboxes
+    }
+  });
+
+
+
+  
 })(jQuery);

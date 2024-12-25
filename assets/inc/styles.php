@@ -18,6 +18,7 @@
 
   <!-- Customized Bootstrap Stylesheet -->
   <link href="assets/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/lib/select2/css/select2.min.css" rel="stylesheet">
 
   <!-- Template Stylesheet -->
   <link href="assets/css/style.css" rel="stylesheet">

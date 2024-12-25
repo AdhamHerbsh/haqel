@@ -28,7 +28,6 @@
             a.business_name, 
             a.business_email, 
             a.business_type, 
-            a.coverage_areas, 
             a.business_segment, 
             a.commercial_register_file
         FROM 
@@ -57,7 +56,6 @@
                 $business_name,
                 $business_email,
                 $business_type,
-                $coverage_areas,
                 $business_segment,
                 $commercial_register_file
             );
@@ -135,10 +133,6 @@
                                             <label class="form-check-label" for="radio-provider">Provider</label>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="cov_area" class="form-label">COVERAGE AREAS:</label>
-                                    <input type="text" class="form-control" name="cov_area" id="cov_area" placeholder="Enter Coverage Areas" value="<?= $coverage_areas ?>" />
                                 </div>
                             <?php } elseif (isset($business_email)) { ?>
                                 <div class="col-12 col-md-6 mb-3">

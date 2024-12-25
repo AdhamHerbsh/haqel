@@ -31,12 +31,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['standard-order'])) {
     $order_number = uniqid('ORD'); // Generate a unique order number
     $order_date = date('Y-m-d H:i:s'); // Current date and time
     $order_status = 'unapproved'; // Default status
+    $order_stage = 'shipping'; // Default stage
 
-    $query = "INSERT INTO orders (ONUMBER, OTYPE, ODATE, OSTATUS, OPAYMETHOD, ODELIVERY, OSCHEDULE, ODAYS, OTOTALPRICE, USER_ID)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    $query = "INSERT INTO orders (ONUMBER, OTYPE, ODATE, OSTATUS, OSTAGE, OPAYMETHOD, ODELIVERY, OSCHEDULE, ODAYS, OTOTALPRICE, USER_ID)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
     $stmt = $conn->prepare($query);
-    $stmt->bind_param('ssssssssdi', $order_number, $otype, $order_date, $order_status, $pay_method, $delivery_option, $delivery_schedule, $days, $totalprice, $user_id);
+    $stmt->bind_param('sssssssssdi', $order_number, $otype, $order_date, $order_status, $order_stage, $pay_method, $delivery_option, $delivery_schedule, $days, $totalprice, $user_id);
 
     if (!$stmt->execute()) {
         die("Failed to insert order: " . $stmt->error);

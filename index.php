@@ -16,8 +16,8 @@
                         <br>
                         <span>Organic Food</span>
                     </h1>
-                    <a class="col-12 col-md-4 btn btn-primary py-2 px-3 fw-bold text-white fs-4" href="login.php">
-                        Shop Now
+                    <a class="col-12 col-md-4 btn btn-primary py-2 px-3 fw-bold text-white fs-4" href="register.php">
+                        Sign Up
                         <i class="bx bx-right-arrow-alt bx-sm"></i>
                     </a>
                 </div>

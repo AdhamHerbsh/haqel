@@ -83,7 +83,7 @@
                                 }
                                 ?>
                                 <div class="mb-3">
-                                    <p class="fs-5"><strong>Provider Name:</strong> <?= ucfirst($provider) ?> </p>
+                                    <p class="fs-5"><strong>Business Name:</strong> <?= ucfirst($provider) ?> </p>
                                 </div>
                                 <hr>
                                 <div class="mb-3">

@@ -87,7 +87,7 @@
                                     <div class="mb-3">
                                         <label class="form-label">QUANTITY:</label>
                                         <div class="mb-3">
-                                            <div class="input-group w-50 w-md-25 quantity bg-white rounded-pill py-3">
+                                            <div class="input-group w-50 quantity bg-white rounded-pill py-3">
                                                 <div class="input-group-btn">
                                                     <button class="btn btn-sm btn-minus rounded-circle bg-light border qty-btn" type="button">
                                                         <i class="bx bx-minus"></i>
@@ -131,7 +131,7 @@
                                 </div>
                             </div>
                             <div class="d-flex justify-content-end mb-3">
-                                <button type="reset" name="cancel" id="cancel" class="btn btn-accent"> Cancel </button>
+                                <a href="home.php" type="reset" name="cancel" id="cancel" class="btn btn-accent"> Cancel </a>
                                 <span class="m-2"></span>
                                 <button type="submit" name="special-order" id="create" class="btn btn-primary"> Create </button>
                             </div>

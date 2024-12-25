@@ -11,60 +11,119 @@ $user_id = $_SESSION['user_id'];
 // New Product
 if (isset($_POST['create'])) {
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
-        // Retrieve form data
-        $pname = $_POST['pname'];
-        $pcategory = $_POST['pcategory'];
-        $pprice = $_POST['pprice'];
-        $pstatus = $_POST['pstatus'];
-        $pkeywords = $_POST['pkeywords'];
-        $pquantity = (int)$_POST['quantity'];
-        $pdescription = $_POST['pdescription'];
-        $pimage = "assets/img/" . $pcategory . "/" . $pname . ".png";
+        // Sanitize and validate input data
+        $pcategory = htmlspecialchars(trim($_POST['pcategory']));
+        $pname = htmlspecialchars(trim($_POST['pname']));
+        $pcountry = htmlspecialchars(trim($_POST['pcountry']));
+        $pprice = filter_var($_POST['pprice'], FILTER_VALIDATE_FLOAT);
+        $pkeywords = htmlspecialchars(trim($_POST['pkeywords']));
+        $pquantity = filter_var($_POST['quantity'], FILTER_VALIDATE_INT);
+        $pdescription = htmlspecialchars(trim($_POST['pdescription']));
+        $user_id = filter_var($_SESSION['user_id'], FILTER_VALIDATE_INT); // Assuming user_id is stored in session
 
+        // Validate required fields
+        if (empty($pcategory) || empty($pname) || empty($pcountry) || $pprice === false || $pquantity === false || empty($pdescription)) {
+            header("Location: ../../add-product.php?action=error&message=invalid_input");
+            exit;
+        }
 
-        $stmt = $conn->prepare("INSERT INTO Products (PNAME, PCATEGORY, PPRICE, PSTATUS, PKEYWORDS, PQUANTITY, PDESCRIPTION, PIMAGE, USER_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        // Bind user_id as an integer
-        $stmt->bind_param("ssdssissi", $pname, $pcategory, $pprice, $pstatus, $pkeywords, $pquantity, $pdescription, $pimage, $user_id);
-        $stmt->execute();
+        // Set default image path based on product category and name
+        $pimage = "assets/img/" . strtolower($pcategory) . "/" . strtolower($pname) . ".png";
+
+        // Determine product status based on quantity
+        $pstatus = ($pquantity > 0) ? "available" : "unavailable";
+
+        // Use prepared statements to prevent SQL injection
+        $stmt = $conn->prepare("INSERT INTO Products 
+            (PNAME, PCATEGORY, PCOUNTRY, PPRICE, PSTATUS, PKEYWORDS, PQUANTITY, PDESCRIPTION, PIMAGE, USER_ID) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        if (!$stmt) {
+            header("Location: ../../add-product.php?action=error&message=stmt_error");
+            exit;
+        }
+
+        // Bind parameters
+        $stmt->bind_param(
+            "sssdssissi",
+            $pname,
+            $pcategory,
+            $pcountry,
+            $pprice,
+            $pstatus,
+            $pkeywords,
+            $pquantity,
+            $pdescription,
+            $pimage,
+            $user_id
+        );
+
+        // Execute the query
+        if ($stmt->execute()) {
+            header("Location: ../../add-product.php?action=success");
+        } else {
+            header("Location: ../../add-product.php?action=error&message=query_failed");
+        }
 
         // Close the statement and connection
         $stmt->close();
         $conn->close();
-        header("Location: ../../add-product.php?action=success");
     }
 }
 
 // Edit Product
-if (isset($_POST['save'])) {
-    if ($_SERVER["REQUEST_METHOD"] === "POST") {
-        // Retrieve form data
-        $pid = isset($_POST['pid']) ? intval($_POST['pid']) : null; // Ensure PID is an integer
-        $pname = $_POST['pname'];
-        $pcategory = $_POST['pcategory'];
-        $pprice = floatval($_POST['pprice']); // Convert to float for price
-        $pstatus = $_POST['pstatus'];
-        $pkeywords = $_POST['pkeywords'];
-        $pquantity = intval($_POST['quantity']); // Convert to integer
-        $pdescription = $_POST['pdescription'];
+if (isset($_POST['save']) && $_SERVER["REQUEST_METHOD"] === "POST") {
+    // Sanitize and validate input data
+    $pid = filter_var($_POST['pid'], FILTER_VALIDATE_INT); // Validate PID as an integer
+    $pcategory = htmlspecialchars(trim($_POST['pcategory']));
+    $pname = htmlspecialchars(trim($_POST['pname']));
+    $pcountry = htmlspecialchars(trim($_POST['pcountry']));
+    $pprice = filter_var($_POST['pprice'], FILTER_VALIDATE_FLOAT); // Validate as float
+    $pkeywords = htmlspecialchars(trim($_POST['pkeywords']));
+    $pquantity = filter_var($_POST['quantity'], FILTER_VALIDATE_INT); // Validate as integer
+    $pdescription = htmlspecialchars(trim($_POST['pdescription']));
 
-        // Ensure PID is not null
-        if ($pid !== null) {
-            // Prepare the SQL query
-            $stmt = $conn->prepare("UPDATE products  SET PNAME = ?, PCATEGORY = ?, PPRICE = ?, PSTATUS = ?, PKEYWORDS = ?, PQUANTITY = ?, PDESCRIPTION = ?  WHERE PID = ?");
-
-            // Bind parameters with appropriate types
-            $stmt->bind_param("ssdssisi", $pname, $pcategory, $pprice, $pstatus, $pkeywords, $pquantity, $pdescription, $pid);
-
-            // Execute the statement
-            $stmt->execute();
-            // Close the statement and connection
-            $stmt->close();
-            $conn->close();
-
-            // Optionally, redirect to another page
-            header("Location: ../../add-product.php?action=edited");
-        }
+    // Validate required fields
+    if ($pid === false || empty($pcategory) || empty($pname) || empty($pcountry) || $pprice === false || $pquantity === false || empty($pdescription)) {
+        header("Location: ../../add-product.php?action=error&message=invalid_input");
+        exit;
     }
+
+    // Determine product status based on quantity
+    $pstatus = ($pquantity > 0) ? "available" : "unavailable";
+
+
+    // Prepare the SQL query
+    $stmt = $conn->prepare("UPDATE products SET PNAME = ?, PCATEGORY = ?, PCOUNTRY = ?, PPRICE = ?, PSTATUS = ?, PKEYWORDS = ?, PQUANTITY = ?, PDESCRIPTION = ? WHERE PID = ?");
+
+    if (!$stmt) {
+        header("Location: ../../add-product.php?action=error&message=stmt_error");
+        exit;
+    }
+
+    // Bind parameters with appropriate types
+    $stmt->bind_param(
+        "sssdssisi",
+        $pname,
+        $pcategory,
+        $pcountry,
+        $pprice,
+        $pstatus,
+        $pkeywords,
+        $pquantity,
+        $pdescription,
+        $pid
+    );
+
+    // Execute the statement
+    if ($stmt->execute()) {
+        header("Location: ../../add-product.php?action=edited");
+    } else {
+        header("Location: ../../add-product.php?action=error&message=query_failed");
+    }
+
+    // Close the statement and connection
+    $stmt->close();
+    $conn->close();
 }
 
 

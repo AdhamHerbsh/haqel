@@ -29,7 +29,6 @@
         a.BUSINESS_NAME, 
         a.BUSINESS_EMAIL, 
         a.BUSINESS_TYPE, 
-        a.COVERAGE_AREAS, 
         a.BUSINESS_SEGMENT, 
         a.COMMERCIAL_REGISTER_FILE
     FROM 
@@ -83,7 +82,7 @@
                                                 <h4 class="card-title"><?= htmlspecialchars($user['FNAME'] . " " . $user['LNAME']); ?></h4>
                                             </div>
                                             <div class="mb-3">
-                                                <p class="card-title"><?= htmlspecialchars($user['COVERAGE_AREAS']); ?></p>
+                                                <p class="card-title"><?= htmlspecialchars(ucfirst($user['BUSINESS_TYPE'])); ?></p>
                                             </div>
                                             <div class="mb-3">
                                                 <?php if($rate !== 'Not Reviewed Yet!'){ ?>
@@ -95,7 +94,7 @@
                                             <div class="my-3">
                                                 <div class="d-flex justify-content-evenly">
                                                     <a class="btn btn-accent fs-6 fw-bold" href="users-list.php">More Info</a>
-                                                    <a class="btn btn-primary fs-6 fw-bold" href="chat.php?wsid=<?= $user['ID'] ?>&soid=000">Chat</a>
+                                                    <a class="btn btn-primary fs-6 fw-bold" href="chat.php?wsid=<?= $user['ID'] ?>&soid=<?= $user_id . $user['ID'] ?>">Chat</a>
                                                 </div>
                                             </div>
                                         </div>
