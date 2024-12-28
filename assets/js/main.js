@@ -38,6 +38,8 @@
       $(".back-to-top").fadeOut("slow");
     }
   });
+
+  // Back to top button
   $(".back-to-top").click(function () {
     $("html, body").animate({ scrollTop: 0 }, 1500, "easeInOutExpo");
     return false;
@@ -54,6 +56,7 @@
   const highlight = (event) => event.target.classList.add("highlight");
   const unhighlight = (event) => event.target.classList.remove("highlight");
 
+  // Get the input and gallery elements from the drop zone
   const getInputAndGalleryRefs = (element) => {
     const zone = element.closest(".upload_dropZone") || false;
     const gallery = zone.querySelector(".upload_gallery") || false;
@@ -61,12 +64,14 @@
     return { input: input, gallery: gallery };
   };
 
+  // Handle the dropped files
   const handleDrop = (event) => {
     const dataRefs = getInputAndGalleryRefs(event.target);
     dataRefs.files = event.dataTransfer.files;
     handleFiles(dataRefs);
   };
 
+  // Event handlers for the drop zone
   const eventHandlers = (zone) => {
     const dataRefs = getInputAndGalleryRefs(zone);
     if (!dataRefs.input) return;
@@ -94,15 +99,18 @@
     );
   };
 
+  // Initialize the event handlers for all drop zones
   const dropZones = document.querySelectorAll(".upload_dropZone");
   for (const zone of dropZones) {
     eventHandlers(zone);
   }
 
+  // Check if the file is an image or PDF
   const isImageFile = (file) =>
     ["image/jpeg", "image/png", "image/svg+xml"].includes(file.type);
   const isPdfFile = (file) => file.type === "application/pdf";
 
+  // Preview the uploaded files
   function previewFiles(dataRefs) {
     if (!dataRefs.gallery) return;
 
@@ -132,6 +140,7 @@
     }
   }
 
+  // Handle the dropped files
   const handleFiles = (dataRefs) => {
     let files = [...dataRefs.files];
 
@@ -176,6 +185,8 @@
     });
   });
 
+  // jQuery function to handle the "Add to Cart" button
+  // Quantity buttons are also handled here
   $(".qty-btn").on("click", function () {
     // Get the closest parent element containing the inputs (specific to this row)
     const parentRow = $(this).closest(".quantity");
@@ -210,12 +221,15 @@
 
     // Collect product data from the table
     const cartData = [];
+
     $("table tbody tr").each(function () {
       const row = $(this);
       const pid = row.find("input[name='pid']").val();
       const pname = row.find("input[name='pname']").val();
       const price = row.find("input[name='pprice']").val();
       const pimage = row.find("input[name='pimage']").val();
+      const puser_id = row.find("input[name='puser_id']").val();
+      const pwholersaler = row.find("input[name='pwholesaler']").val();
       const quantity = row.find("input[name='quantity']").val();
 
       if (pid && quantity) {
@@ -224,6 +238,8 @@
           PNAME: pname,
           PPRICE: price,
           PIMAGE: pimage,
+          PUSER_ID: puser_id,
+          PWHOLESALER: pwholersaler,
           QUANTITY: parseInt(quantity, 10),
         });
       }
@@ -293,13 +309,75 @@
     });
   });
 
+  // Listen for input in the search bar
+  $('input[type="text"]').on("input", function () {
+    const searchValue = $(this).val().toLowerCase(); // Get search value in lowercase
+    $(".product-item").each(function () {
+      const productName = $(this).find("h2, p").text().toLowerCase(); // Get the product name from the card
+      if (productName.includes(searchValue)) {
+        $(this).parent().show(); // Show the card if it matches
+      } else {
+        $(this).parent().hide(); // Hide the card if it doesn't match
+      }
+    });
+  });
+
   // Toggle visibility based on radio button selection
   $("input[name='btype']").on("change", function () {
     const isFarmer = $("#radio-farm").is(":checked");
     $("#comm_field").toggleClass("d-none", isFarmer);
   });
 
+  
+  // Filter products based on category selection
+//   $('#pcategory').on('input', function () {
+//     const selectedCategory = $(this).val();
 
+//     if (selectedCategory === 'Fruits') {
+//         $('.select2-results__option--group[aria-label="Fruits"]').hide(); // Hide the "Fruits" list
+//     } else {
+//         $('.select2-results__option--group[aria-label="Fruits"]').show(); // Show the "Fruits" list
+//     }
+// });
+
+  // Initialize Select2 for searchable dropdown
+  $(".searchable-select").select2({
+    width: "100%", // Ensure proper alignment
+  });
+
+  // Initialize Select2 for searchable dropdowns within modals
+  $("body").on("shown.bs.modal", ".modal", function () {
+    const $modal = $(this); // Reference to the current modal
+    $modal.find("select.searchable-select").each(function () {
+      $(this).select2({
+        dropdownParent: $modal, // Ensures the dropdown is correctly contained within the modal
+        placeholder: "Select Product", // Placeholder for Select2
+        allowClear: true, // Allows clearing of selected value
+        width: "100%", // Ensures proper alignment
+      });
+    });
+  });
+
+  // Initially hide the days-select input
+  $(".days-select").hide();
+
+  // Handle the change event on the radio buttons
+  $("input[name='delivery_schedule'],input[name='schedule_option']").on("change", function () {
+    if ($(this).val() === "week") {
+      $(".days-select").fadeIn(500); // Hide days-select input
+    } else {
+      $(".days-select input[type='checkbox']").prop("checked", false); // Uncheck all checkboxes
+      $(".days-select").fadeOut(100) // Show days-select input
+    }
+  });
+
+  // Set Special Order Number To Approve Modal
+  $(".approve-request").on("click", function () {
+    const orderId = $(this).attr('data-o-id');
+    $("[name='soid']").val(orderId);
+    const orderNumber = $(this).attr('data-o-num');
+    $("[name='sonumber']").val(orderNumber);
+  });
 
   // Chat Functions
   // Cache jQuery selectors for better performance
@@ -380,65 +458,4 @@
 
   // Scroll to the bottom when the page loads
   scrollToBottom();
-
-  // Filter products based on category selection
-  $("#pcategory").on("change", function () {
-    const selectedCategory = $(this).val(); // Get the selected category
-    const $pnameSelect = $("#pname"); // Product dropdown
-    const $optgroups = $pnameSelect.find("optgroup"); // All optgroups
-
-    // Show/hide optgroups based on the selected category
-    $optgroups.each(function () {
-      const $optgroup = $(this);
-      const groupLabel = $optgroup.attr("label");
-
-      // Check if the optgroup matches the selected category
-      if (
-        groupLabel &&
-        groupLabel.toLowerCase() === selectedCategory.toLowerCase()
-      ) {
-        $optgroup.show(); // Show the matching optgroup
-      } else {
-        $optgroup.hide(); // Hide non-matching optgroups
-      }
-    });
-
-    // Reset the product dropdown value and placeholder
-    $pnameSelect.val("").trigger("change");
-  });
-
-  // Initialize Select2 for searchable dropdown
-  $(".searchable-select").select2({
-    width: "100%", // Ensure proper alignment
-  });
-
-  // Initialize Select2 for searchable dropdowns within modals
-  $("body").on("shown.bs.modal", ".modal", function () {
-    const $modal = $(this); // Reference to the current modal
-    $modal.find("select.searchable-select").each(function () {
-      $(this).select2({
-        dropdownParent: $modal, // Ensures the dropdown is correctly contained within the modal
-        placeholder: "Select Product", // Placeholder for Select2
-        allowClear: true, // Allows clearing of selected value
-        width: "100%", // Ensures proper alignment
-      });
-    });
-  });
-
-  // Initially hide the days-select input
-  $(".days-select").hide();
-
-  // Handle the change event on the radio buttons
-  $("input[name='delivery_schedule']").on("change", function () {
-    if ($(this).val() === "week") {
-      $(".days-select").slideDown(); // Show days-select input
-    } else {
-      $(".days-select").slideUp(); // Hide days-select input
-      $(".days-select input[type='checkbox']").prop("checked", false); // Uncheck all checkboxes
-    }
-  });
-
-
-
-  
 })(jQuery);

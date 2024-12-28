@@ -157,6 +157,7 @@ $special_orders = $result->fetch_all(MYSQLI_ASSOC);
 
                 // Prepare SQL to fetch special orders data
                 $stmt = $conn->prepare("SELECT * FROM `special_orders` WHERE USER_ID = ? AND SOSTATUS LIKE ? ");
+                $status_closed = 'finished';
                 // Bind user_id as an integer
                 $stmt->bind_param('is', $user_id, $status_closed);
 

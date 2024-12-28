@@ -19,18 +19,21 @@
     }
 
     // Prepare SQL to fetch user and account data
-    $stmt = $conn->prepare("SELECT * FROM special_orders WHERE SOSTATUS = 'unapproved'");
+    $stmt = $conn->prepare("SELECT *  FROM special_orders so WHERE so.SOSTATUS = 'unapproved' AND SOID NOT IN (SELECT RSOID FROM requests r WHERE r.WS_ID = ?)");
 
     // Bind user_id as an integer
+    $stmt->bind_param('i', $user_id);
+           
+    // Execute the query    
     $stmt->execute();
 
     // Fetch data as an associative array
     $result = $stmt->get_result();
     $special_orders = $result->fetch_all(MYSQLI_ASSOC);
+    
     // Close the statement and connection
     $stmt->close();
     $conn->close();
-
     ?>
 
     <main>
@@ -53,7 +56,7 @@
                                 <a href="chat.php" class="alert-link"><i class="bx bx-message bx-sm"></i></a>
                             </div>
                         <?php } ?>
-                        <!--    Apprved Message Start  -->
+                        <!--    Apprved Message End  -->
 
                         <div class="row g-4" style="min-height: 400px; max-height:800px; overflow-y: auto;">
                             <?php if ($result->num_rows > 0) { ?>
@@ -102,12 +105,13 @@
                                                     <div class="d-flex justify-content-end">
                                                         <button class="btn btn-danger fw-bold" type="button">Reject</button>
                                                         <span class="mx-2"></span>
-                                                        <a class="btn btn-primary fw-bold" type="button" href="#contract-modal" data-bs-toggle="modal" data-bs-target="#contract-modal">Approve</a>
+                                                        <a  class="btn btn-primary fw-bold approve-request" type="button" href="#contract-modal" data-bs-toggle="modal" data-bs-target="#contract-modal" data-o-id="<?= $specialorder['SOID'] ?>" data-o-num="<?= $specialorder['SONUMBER'] ?>">Approve</a>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+                                    <?php endforeach; ?>
                                     <!--    Upload Contart Modal Start      -->
                                     <!--    Modal Body     -->
                                     <!--    if you want to close by clicking outside the modal, delete the last endpoint:data-bs-backdrop and data-bs-keyboard   -->
@@ -120,8 +124,8 @@
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <form action="assets/php/request.php" method="POST" enctype="multipart/form-data" id="uploadContractForm">
-                                                    <input type="hidden" name="soid" value="<?= htmlspecialchars($specialorder['SOID']) ?>" />
-                                                    <input type="hidden" name="sonumber" value="<?= htmlspecialchars($specialorder['SONUMBER']) ?>" />
+                                                    <input type="hidden" name="soid" value="" />
+                                                    <input type="hidden" name="sonumber" value="" />
                                                     <div class="modal-body overflow-hidden">
                                                         <div class="mb-3">
                                                             <label for="contract_file" class="form-label">Choose File:</label>
@@ -141,7 +145,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer">
-                                                        <button class="btn btn-secondary fw-bold" type="reset" data-bs-dismiss="modal">Cancel</button>
+                                                        <button class="btn btn-accent fw-bold" type="reset" data-bs-dismiss="modal">Cancel</button>
                                                         <button class="btn btn-primary fw-bold" type="submit" name="approve-submit">Send</button>
                                                     </div>
                                                 </form>
@@ -150,7 +154,6 @@
                                     </div>
 
                                     <!--    Upload Contart Modal End    -->
-                                <?php endforeach; ?>
                             <?php } else { ?>
                                 <!--    Alter Warning Start  -->
                                 <div class="container py-5">
@@ -185,5 +188,7 @@
             <?php } ?>
         </section>
     </main>
+
     <!--    Include Footer   -->
     <?php include('assets/inc/footer.php') ?>
+    

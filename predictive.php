@@ -81,10 +81,10 @@ if ($user_id === null) {
         ];
 
         // Get product ID from URL
-        $productID = $_GET['pid'] ?? '';
+        $itemID = $_GET['pid'] ?? '';
 
         // Validate product ID
-        if (!array_key_exists($productID, $equations)) {
+        if (!array_key_exists($itemID, $equations)) {
             die("Invalid Product ID.");
         }
 
@@ -106,7 +106,7 @@ if ($user_id === null) {
             $month = (int) $date->format('m');
             $day = (int) $date->format('d');
 
-            $price = calculatePrice($equations[$productID], $year, $month, $day);
+            $price = calculatePrice($equations[$itemID], $year, $month, $day);
             $percentageChange = $i === 0 ? 0 : (($price - $priceTable[$i - 1]['Price']) / $priceTable[$i - 1]['Price']) * 100;
 
             $priceTable[] = [
@@ -127,7 +127,7 @@ if ($user_id === null) {
                         <h3 class="text-muted">See Best Wholesalers On Website</h3>
                     </div>
                     <div class="prodcut">
-                        <h2><?= htmlspecialchars($productID) ?></h2>
+                        <h2><?= htmlspecialchars($itemID) ?></h2>
                     </div>
                     <hr>
                     <div class="table-responsive my-5 rounded-2 shadow" style="max-height: 60vh; overflow-y:auto;">
@@ -166,52 +166,100 @@ if ($user_id === null) {
                         <h1>Predictive Price</h1>
                         <h3 class="text-muted">Know More About Predictive Pricing Products</h3>
                     </div>
-                    <div class="vegetables">
-                        <h2>Vegetables</h2>
+                    <div class="tabs-class">
                         <div class="row g-4">
-                            <?php foreach ($categories['Vegetables'] as $category) : ?>
-                                <div class="col-12 col-md-4 p-4">
-                                    <div class="text-center border border-white-50 rounded-2 position-relative product-item">
-                                        <h2><?= htmlspecialchars($category) ?></h2>
-                                        <div class="product-img">
-                                            <img src="assets/img/vegetables/<?= strtolower(str_replace(' ', '-', $category)) ?>.png"
-                                                class="img-fluid w-100 rounded-top"
-                                                alt="<?= htmlspecialchars($category) ?>">
+                            <!-- Search bar -->
+                            <div class="col-12 col-md-6 position-relative mx-auto">
+                                <input class="form-control border-2 border-gray py-3 rounded-pill" type="text" placeholder="Write what you want?">
+                                <button type="submit" class="btn btn-secondary border-2 border-secondary py-3 px-4 position-absolute rounded-pill text-white" style="top: 0; right: 0%;">Submit Now</button>
+                            </div>
+                            <!-- Tabs -->
+                            <div class="col-12 col-md-6 text-end">
+                                <ul class="nav nav-pills d-inline-flex text-center mb-5">
+                                    <li class="nav-item">
+                                        <a class="d-flex p-2 m-2 bg-light rounded-pill active" data-bs-toggle="pill" href="#tab-all">
+                                            <span class="text-dark">All Products</span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="d-flex p-2 m-2 bg-light rounded-pill" data-bs-toggle="pill" href="#tab-fruits">
+                                            <span class="text-dark">Fruits</span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="d-flex p-2 m-2 bg-light rounded-pill" data-bs-toggle="pill" href="#tab-vegetables">
+                                            <span class="text-dark">Vegetables</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="tab-content">
+                                <div id="tab-all" class="tab-pane fade show p-0 active">
+                                    <div class="row g-4">
+                                    <?php foreach ($categories as $category => $items) : ?>
+                                        <div class="col-12 col mb-3">
+                                            <h2><?= $category ?></h2>
                                         </div>
-                                        <div class="p-4">
-                                            <div class="d-md-flex justify-content-center">
-                                                <a href="predictive.php?pid=<?= urlencode($category) ?>"
-                                                    class="btn btn-secondary rounded-pill">More Details</a>
-                                            </div>
-                                        </div>
+                                        <?php foreach ($items as $item) : ?>
+                                                <div class="col-12 col-md-4 p-4">
+                                                    <div class="text-center border border-white-50 rounded-2 position-relative product-item">
+                                                        <h2><?= htmlspecialchars($item) ?></h2>
+                                                        <div class="product-img">
+                                                            <img src="assets/img/<?= ($category ===  'Fruits' )? 'fruits' : 'vegetables' ?>/<?= strtolower(str_replace(' ', '-', $item)) ?>.png" class="img-fluid w-100 rounded-top">
+                                                        </div>
+                                                        <div class="p-4">
+                                                            <div class="d-md-flex justify-content-center">
+                                                                <a href="predictive.php?pid=<?= urlencode($item) ?>" class="btn btn-secondary rounded-pill">More Details</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        <?php endforeach; ?>
                                     </div>
                                 </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                    <div class="fruits">
-                        <h2>Fruits</h2>
-                        <div class="row g-4">
-                            <?php foreach ($categories['Fruits'] as $category) : ?>
-                                <div class="col-12 col-md-4 p-4">
-                                    <div class="text-center border border-white-50 rounded-2 position-relative product-item">
-                                        <h2><?= htmlspecialchars($category) ?></h2>
-                                        <div class="product-img">
-                                            <img src="assets/img/fruits/<?= strtolower(str_replace(' ', '-', $category)) ?>.png"
-                                                class="img-fluid w-100 rounded-top"
-                                                alt="<?= htmlspecialchars($category) ?>">
-                                        </div>
-                                        <div class="p-4">
-                                            <div class="d-md-flex justify-content-center">
-                                                <a href="predictive.php?pid=<?= urlencode($category) ?>"
-                                                    class="btn btn-secondary rounded-pill">More Details</a>
-                                            </div>
-                                        </div>
+                                <div id="tab-fruits" class="tab-pane fade show p-0">
+                                    <div class="row g-4">
+                                    <?php foreach ($categories['Fruits'] as $fruits) : ?>
+                                                <div class="col-12 col-md-4 p-4">
+                                                    <div class="text-center border border-white-50 rounded-2 position-relative product-item">
+                                                        <h2><?= htmlspecialchars($fruits) ?></h2>
+                                                        <div class="product-img">
+                                                            <img src="assets/img/fruits/<?= strtolower(str_replace(' ', '-', $fruits)) ?>.png" class="img-fluid w-100 rounded-top" alt="<?= htmlspecialchars($fruits) ?>">
+                                                        </div>
+                                                        <div class="p-4">
+                                                            <div class="d-md-flex justify-content-center">
+                                                                <a href="predictive.php?pid=<?= urlencode($fruits) ?>" class="btn btn-secondary rounded-pill">More Details</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <?php endforeach; ?>
                                     </div>
                                 </div>
-                            <?php endforeach; ?>
+                                <div id="tab-vegetables" class="tab-pane fade show p-0">
+                                    <div class="row g-4">
+                                            <?php foreach ($categories['Vegetables'] as $vegetables) : ?>
+                                                <div class="col-12 col-md-4 p-4">
+                                                    <div class="text-center border border-white-50 rounded-2 position-relative product-item">
+                                                        <h2><?= htmlspecialchars($vegetables) ?></h2>
+                                                        <div class="product-img">
+                                                            <img src="assets/img/vegetables/<?= strtolower(str_replace(' ', '-', $vegetables)) ?>.png" class="img-fluid w-100 rounded-top" alt="<?= htmlspecialchars($vegetables) ?>">
+                                                        </div>
+                                                        <div class="p-4">
+                                                            <div class="d-md-flex justify-content-center">
+                                                                <a href="predictive.php?pid=<?= urlencode($vegetables) ?>" class="btn btn-secondary rounded-pill">More Details</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
                 </div>
         </section>
         <!--    Predictive Products End     -->

@@ -11,9 +11,8 @@ $user_id = $_SESSION['user_id'];
 if (isset($_GET['pid'])) {
 
     $pid = $_GET['pid'];
-
     // Fetch product details from the database
-    $stmt = $conn->prepare("SELECT PID, PNAME, PPRICE, PIMAGE FROM products WHERE PID = ?");
+    $stmt = $conn->prepare("SELECT PID, PNAME, PCATEGORY, PCOUNTRY, PPRICE, PSTATUS, PKEYWORDS, PQUANTITY, PDESCRIPTION, PIMAGE, USER_ID FROM products WHERE PID = ?");
     $stmt->bind_param("i", $pid);
     $stmt->execute();
     $product = $stmt->get_result()->fetch_assoc();
@@ -29,12 +28,21 @@ if (isset($_GET['pid'])) {
                 $_SESSION['cart'][$pid]['QUANTITY'] += 1; // Default increment
             }
         } else {
+            $product_wholesaler = $product['USER_ID'];
+            // Fetch product details from the database
+            $stmt = $conn->prepare("SELECT BUSINESS_NAME FROM account WHERE USER_ID = ?");
+            $stmt->bind_param("i", $product_wholesaler);
+            $stmt->execute();
+            $product_business_name = $stmt->get_result()->fetch_assoc();
+
             // Add a new product to the cart
             $_SESSION['cart'][$pid] = [
                 'PID' => $product['PID'],
                 'PNAME' => $product['PNAME'],
                 'PPRICE' => $product['PPRICE'],
                 'PIMAGE' => $product['PIMAGE'],
+                'PUSER_ID' => $product['USER_ID'],
+                'PWHOLESALER' => $product_business_name['BUSINESS_NAME'],
                 'QUANTITY' => isset($_GET['qty']) && is_numeric($_GET['qty']) ? (int)$_GET['qty'] : 1 // Default to 1
             ];
         }
@@ -59,24 +67,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     // Update the session cart
     $_SESSION['cart'] = [];
   
-    foreach($cartData as $data) {
-        echo $data['PID'];
-        echo $data['PNAME'];
-        echo $data['PRICE'];
-        echo $data['QUANTITY'];
-    }
-
     foreach ($cartData as $item) {
         $pid = $item['PID'];
         $pname = $item['PNAME'];
         $pprice = $item['PPRICE'];
         $pimage = $item['PIMAGE'];
+        $puser_id = $item['PUSER_ID'];
+        $pwholesaler = $item['PWHOLESALER'];
         $quantity = $item['QUANTITY'];
         $_SESSION['cart'][$pid] = [
             'PID' => $pid,
             'PNAME' => $pname,
             'PPRICE' => $pprice,
             'PIMAGE' => $pimage,
+            'PUSER_ID' => $puser_id,
+            'PWHOLESALER' => $pwholesaler,
             'QUANTITY' => $quantity
         ];
     }

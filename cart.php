@@ -39,6 +39,7 @@ if ($user_id === null | $user_type != "retailer") {
                                         <th scope="col">Product</th>
                                         <th scope="col">Price</th>
                                         <th scope="col">Quantity</th>
+                                        <th scope="col">Wholesaler</th>
                                     </tr>
                                 </thead>
                                 <!-- Cart Products Section -->
@@ -69,6 +70,8 @@ if ($user_id === null | $user_type != "retailer") {
                                                         <input id="pname-input" type="hidden" name="pname" value="<?= $item['PNAME'] ?>">
                                                         <input id="pprice-input" type="hidden" name="pprice" value="<?= $item['PPRICE'] ?>">
                                                         <input id="pimage-input" type="hidden" name="pimage" value="<?= $item['PIMAGE'] ?>">
+                                                        <input id="puser_id-input" type="hidden" name="puser_id" value="<?= $item['PUSER_ID'] ?>">
+                                                        <input id="pwholesaler-input" type="hidden" name="pwholesaler" value="<?= $item['PWHOLESALER'] ?>">
                                                         <input id="qty-input" type="text" class="form-control form-control-sm text-center border-0" name="quantity" value="<?= $item['QUANTITY'] ?>">
                                                         <div class="input-group-btn">
                                                             <button class="btn btn-sm btn-plus rounded-circle bg-light border qty-btn" type="button">
@@ -77,6 +80,9 @@ if ($user_id === null | $user_type != "retailer") {
                                                         </div>
                                                     </div>
                                                 </td>
+                                                    <td>
+                                                        <p class="mb-0 mt-4"><?= $item['PWHOLESALER'] ?></p>
+                                                    </td>
                                             </tr>
                                             <?php $itemTotalPrice = $item['PPRICE'] * $item['QUANTITY']; ?>
                                             <?php $totalPrice += $itemTotalPrice; ?>

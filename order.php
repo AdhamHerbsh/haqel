@@ -27,7 +27,7 @@ $_SESSION['wholesaler'] = $_SESSION['wholesaler'] ?? [];
 
 
 if ($order_id > 0) {
-    $stmt = $conn->prepare("SELECT OID, ONUMBER, OSTATUS, OSTAGE, WS_ID FROM orders WHERE OID = ?");
+    $stmt = $conn->prepare("SELECT OID, ONUMBER, OSTATUS, OSTAGE, WS_ID, OSCHEDULE, ODAYS FROM orders WHERE OID = ?");
     $stmt->bind_param('i', $order_id);
 
     if ($stmt->execute()) {
@@ -39,7 +39,14 @@ if ($order_id > 0) {
     }
     $stmt->close();
 } elseif ($special_order_id > 0) {
-    $stmt = $conn->prepare("SELECT SOID, SONUMBER, SOTYPE, SOSTATUS, PNAME, PCATEGORY, PPRICE, SOQUANTITY, SORECEIVEDDATE, SOSCHEDULEOPTION, SODESCRIPTION, SOTOTALPRICE, SODATE, CONTRACT_FILE, USER_ID, WS_ID FROM special_orders WHERE SOID = ?");
+    // Fetch special order details
+    $stmt = $conn->prepare("
+        SELECT 
+            SOID, SONUMBER, SOTYPE, SOSTATUS, PNAME, PCATEGORY, PPRICE, SOQUANTITY, SORECEIVEDDATE, 
+            SOSCHEDULEOPTION, SODAYS, SODESCRIPTION, SOTOTALPRICE, SODATE, CONTRACT_FILE, USER_ID, WS_ID 
+        FROM special_orders 
+        WHERE SOID = ?
+    ");
     $stmt->bind_param('i', $special_order_id);
 
     if ($stmt->execute()) {
@@ -48,9 +55,29 @@ if ($order_id > 0) {
         if ($special_order) {
             $_SESSION['specialOrder'][$special_order_id] = $special_order;
 
+            // Fetch requests associated with the wholesaler
+            $stmt_req = $conn->prepare("
+                SELECT RSOID, RCONTRACT_FILE, WS_ID 
+                FROM requests WHERE RSOID = ? AND RSTATUS = 'unapplied'
+            ");
+            $stmt_req->bind_param('i', $special_order_id);
+
+            if ($stmt_req->execute()) {
+                $result = $stmt_req->get_result();
+                $requests = $result->fetch_all(MYSQLI_ASSOC);
+            } else {
+                $requests = [];
+            }
+            $stmt_req->close();
+
             $wholesaler_id = (int)$special_order['WS_ID'];
             if ($wholesaler_id > 0) {
-                $stmt_wholesaler = $conn->prepare("SELECT BUSINESS_NAME, BUSINESS_TYPE FROM account WHERE user_id = ?");
+                // Fetch wholesaler details
+                $stmt_wholesaler = $conn->prepare("
+                    SELECT BUSINESS_NAME, BUSINESS_TYPE 
+                    FROM account 
+                    WHERE user_id = ?
+                ");
                 $stmt_wholesaler->bind_param('i', $wholesaler_id);
 
                 if ($stmt_wholesaler->execute()) {
@@ -60,23 +87,33 @@ if ($order_id > 0) {
                         $_SESSION['wholesaler'][$wholesaler_id] = $wholesaler;
                     }
                 }
-                // Prepare SQL to get rate of wholesaler
-                $stmt = $conn->prepare("SELECT RATE FROM reviews WHERE WS_ID = ?");
-                $stmt->bind_param("s", $wholesaler_id);
-                $stmt->execute();
-                $stmt->store_result();
-                // Bind the result
-                $stmt->bind_result($rate);
-                $stmt->fetch();
 
                 $stmt_wholesaler->close();
+
+
+                // Fetch wholesaler's average rate
+                $stmt_rate = $conn->prepare("
+                    SELECT AVG(RATE) AS average_rate 
+                    FROM reviews 
+                    WHERE WS_ID = ?
+                ");
+                $stmt_rate->bind_param('i', $wholesaler_id);
+
+                if ($stmt_rate->execute()) {
+                    $result_rate = $stmt_rate->get_result();
+                    $rate_data = $result_rate->fetch_assoc();
+                    $rate = $rate_data['average_rate'] ?? null;
+                } else {
+                    $rate = null;
+                }
+                $stmt_rate->close();
             }
         }
     }
 
-
     $stmt->close();
 }
+
 
 ?>
 <main>
@@ -105,6 +142,9 @@ if ($order_id > 0) {
                                     <th scope="col">Product Category</th>
                                     <th scope="col">Product Price</th>
                                     <th scope="col">Product Quantity</th>
+                                    <th scope="col">Schedule Option</th>
+                                    <th scope="col">Schedule Days</th>
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -128,6 +168,8 @@ if ($order_id > 0) {
                                         <td><?= htmlspecialchars(ucfirst($pcategory)); ?></td>
                                         <td><?= htmlspecialchars($orderitem['OIQUANTITY']); ?></td>
                                         <td><?= htmlspecialchars($orderitem['OIPRICE']); ?></td>
+                                        <td><?= htmlspecialchars($_SESSION['standardOrder'][$order_id]['OSCHEDULE']); ?></td>
+                                        <td><?= htmlspecialchars($_SESSION['standardOrder'][$order_id]['ODAYS']); ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -150,6 +192,9 @@ if ($order_id > 0) {
                                     <th scope="col">Product Category</th>
                                     <th scope="col">Product Price</th>
                                     <th scope="col">Product Quantity</th>
+                                    <th scope="col">Schedule Option</th>
+                                    <th scope="col">Schedule Days</th>
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -158,6 +203,8 @@ if ($order_id > 0) {
                                     <td><?= htmlspecialchars(ucfirst($_SESSION['specialOrder'][$special_order_id]['PCATEGORY'])); ?></td>
                                     <td><?= htmlspecialchars($_SESSION['specialOrder'][$special_order_id]['PPRICE']); ?></td>
                                     <td><?= htmlspecialchars($_SESSION['specialOrder'][$special_order_id]['SOQUANTITY']); ?></td>
+                                    <td><?= htmlspecialchars(ucfirst($_SESSION['specialOrder'][$special_order_id]['SOSCHEDULEOPTION'])); ?></td>
+                                    <td><?= htmlspecialchars(ucwords($_SESSION['specialOrder'][$special_order_id]['SODAYS'])); ?></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -167,7 +214,45 @@ if ($order_id > 0) {
                 <?php if ($special_order_id > 0) { ?>
                     <div class="card-container">
                         <?php $status = $_SESSION['specialOrder'][$special_order_id]['SOSTATUS'] ?? ''; ?>
-                        <?php if ($status === 'approved') { ?>
+                        <?php if ($status === 'unapproved') { ?>
+                            <?php foreach ($requests as $request): ?>
+                            <?php // Fetch wholesaler details
+                            $stmt_wholesaler = $conn->prepare("
+                                SELECT BUSINESS_NAME, BUSINESS_TYPE 
+                                FROM account 
+                                WHERE user_id = ?
+                            ");
+                                $stmt_wholesaler->bind_param('i', $request['WS_ID']);
+                                $stmt_wholesaler->execute();
+                                $result_wholesaler = $stmt_wholesaler->get_result();
+                                $wholesaler = $result_wholesaler->fetch_assoc();
+                               ?>
+                            <div class="card col-12 border border-1 border-white-50 mb-3 p-3">
+                                <div class="row">
+                                    <div class="col-12 col-md-4">
+                                        <div class="card-body">
+                                            <h4 class="card-title"><?= htmlspecialchars($wholesaler['BUSINESS_NAME'] ?? 'Unknown Wholesaler') ?></h4>
+                                            <p><?= htmlspecialchars(ucfirst($wholesaler['BUSINESS_TYPE'] ?? 'Unknown Business Type')) ?></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-8 align-content-center">
+                                        <div class="d-flex flex-column flex-md-row justify-content-around align-items-end">
+                                            <a class="btn btn-secondary m-1" href="view-file.php?contract=<?= urlencode($request['RCONTRACT_FILE'] ?? 'File Not Found') ?>">View Contract</a>
+                                            <a class="btn btn-danger m-1" href="">Reject</a>
+                                            <form class="d-flex" action="assets/php/request.php" method="POST" enctype="multipart/form-data">
+                                                <input type="hidden" name="soid" value="<?= htmlspecialchars($request['RSOID']) ?>">
+                                                <input type="hidden" name="sonumber" value="<?= htmlspecialchars($_SESSION['specialOrder'][$special_order_id]['SONUMBER']) ?>">
+                                                <input type="hidden" name="wsid" value="<?= htmlspecialchars($request['WS_ID']) ?>">
+                                                <input type="file" class="form-control" name="contract_file" id="contract_file" placeholder="No File Chosen" required />
+                                                <span class="mx-2"></span>
+                                                <button class="btn btn-primary m-1" type="submit" name="apply-submit">Apply</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        <?php }elseif ($status === 'approved') { ?>
                             <div class="card col-12 border border-1 border-white-50 mb-3 p-3">
                                 <div class="row">
                                     <div class="col-12 col-md-4">

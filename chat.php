@@ -22,18 +22,12 @@
     $sender_id = $user_id ?? null;
     $receiver_id = $_GET['wsid'] ?? $_GET['rtid'] ?? null;
     $soid = $_GET['soid'] ?? null;
-    
+
 
     // Special Order ID Unset
     if (!isset($soid)) {
 
-        $stmt = $conn->prepare("SELECT SOID, SONUMBER, USER_ID FROM special_orders WHERE WS_ID = ? AND SOSTATUS LIKE 'applied'");
-        $stmt->bind_param("i", $user_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $specialOrders = $result->fetch_all(MYSQLI_ASSOC);
-
-        $stmt = $conn->prepare("SELECT CSENDER, CSOID, CDATE FROM chats WHERE CRECEIVER = ?");
+        $stmt = $conn->prepare("SELECT DISTINCT CSENDER, CSOID FROM chats WHERE CRECEIVER = ?");
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -85,7 +79,7 @@
                                     <!-- Chat Header -->
                                     <div class="chat-info text-center p-2 border border-primary border-2 rounded-2 mb-3">
                                         <p>
-                                            <span class="fw-bold"><i class="bx bx-user bx-sm"></i> <?= ucfirst($user_type === 'retailer'? 'wholesaler' : 'retailer') ?> Name: <?= ucfirst($fname) . " " . ucfirst($lname) ?>
+                                            <span class="fw-bold"><i class="bx bx-user bx-sm"></i> <?= ucfirst($user_type === 'retailer' ? 'wholesaler' : 'retailer') ?> Name: <?= ucfirst($fname) . " " . ucfirst($lname) ?>
                                                 <span class="mx-2 d-block d-sm-inline"></span>
                                                 <span class="fw-bold"><i class="bx bx-package bx-sm"></i> Order Number:</span> #<?= $sonumber ?>
                                         </p>
@@ -121,54 +115,25 @@
         <!--    Chat Region End -->
     <?php } elseif ($user_type === 'wholesaler') { ?>
         <!--    Users Chat Section    -->
-        <div class="card-container">
-            <?php $counter = 0 ?>
-            <?php foreach ($specialOrders as $specialOrder) : ?>
+        <div class="card-container" style="overflow-y: auto; max-height: 70vh;">
+            <?php $count = 1; ?>
+            <?php foreach ($chats as $chat) : ?>
+                
                 <?php
-                            $stmt = $conn->prepare("SELECT FNAME, LNAME, USER_TYPE FROM users WHERE ID = ?");
-                            $retailer_id = $specialOrder['USER_ID'];
-                            $stmt->bind_param("i", $retailer_id);
-                            $stmt->execute();
-                            $stmt->store_result();
-                            // Bind the result
-                            $stmt->bind_result($fname, $lname, $user_type);
-                            $stmt->fetch();
-                            $counter++;
+                    $stmt = $conn->prepare("SELECT FNAME, LNAME, USER_TYPE FROM users WHERE ID = ?");
+                    $retailer_id = $chat['CSENDER'];
+                    $stmt->bind_param("i", $retailer_id);
+                    $stmt->execute();
+                    $stmt->store_result();
+                    // Bind the result
+                    $stmt->bind_result($fname, $lname, $user_type);
+                    $stmt->fetch();
                 ?>
-                <div class="card col-12 border border-1 border-white-50 mb-3 p-3" data-aos="slide-right" data-aos-duration="<?= $counter ?>000">
+                <div class="card col-12 border border-1 border-white-50 mb-3 p-3" data-aos="slide-right" data-aos-duration="<?= $count++ ?>000">
                     <div class="row">
                         <div class="col-12 col-md-4">
                             <div class="card-body">
                                 <h4 class="card-title"><?= ucfirst($fname) . " " . ucfirst($lname) ?></h4>
-                                <p class="card-title"><span class="fw-bold"><i class="bx bx-package bx-sm"></i> Order Number:</span> #<?= $specialOrder['SONUMBER'] ?></p>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-8 align-content-center">
-                            <div class="text-center text-md-end">
-                                <a class="btn btn-primary" href="chat.php?rtid=<?= $retailer_id ?>&soid=<?= $specialOrder['SOID'] ?>">Chat</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-                <?php foreach ($chats as $chat) : ?>
-                    <?php
-                            $stmt = $conn->prepare("SELECT FNAME, LNAME, USER_TYPE FROM users WHERE ID = ?");
-                            $retailer_id = $chat['CSENDER'];
-                            $stmt->bind_param("i", $retailer_id);
-                            $stmt->execute();
-                            $stmt->store_result();
-                            // Bind the result
-                            $stmt->bind_result($fname, $lname, $user_type);
-                            $stmt->fetch();
-                            $counter++;
-                ?>
-                <div class="card col-12 border border-1 border-white-50 mb-3 p-3" data-aos="slide-right" data-aos-duration="<?= $counter ?>000">
-                    <div class="row">
-                        <div class="col-12 col-md-4">
-                            <div class="card-body">
-                                <h4 class="card-title"><?= ucfirst($fname) . " " . ucfirst($lname) ?></h4>
-                                <p class="card-title"><span class="fw-bold"><i class="bx bx-calendar bx-sm"></i> Date:</span> #<?= $chat['CDATE'] ?></p>
                             </div>
                         </div>
                         <div class="col-12 col-md-8 align-content-center">

@@ -24,7 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = htmlspecialchars(trim($_POST['username']));
     $bname = isset($_POST['bname']) ? htmlspecialchars(trim($_POST['bname'])) : null;
     $btype = isset($_POST['btype']) ? htmlspecialchars(trim($_POST['btype'])) : null;
-    $cov_area = isset($_POST['cov_area']) ? htmlspecialchars(trim($_POST['cov_area'])) : null;
     $bemail = isset($_POST['bemail']) ? htmlspecialchars(trim($_POST['bemail'])) : null;
     $business_segment = isset($_POST['BUSINESS_SEGMENT']) ? htmlspecialchars(trim($_POST['BUSINESS_SEGMENT'])) : null;
 
@@ -73,20 +72,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Update account details
             $update_account_stmt = $conn->prepare("
                 UPDATE account 
-                SET BUSINESS_NAME = ?, BUSINESS_EMAIL = ?, BUSINESS_TYPE = ?, COVERAGE_AREAS = ?, BUSINESS_SEGMENT = ?, COMMERCIAL_REGISTER_FILE = ? 
+                SET BUSINESS_NAME = ?, BUSINESS_EMAIL = ?, BUSINESS_TYPE = ?, BUSINESS_SEGMENT = ?, COMMERCIAL_REGISTER_FILE = ? 
                 WHERE user_id = ?
             ");
-            $update_account_stmt->bind_param("ssssssi", $bname, $bemail, $btype, $cov_area, $business_segment, $comm_file, $user_id);
+            $update_account_stmt->bind_param("sssssi", $bname, $bemail, $btype, $business_segment, $comm_file, $user_id);
             $update_account_stmt->execute();
             $update_account_stmt->close();
             
         } else {
             // Insert new account details
             $insert_account_stmt = $conn->prepare("
-                INSERT INTO account (BUSINESS_NAME, BUSINESS_EMAIL, BUSINESS_TYPE, COVERAGE_AREAS, BUSINESS_SEGMENT, COMMERCIAL_REGISTER_FILE, USER_ID) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO account (BUSINESS_NAME, BUSINESS_EMAIL, BUSINESS_TYPE, BUSINESS_SEGMENT, COMMERCIAL_REGISTER_FILE, USER_ID) 
+                VALUES (?, ?, ?, ?, ?, ?)
             ");
-            $insert_account_stmt->bind_param("ssssssi", $bname, $bemail, $btype, $cov_area, $business_segment, $comm_file, $user_id);
+            $insert_account_stmt->bind_param("sssssi", $bname, $bemail, $btype, $business_segment, $comm_file, $user_id);
             $insert_account_stmt->execute();
             $insert_account_stmt->close();
         }

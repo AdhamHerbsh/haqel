@@ -7,7 +7,7 @@ session_start();
 
 $user_id = $_SESSION['user_id'];
 
-
+// Check if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['standard-order'])) {
     // Check if cart is available in the session
     if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
@@ -79,6 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['special-order'])) {
     $quantity = $_POST['quantity'] ?? 1;
     $receiveddate = $_POST['received_date'] ?? '';
     $schedule_option = $_POST['schedule_option'] ?? '';
+    $days = isset($_POST['days']) ? implode(', ', $_POST['days']) : '';
     $description = $_POST['description'] ?? '';
 
     // Calculate total price
@@ -93,14 +94,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['special-order'])) {
     }
 
     // Prepare SQL query
-    $sql = "INSERT INTO special_orders (SONUMBER, SOTYPE, SOSTATUS, PNAME, PCATEGORY, PPRICE, SOQUANTITY, SORECEIVEDDATE, SOSCHEDULEOPTION, SODESCRIPTION, SOTOTALPRICE, SODATE, USER_ID) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)";
+    $sql = "INSERT INTO special_orders (SONUMBER, SOTYPE, SOSTATUS, PNAME, PCATEGORY, PPRICE, SOQUANTITY, SORECEIVEDDATE, SOSCHEDULEOPTION, SODESCRIPTION, SOTOTALPRICE, SODATE, USER_ID, SODAYS) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)";
 
     $stmt = $conn->prepare($sql);
 
     if ($stmt) {
         // Bind parameters
-        $stmt->bind_param('sssssissssdi', $order_number, $otype, $order_status, $pname, $pcategory, $pprice, $quantity, $receiveddate, $schedule_option, $description, $totalprice, $user_id);
+        $stmt->bind_param('sssssissssdis', $order_number, $otype, $order_status, $pname, $pcategory, $pprice, $quantity, $receiveddate, $schedule_option, $description, $totalprice, $user_id, $days);
 
         // Execute the query
         if ($stmt->execute()) {

@@ -3,13 +3,16 @@
   display: inline-block;
   margin: 0;
   position: relative;
-  border: 1px solid #aaa;
   vertical-align: middle;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   padding-left: 1rem;
   font-size: 1.25rem;
   border-radius: 20px;
+}
+span.select2.select2-container.select2-container--default{
+  border: 1px solid #aaa;
+
 }
 .select2-container .select2-selection--single {
   box-sizing: border-box;

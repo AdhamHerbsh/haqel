@@ -25,9 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             <div class="d-flex justify-content-end mb-3">
                 <div>
                     <p class="bg-primary text-white p-3 rounded-pill shadow-sm mb-1">
-                        ' . htmlspecialchars($chat['CMESSAGE']) . '
+                        ' . $chat['CMESSAGE'] . '
                     </p>
-                    <small class="text-muted">' . htmlspecialchars($chat['CDATE']) . '</small>
+                    <small class="text-muted">' . $chat['CDATE'] . '</small>
                 </div>
             </div>
             ';
@@ -37,9 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             <div class="d-flex align-items-start mb-3">
                 <div>
                     <p class="bg-white border border-primary p-3 rounded-pill shadow-sm mb-1">
-                        ' . htmlspecialchars($chat['CMESSAGE']) . '
+                        ' . $chat['CMESSAGE'] . '
                     </p>
-                    <small class="text-muted">' . htmlspecialchars($chat['CDATE']) . '</small>
+                    <small class="text-muted">' . $chat['CDATE'] . '</small>
                 </div>
             </div>
             ';
