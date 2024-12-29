@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 15, 2024 at 08:30 AM
+-- Generation Time: Dec 29, 2024 at 12:37 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -32,9 +32,8 @@ CREATE TABLE `account` (
   `BUSINESS_NAME` varchar(255) NOT NULL,
   `BUSINESS_EMAIL` varchar(255) DEFAULT NULL,
   `BUSINESS_TYPE` enum('farm','provider') DEFAULT NULL,
-  `COVERAGE_AREAS` varchar(255) DEFAULT NULL,
   `BUSINESS_SEGMENT` varchar(255) DEFAULT NULL,
-  `COMMERCIAL_REGISTER_FILE` varchar(255) NOT NULL,
+  `COMMERCIAL_REGISTER_FILE` varchar(255) DEFAULT NULL,
   `USER_ID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -42,9 +41,14 @@ CREATE TABLE `account` (
 -- Dumping data for table `account`
 --
 
-INSERT INTO `account` (`ID`, `BUSINESS_NAME`, `BUSINESS_EMAIL`, `BUSINESS_TYPE`, `COVERAGE_AREAS`, `BUSINESS_SEGMENT`, `COMMERCIAL_REGISTER_FILE`, `USER_ID`) VALUES
-(1, 'ALWADY', 'wady@gmail.com', NULL, NULL, 'hypermarket', '../files/accounts/retailers/ALWADY-TEST.pdf', 1000),
-(2, 'Taha Store', NULL, 'provider', 'Al Dammam', NULL, '../files/accounts/wholesalers/TahaStore-TEST.pdf', 1001);
+INSERT INTO `account` (`ID`, `BUSINESS_NAME`, `BUSINESS_EMAIL`, `BUSINESS_TYPE`, `BUSINESS_SEGMENT`, `COMMERCIAL_REGISTER_FILE`, `USER_ID`) VALUES
+(1, 'ALWADY', 'wady@gmail.com', NULL, 'hypermarket', '../files/accounts/retailers/ALWADY-TEST.pdf', 1000),
+(2, 'Taha Store', NULL, 'provider', NULL, '../files/accounts/wholesalers/TahaStore-TEST.pdf', 1001),
+(3, 'Mohamed Group', 'mogo@gmail.com', NULL, 'juice', '../files/accounts/retailers/Mohamed Group-TEST 2.pdf', 1002),
+(4, 'Z Store', NULL, 'provider', NULL, '../files/accounts/wholesalers/Z Store-TEST 2.pdf', 1003),
+(5, 'POP STORE', 'sop@gm.gm', NULL, 'caffe', '../files/accounts/retailers/POP STORE-TEST 2.pdf', 1004),
+(7, 'Twest', NULL, 'farm', NULL, NULL, 1006),
+(8, 'KOKOKO', NULL, NULL, NULL, '../files/accounts/wholesalers/KOKOKO-1735129360_TEST.pdf', 1007);
 
 -- --------------------------------------------------------
 
@@ -56,7 +60,7 @@ CREATE TABLE `chats` (
   `CID` int(11) NOT NULL,
   `CSENDER` int(11) NOT NULL,
   `CRECEIVER` int(11) NOT NULL,
-  `CSONUMBER` varchar(255) NOT NULL,
+  `CSOID` varchar(255) NOT NULL,
   `CMESSAGE` varchar(4000) NOT NULL,
   `CDATE` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -65,41 +69,11 @@ CREATE TABLE `chats` (
 -- Dumping data for table `chats`
 --
 
-INSERT INTO `chats` (`CID`, `CSENDER`, `CRECEIVER`, `CSONUMBER`, `CMESSAGE`, `CDATE`) VALUES
-(1, 1000, 1001, 'SORD675db53380e58', 'Ya Omar', '2024-12-14 17:25:34'),
-(2, 1001, 1000, 'SORD675db53380e58', 'sadasd', '2024-12-14 17:36:07'),
-(3, 1001, 1000, 'SORD675db53380e58', 'KK', '2024-12-14 17:44:14'),
-(4, 1000, 1001, 'SORD675db53380e58', 'KKK', '2024-12-14 17:45:11'),
-(5, 1000, 1001, 'SORD675db53380e58', '', '2024-12-14 17:45:31'),
-(6, 1000, 1001, 'SORD675db53380e58', '', '2024-12-14 17:45:36'),
-(7, 1000, 1001, 'SORD675db53380e58', 'Hello', '2024-12-14 17:48:35'),
-(8, 1000, 1001, 'SORD675db53380e58', 'JJ', '2024-12-14 17:49:56'),
-(9, 1000, 1001, 'SORD675db53380e58', 'Ya Omar', '2024-12-14 17:55:11'),
-(10, 1000, 1001, 'SORD675db53380e58', 'Ya Omar', '2024-12-14 17:56:51'),
-(11, 1000, 1001, 'SORD675db53380e58', 'HIII', '2024-12-14 17:58:23'),
-(12, 1000, 1001, 'SORD675db53380e58', 'Hii', '2024-12-14 18:01:42'),
-(13, 1000, 1001, 'SORD675db53380e58', 'sadasd', '2024-12-14 18:02:23'),
-(14, 1000, 1001, 'SORD675db53380e58', 'Jo', '2024-12-14 18:03:02'),
-(15, 1000, 1001, 'SORD675db53380e58', 'DD', '2024-12-14 18:03:27'),
-(16, 1000, 1001, 'SORD675db53380e58', 'Ya Omar', '2024-12-14 18:04:39'),
-(17, 1001, 1000, 'SORD675db53380e58', 'OK', '2024-12-14 18:06:30'),
-(18, 1001, 1000, 'SORD675db53380e58', 'Hi', '2024-12-14 18:06:58'),
-(19, 1000, 1001, 'SORD675db53380e58', 'HIII', '2024-12-14 18:09:20'),
-(20, 1001, 1000, 'SORD675db53380e58', 'Ya Omar', '2024-12-14 18:09:30'),
-(21, 1000, 1001, 'SORD675db53380e58', 'asd', '2024-12-14 18:14:44'),
-(22, 1000, 1001, 'SORD675db53380e58', 'sadasd', '2024-12-14 18:22:37'),
-(23, 1000, 1001, 'SORD675db53380e58', 'asd', '2024-12-14 18:22:48'),
-(24, 1000, 1001, 'SORD675db53380e58', 'Ya Omar', '2024-12-14 18:24:05'),
-(25, 1000, 1001, 'SORD675db53380e58', 'Ya Omar', '2024-12-14 18:24:09'),
-(26, 1000, 1001, 'SORD675db53380e58', 'Ji', '2024-12-14 18:36:11'),
-(27, 1000, 1001, 'SORD675db53380e58', 'أه', '2024-12-14 18:45:44'),
-(28, 1000, 1001, 'SORD675db53380e58', 'HIII', '2024-12-14 18:51:21'),
-(29, 1000, 1001, 'SORD675db53380e58', 'Ya Omar', '2024-12-14 18:52:17'),
-(30, 1001, 1000, 'SORD675db53380e58', 'HIII', '2024-12-14 18:52:23'),
-(31, 1001, 1000, 'SORD675db53380e58', 'JJJJJ', '2024-12-14 18:52:30'),
-(32, 1000, 1001, 'SORD675db53380e58', 'Howowow', '2024-12-14 18:52:37'),
-(33, 1000, 1001, 'SORD675c1f92864c1', 'Hi', '2024-12-14 22:55:34'),
-(34, 1001, 1000, 'SORD675c1f92864c1', 'Hello', '2024-12-14 22:57:15');
+INSERT INTO `chats` (`CID`, `CSENDER`, `CRECEIVER`, `CSOID`, `CMESSAGE`, `CDATE`) VALUES
+(53, 1000, 1001, '20', 'HI', '2024-12-28 18:43:13'),
+(54, 1001, 1000, '20', 'Hi', '2024-12-28 18:43:21'),
+(55, 1000, 1001, '10001001', 'Hu', '2024-12-28 19:22:06'),
+(56, 1004, 1001, '10041001', 'Hiii', '2024-12-28 19:34:33');
 
 -- --------------------------------------------------------
 
@@ -128,8 +102,7 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`OID`, `ONUMBER`, `OTYPE`, `ODATE`, `OSTATUS`, `OSTAGE`, `OPAYMETHOD`, `ODELIVERY`, `OSCHEDULE`, `ODAYS`, `OTOTALPRICE`, `USER_ID`, `WS_ID`) VALUES
-(1, 'ORD675c1df721241', 'standard', '2024-12-13', 'closed', 'done', 'later', 'logistic_shipping', 'week', 'one-time', 200, 1000, 1001),
-(2, 'ORD675c77fbd0133', 'standard', '2024-12-13', 'approved', 'done', 'cash', 'personal_recevice', 'day', 'wensday, friday', 250, 1000, 1001);
+(13, 'ORD676af3b0e9d03', 'standard', '2024-12-24', 'unapproved', 'delivery', 'cash', 'logistic_shipping', 'week', 'saturday, thuesday, wensday, thrusday', 140, 1000, 0);
 
 -- --------------------------------------------------------
 
@@ -150,8 +123,7 @@ CREATE TABLE `order_items` (
 --
 
 INSERT INTO `order_items` (`OIID`, `OIPID`, `OIOID`, `OIQUANTITY`, `OIPRICE`) VALUES
-(1, 6, 1, 10, 20),
-(2, 23, 2, 5, 50);
+(19, 32, 13, 2, 20);
 
 -- --------------------------------------------------------
 
@@ -163,6 +135,7 @@ CREATE TABLE `products` (
   `PID` int(11) NOT NULL,
   `PNAME` varchar(255) NOT NULL,
   `PCATEGORY` varchar(255) NOT NULL,
+  `PCOUNTRY` varchar(255) NOT NULL,
   `PPRICE` decimal(10,2) NOT NULL,
   `PSTATUS` enum('available','unavailable') DEFAULT 'available',
   `PKEYWORDS` text DEFAULT NULL,
@@ -177,10 +150,34 @@ CREATE TABLE `products` (
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`PID`, `PNAME`, `PCATEGORY`, `PPRICE`, `PSTATUS`, `PKEYWORDS`, `PQUANTITY`, `PDESCRIPTION`, `PIMAGE`, `USER_ID`, `CREATED_DATE`) VALUES
-(6, 'apple', 'fruits', 20.00, 'available', '0', 10, '0', 'assets/img/fruits/apple.png', 1001, '2024-12-08 12:05:06'),
-(23, 'mango', 'fruits', 50.00, 'unavailable', 'Yellow Semi-Green ', 1, 'Mango Organic From India', 'assets/img/fruits/mango.png', 1001, '2024-12-08 19:47:12'),
-(24, 'onion', 'vegetables', 5.00, 'available', 'Big Solid', 10, 'Organic', 'assets/img/vegetables/onion.png', 1001, '2024-12-08 20:28:01');
+INSERT INTO `products` (`PID`, `PNAME`, `PCATEGORY`, `PCOUNTRY`, `PPRICE`, `PSTATUS`, `PKEYWORDS`, `PQUANTITY`, `PDESCRIPTION`, `PIMAGE`, `USER_ID`, `CREATED_DATE`) VALUES
+(32, 'apple', 'fruits', 'Saudi Arabia', 20.00, 'available', 'Good Organic', 10, 'Product Description', 'assets/img/fruits/apple.png', 1001, '2024-12-24 17:05:21'),
+(33, 'cilantro', 'vegetables', 'Albania', 100.00, 'available', 'Delicuse', 50, 'Product Description', 'assets/img/vegetables/cilantro.png', 1001, '2024-12-24 19:39:42'),
+(34, 'banana', 'fruits', 'South Sudan', 50.00, 'available', 'Yellow Good', 200, 'Banana Product Description', 'assets/img/fruits/banana.png', 1003, '2024-12-28 14:20:20'),
+(35, 'pomegranate', 'fruits', 'Saudi Arabia', 10.00, 'available', 'Good', 200, 'ssss', 'assets/img/fruits/pomegranate.png', 1003, '2024-12-28 14:24:40'),
+(36, 'apple', 'fruits', 'Afghanistan', 30.00, 'available', 'Good', 100, 'loprwem', 'assets/img/fruits/apple.png', 1003, '2024-12-28 14:29:34');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `requests`
+--
+
+CREATE TABLE `requests` (
+  `ID` int(11) NOT NULL,
+  `RSOID` int(11) NOT NULL,
+  `RDATE` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `RCONTRACT_FILE` varchar(4000) NOT NULL,
+  `RSTATUS` enum('applied','rejected','unapplied') NOT NULL,
+  `WS_ID` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `requests`
+--
+
+INSERT INTO `requests` (`ID`, `RSOID`, `RDATE`, `RCONTRACT_FILE`, `RSTATUS`, `WS_ID`) VALUES
+(15, 20, '2024-12-28 18:42:38', '../files/contracts/wholesalers/SORD6770465ecc4e7-TEST.pdf', 'applied', 1001);
 
 -- --------------------------------------------------------
 
@@ -197,13 +194,6 @@ CREATE TABLE `reviews` (
   `WS_ID` int(11) NOT NULL,
   `USER_ID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `reviews`
---
-
-INSERT INTO `reviews` (`RID`, `RATE`, `MESSAGE`, `RDATE`, `OID`, `WS_ID`, `USER_ID`) VALUES
-(3, 5, 'Thanks', '2024-12-14 11:56:54', 1, 1001, 1000);
 
 -- --------------------------------------------------------
 
@@ -227,16 +217,18 @@ CREATE TABLE `special_orders` (
   `SODATE` timestamp NOT NULL DEFAULT current_timestamp(),
   `CONTRACT_FILE` varchar(4000) NOT NULL,
   `USER_ID` int(11) NOT NULL,
-  `WS_ID` int(11) NOT NULL
+  `WS_ID` int(11) NOT NULL,
+  `SODAYS` varchar(4000) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `special_orders`
 --
 
-INSERT INTO `special_orders` (`SOID`, `SONUMBER`, `SOTYPE`, `SOSTATUS`, `PNAME`, `PCATEGORY`, `PPRICE`, `SOQUANTITY`, `SORECEIVEDDATE`, `SOSCHEDULEOPTION`, `SODESCRIPTION`, `SOTOTALPRICE`, `SODATE`, `CONTRACT_FILE`, `USER_ID`, `WS_ID`) VALUES
-(1, 'SORD675c1f92864c1', 'special', 'applied', 'apple', 'fruits', 20.00, 20, '2025-01-11', 'week', 'Special Order Description', 400, '2024-12-13 11:50:42', '../files/contracts/wholesalers/SORD675c1f92864c1-TEST.pdf', 1000, 1001),
-(2, 'SORD675db53380e58', 'special', 'applied', 'watermelon', 'fruits', 100.00, 5, '2024-12-28', 'day', 'Special Product', 500, '2024-12-14 16:41:23', '../files/contracts/wholesalers/SORD675db53380e58-SORD675c1f92864c1-TEST.pdf', 1000, 1001);
+INSERT INTO `special_orders` (`SOID`, `SONUMBER`, `SOTYPE`, `SOSTATUS`, `PNAME`, `PCATEGORY`, `PPRICE`, `SOQUANTITY`, `SORECEIVEDDATE`, `SOSCHEDULEOPTION`, `SODESCRIPTION`, `SOTOTALPRICE`, `SODATE`, `CONTRACT_FILE`, `USER_ID`, `WS_ID`, `SODAYS`) VALUES
+(20, 'SORD6770465ecc4e7', 'special', 'finished', 'apple', 'fruits', 100.00, 100, '2025-01-10', 'day', 'Order Desc', 10000, '2024-12-28 18:41:34', 'applied-SORD6770465ecc4e7-TEST 2.pdf', 1000, 1001, ''),
+(21, 'SORD67704b2601ac0', 'special', 'unapproved', 'onion', 'vegetables', 20.00, 50, '2025-01-09', 'week', 'Special Order', 1000, '2024-12-28 19:01:58', '', 1000, 0, 'sunday, monday, thrusday'),
+(22, 'SORD677052c23f333', 'special', 'unapproved', 'apple', 'fruits', 50.00, 50, '2025-01-15', 'day', 'Special Orders', 2500, '2024-12-28 19:34:26', '', 1004, 0, '');
 
 -- --------------------------------------------------------
 
@@ -262,7 +254,12 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`ID`, `USERNAME`, `PASSWORD`, `FNAME`, `LNAME`, `PHONE`, `USER_TYPE`, `CREATED_DATE`) VALUES
 (999, 'admin@admin.com', '$2y$10$ZTjLzAv7GFUY8dKPFZpn3OEEGgGg1BiB/L/LRpwJLXylD09XZmMaa', 'admin', 'admin', '123456', 'admin', '0000-00-00'),
 (1000, 'adham@gmail.com', '$2y$10$NpeMMUJNAV/U6FM.4VtUCOYFNoqHCIKQeEzNCltYwsd3TjSMNx9fG', 'adham', 'mohamed', '123456789', 'retailer', '2024-12-13'),
-(1001, 'omarthhh@gmail.com', '$2y$10$b6MmakMLColLs9.j3HQ4K.bUMcWGzISeBmX2Og20Hvrm//.6woCom', 'Omar', 'Taha', '0123456789', 'wholesaler', '2024-12-13');
+(1001, 'omarthhh@gmail.com', '$2y$10$b6MmakMLColLs9.j3HQ4K.bUMcWGzISeBmX2Og20Hvrm//.6woCom', 'Omar', 'Taha', '0123456789', 'wholesaler', '2024-12-13'),
+(1002, 'mohww@gmail.com', '$2y$10$emnC/nPwNdfEeXrpuk3gOOnXKnbD1XlU1.xKBoKPtldTqNi9QNzvW', 'Mohamed', 'Kareem', '123456789', 'retailer', '2024-12-15'),
+(1003, 'momm@gmail.com', '$2y$10$fBZ88qDCZDmPixQPbERQVOvslKqkEl1f4zNg6f9F46YlLBa.6H0iC', 'Mostafa', 'Mamdouh', '123456789', 'wholesaler', '2024-12-15'),
+(1004, 'po2@gmail.com', '$2y$10$dB8eQ67phPyluJHsHa8IbeWrqT.8TJu/FiivxLGeJ5a64YPAZfDJi', 'POP', 'MOM', '123456', 'retailer', '2024-12-16'),
+(1006, 't@t.com', '$2y$10$r/VFKtK/GsVCSgWJChmH2evpHAKtbMpoYge/RReC90r4NGfLK3Lva', 'Test', 'Test', '123456789', 'wholesaler', '2024-12-21'),
+(1007, 'h@h.h', '$2y$10$P9uUVg8YVqcnHvLZHsqamuJzMdZ0Noj2KsZWhMPj0ySYYXHctVw6a', 'kk', 'kk', '242424', 'wholesaler', '2024-12-24');
 
 --
 -- Indexes for dumped tables
@@ -299,6 +296,12 @@ ALTER TABLE `products`
   ADD PRIMARY KEY (`PID`);
 
 --
+-- Indexes for table `requests`
+--
+ALTER TABLE `requests`
+  ADD PRIMARY KEY (`ID`);
+
+--
 -- Indexes for table `reviews`
 --
 ALTER TABLE `reviews`
@@ -324,49 +327,55 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `account`
 --
 ALTER TABLE `account`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `chats`
 --
 ALTER TABLE `chats`
-  MODIFY `CID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `CID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `OID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `OID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `OIID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `OIID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `PID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `PID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+
+--
+-- AUTO_INCREMENT for table `requests`
+--
+ALTER TABLE `requests`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `reviews`
 --
 ALTER TABLE `reviews`
-  MODIFY `RID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `RID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `special_orders`
 --
 ALTER TABLE `special_orders`
-  MODIFY `SOID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `SOID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1002;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1008;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

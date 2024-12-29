@@ -120,23 +120,37 @@
             <?php foreach ($chats as $chat) : ?>
                 
                 <?php
-                    $stmt = $conn->prepare("SELECT FNAME, LNAME, USER_TYPE FROM users WHERE ID = ?");
+                    // Get Retailer Name
+                    $stmt = $conn->prepare("SELECT FNAME, LNAME, PHONE FROM users WHERE ID = ?");
                     $retailer_id = $chat['CSENDER'];
                     $stmt->bind_param("i", $retailer_id);
                     $stmt->execute();
                     $stmt->store_result();
                     // Bind the result
-                    $stmt->bind_result($fname, $lname, $user_type);
+                    $stmt->bind_result($fname, $lname, $phone);
                     $stmt->fetch();
+                    
+                    // Get Order Number
+                    $stmt = $conn->prepare("SELECT SONUMBER FROM special_orders WHERE SOID = ?");
+                    $order_id = $chat['CSOID'];
+                    $stmt->bind_param("i", $order_id);
+                    $stmt->execute();
+                    $stmt->store_result();
+                    $sonumber = null;
+                    // Bind the result
+                    $stmt->bind_result($sonumber);
+                    $stmt->fetch();
+                    $count++;
                 ?>
-                <div class="card col-12 border border-1 border-white-50 mb-3 p-3" data-aos="slide-right" data-aos-duration="<?= $count++ ?>000">
+                <div class="card col-12 border border-1 border-white-50 mb-3 p-3" data-aos="slide-right" data-aos-duration="<?= $count ?>00">
                     <div class="row">
-                        <div class="col-12 col-md-4">
+                        <div class="col-12 col-md-6">
                             <div class="card-body">
                                 <h4 class="card-title"><?= ucfirst($fname) . " " . ucfirst($lname) ?></h4>
+                                <?= (isset($sonumber))? '<span class="fw-bold"><i class="bx bx-package bx-sm"></i> Special Order Number:</span> # ' . $sonumber : '<span class="fw-bold"><i class="bx bx-phone bx-sm"></i> ' . $phone . '</span>' ?>
                             </div>
                         </div>
-                        <div class="col-12 col-md-8 align-content-center">
+                        <div class="col-12 col-md-6 align-content-center">
                             <div class="text-center text-md-end">
                                 <a class="btn btn-primary" href="chat.php?rtid=<?= $retailer_id ?>&soid=<?= $chat['CSOID'] ?>">Chat</a>
                             </div>

@@ -3056,20 +3056,20 @@ fieldset:disabled .btn {
   border-color: var(--bs-secondary);
 }
 .btn-outline-secondary:hover {
-  color: var(--bs-black);
+  color: var(--bs-white);
   background-color: var(--bs-secondary);
   border-color: var(--bs-secondary);
 }
 .btn-check:focus + .btn-outline-secondary,
 .btn-outline-secondary:focus {
-  box-shadow: 0 0 0 0.25rem rgba(255, 181, 36, 0.5);
+  box-shadow: 0 0 0 0.25rem var(--bs-accent-50);
 }
 .btn-check:checked + .btn-outline-secondary,
 .btn-check:active + .btn-outline-secondary,
 .btn-outline-secondary:active,
 .btn-outline-secondary.active,
 .btn-outline-secondary.dropdown-toggle.show {
-  color: var(--bs-black);
+  color: var(--bs-white-50);
   background-color: var(--bs-secondary);
   border-color: var(--bs-secondary);
 }
@@ -3078,7 +3078,7 @@ fieldset:disabled .btn {
 .btn-outline-secondary:active:focus,
 .btn-outline-secondary.active:focus,
 .btn-outline-secondary.dropdown-toggle.show:focus {
-  box-shadow: 0 0 0 0.25rem rgba(255, 181, 36, 0.5);
+  box-shadow: 0 0 0 0.25rem var(--bs-accent-50);
 }
 .btn-outline-secondary:disabled,
 .btn-outline-secondary.disabled {

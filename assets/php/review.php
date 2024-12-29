@@ -8,7 +8,7 @@ session_start();
 $user_id = $_SESSION['user_id'];
 
 // Check if the form is submitted
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['closed-submit'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['review-submit'])) {
     
     // Special Order ID
     $order_id = $_POST['oid'] ?? "";
@@ -27,24 +27,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['closed-submit'])) {
     
     // Execute the statement
     $stmt->execute();
-    
-
-    // Prepare the SQL query
-    $stmt = $conn->prepare("UPDATE orders SET OSTATUS = ? WHERE OID = ?");
-    
-    // Bind parameters with appropriate types
-    $stmt->bind_param("si", $order_status, $order_id);
-    
-    // Execute the statement
-    $stmt->execute();
-    
-    
+        
     // Close the statement and connection
     $stmt->close();
     $conn->close();
     
     // Optionally, redirect to another page
-    header("Location: ../../my-orders.php?action=approved");
+    header("Location: ../../my-orders.php?action=reviewed");
 }
 
 

@@ -13,7 +13,7 @@ $user_id = $_SESSION['user_id'] ?? null;
 $user_type = $_SESSION['user_type'] ?? null;
 $status = "";
 
-if ($user_id === null || $user_type !== 'retailer') {
+if ($user_id === null) {
     header("Location: 404.php");
     exit();
 }
@@ -126,7 +126,160 @@ if ($order_id > 0) {
                     <h1>Order Details</h1>
                     <h3 class="text-muted">Apply Offers and Track Order</h3>
                 </div>
-                <?php if ($order_id > 0) { ?>
+                <?php if ($special_order_id > 0) { ?>
+                    <!-- Special Order Start -->
+                    <div class="container mb-3">
+                        <!--    Special Order Title Start    -->
+                        <div class="text-center">
+                            <h2>Special Order</h2>
+                            <h6>Special Order ID: <?= $_SESSION['specialOrder'][$special_order_id]['SONUMBER']; ?></h6>
+                        </div>
+                        <!--    Special Order Title End    -->
+                        <table class="table table-striped table-hover w-100">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Product Name</th>
+                                    <th scope="col">Product Category</th>
+                                    <th scope="col">Product Price</th>
+                                    <th scope="col">Product Quantity</th>
+                                    <th scope="col">Schedule Option</th>
+                                    <th scope="col">Schedule Days</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><?= htmlspecialchars(ucfirst($_SESSION['specialOrder'][$special_order_id]['PNAME'])); ?></td>
+                                    <td><?= htmlspecialchars(ucfirst($_SESSION['specialOrder'][$special_order_id]['PCATEGORY'])); ?></td>
+                                    <td><?= htmlspecialchars($_SESSION['specialOrder'][$special_order_id]['PPRICE']); ?></td>
+                                    <td><?= htmlspecialchars($_SESSION['specialOrder'][$special_order_id]['SOQUANTITY']); ?></td>
+                                    <td><?= htmlspecialchars(ucfirst($_SESSION['specialOrder'][$special_order_id]['SOSCHEDULEOPTION'])); ?></td>
+                                    <td><?= htmlspecialchars(ucwords($_SESSION['specialOrder'][$special_order_id]['SODAYS'])); ?></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Special Order End -->
+                    <div class="card-container">
+                        <?php $status = $_SESSION['specialOrder'][$special_order_id]['SOSTATUS'] ?? ''; ?>
+                        <?php if ($status === 'unapproved') { ?>
+                            <?php if ($result->num_rows > 0) { ?>
+                                <?php foreach ($requests as $request): ?>
+                                    <?php // Fetch wholesaler details
+                                    $stmt_wholesaler = $conn->prepare("SELECT BUSINESS_NAME, BUSINESS_TYPE FROM account WHERE user_id = ? ");
+                                    $stmt_wholesaler->bind_param('i', $request['WS_ID']);
+                                    $stmt_wholesaler->execute();
+                                    $result_wholesaler = $stmt_wholesaler->get_result();
+                                    $wholesaler = $result_wholesaler->fetch_assoc();
+                                    ?>
+                                    <div class="card col-12 border border-1 border-white-50 mb-3 p-3">
+                                        <div class="row">
+                                            <div class="col-12 col-md-4">
+                                                <div class="card-body">
+                                                    <h4 class="card-title"><?= htmlspecialchars($wholesaler['BUSINESS_NAME'] ?? 'Unknown Wholesaler') ?></h4>
+                                                    <p><?= htmlspecialchars(ucfirst($wholesaler['BUSINESS_TYPE'] ?? 'Unknown Business Type')) ?></p>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-8 align-content-center">
+                                                <div class="d-flex flex-column flex-md-row justify-content-around align-items-end">
+                                                    <a class="btn btn-secondary m-1" href="view-file.php?request-file=<?= urlencode($request['RCONTRACT_FILE'] ?? 'File Not Found') ?>&sonumber=<?= $_SESSION['specialOrder'][$special_order_id]['SONUMBER'] ?? 'Order Not Found' ?>">View Contract</a>
+                                                    <a class="btn btn-danger m-1" href="">Reject</a>
+                                                    <form class="d-flex" action="assets/php/request.php" method="POST" enctype="multipart/form-data">
+                                                        <input type="hidden" name="soid" value="<?= htmlspecialchars($request['RSOID']) ?>">
+                                                        <input type="hidden" name="sonumber" value="<?= htmlspecialchars($_SESSION['specialOrder'][$special_order_id]['SONUMBER']) ?>">
+                                                        <input type="hidden" name="wsid" value="<?= htmlspecialchars($request['WS_ID']) ?>">
+                                                        <input type="file" class="form-control" name="contract_file" id="contract_file" placeholder="No File Chosen" required />
+                                                        <span class="mx-2"></span>
+                                                        <button class="btn btn-primary m-1" type="submit" name="apply-submit">Apply</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+
+                            <?php } else { ?>
+                                <!--    Alter Warning Start  -->
+                                <div class="container py-5">
+                                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <i class="bx bx-timer bx-lg"></i>
+                                            <p><strong>Order Didn't Approved Yet!</strong> Wait for Approved Or</p>
+                                            <strong>Contact With Provider</strong>
+                                            <a href="providers.php" class="alert-link p-2 border border-accent rounded-circle mb-3"><i class="bx bx-support bx-sm"></i></a>
+                                            <a class="mb-3 btn btn-accent" href="my-orders.php">My Orders</a>
+                                        </div>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                </div>
+                                <!--    Alter Warning End   -->
+                            <?php } ?>
+                        <?php } elseif ($status === 'applied' && $user_id !== $wholesaler_id) { ?>
+                            <div class="card col-12 border border-1 border-white-50 mb-3 p-3">
+                                <div class="row">
+                                    <div class="col-8 col-md-10">
+                                        <div class="card-body">
+                                            <h4 class="card-title">
+                                                <p><?= htmlspecialchars($_SESSION['wholesaler'][$wholesaler_id]['BUSINESS_NAME'] ?? 'Unknown Wholersaler') ?></p>
+                                            </h4>
+                                            <p><?= htmlspecialchars(ucfirst($_SESSION['wholesaler'][$wholesaler_id]['BUSINESS_TYPE'] ?? 'Unknown Business Type')) ?></p>
+                                            <div class="d-flex star-rating" data-stars="<?= isset($rate) ? $rate : "" ?>"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-4 col-md-2 align-content-center">
+                                        <div class="text-end">
+                                            <div class="row">
+                                                <div class="col mb-3">
+                                                    <a class="btn btn-secondary" href="chat.php?wsid=<?= $wholesaler_id ?>&soid=<?= $special_order_id ?>">Chat</a>
+                                                </div>
+                                                <div class="col mb-3">
+                                                    <form action="assets/php/request.php" method="POST">
+                                                        <input type="hidden" name="soid" value="<?= htmlspecialchars($_SESSION['specialOrder'][$special_order_id]['SOID'] ?? 0) ?>">
+                                                        <button class="btn btn-primary" type="submit" name="finish-submit">Finished</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--    Contract File Title Start    -->
+                            <div class="mt-3">
+                                <h2>Contract File</h2>
+                                <h6>Contract File of Special Order Number: <?= $_SESSION['specialOrder'][$special_order_id]['SONUMBER']; ?></h6>
+                            </div>
+                            <!--    Contract File Title End    -->
+                            <iframe src="assets/files/contracts/retailers/<?= $_SESSION['specialOrder'][$special_order_id]['CONTRACT_FILE']; ?>" width="100%" height="635" frameborder="0"></iframe>
+                            <!--  Back Button    -->
+                            <div class="container">
+                                <div class="row">
+                                    <a href="" class="btn btn-accent"><i class="bx bx-left-arrow-alt"></i> <span class="fw-bold"> Back</span></a>
+                                </div>
+                            </div>
+
+                        <?php } elseif ($status === 'applied' || $status === 'finished' && $user_id === $wholesaler_id) { ?>
+                            <!--    Contract File Title Start    -->
+                            <div class="mt-3">
+                                <h2>Contract File</h2>
+                                <h6>Contract File of Special Order Number: <?= $_SESSION['specialOrder'][$special_order_id]['SONUMBER']; ?></h6>
+                            </div>
+                            <!--    Contract File Title End    -->
+                            <iframe src="assets/files/contracts/retailers/<?= $_SESSION['specialOrder'][$special_order_id]['CONTRACT_FILE']; ?>" width="100%" height="635" frameborder="0"></iframe>
+                            <!--  Back Button    -->
+                            <div class="container">
+                                <div class="row">
+                                    <a href="requests.php" class="btn btn-accent"><i class="bx bx-left-arrow-alt"></i> <span class="fw-bold"> Back</span></a>
+                                </div>
+                            </div>
+                        <?php } else { ?>
+                            <?php if ($status === 'finished') { ?>
+
+                            <?php } ?>
+                        <?php } ?>
+                    </div>
+                    <!--    Special Order Requests Section  -->
+                <?php } elseif ($order_id > 0) { ?>
                     <!-- Standard Order Start -->
                     <div class="container mb-3">
                         <!--    Special Order Title Start    -->
@@ -176,158 +329,6 @@ if ($order_id > 0) {
                         </table>
                     </div>
                     <!-- Standard Order End -->
-                <?php } else { ?>
-                    <!-- Special Order Start -->
-                    <div class="container mb-3">
-                        <!--    Special Order Title Start    -->
-                        <div class="text-center">
-                            <h2>Special Order</h2>
-                            <h6>Special Order ID: <?= $_SESSION['specialOrder'][$special_order_id]['SONUMBER']; ?></h6>
-                        </div>
-                        <!--    Special Order Title End    -->
-                        <table class="table table-striped table-hover w-100">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Product Name</th>
-                                    <th scope="col">Product Category</th>
-                                    <th scope="col">Product Price</th>
-                                    <th scope="col">Product Quantity</th>
-                                    <th scope="col">Schedule Option</th>
-                                    <th scope="col">Schedule Days</th>
-
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><?= htmlspecialchars(ucfirst($_SESSION['specialOrder'][$special_order_id]['PNAME'])); ?></td>
-                                    <td><?= htmlspecialchars(ucfirst($_SESSION['specialOrder'][$special_order_id]['PCATEGORY'])); ?></td>
-                                    <td><?= htmlspecialchars($_SESSION['specialOrder'][$special_order_id]['PPRICE']); ?></td>
-                                    <td><?= htmlspecialchars($_SESSION['specialOrder'][$special_order_id]['SOQUANTITY']); ?></td>
-                                    <td><?= htmlspecialchars(ucfirst($_SESSION['specialOrder'][$special_order_id]['SOSCHEDULEOPTION'])); ?></td>
-                                    <td><?= htmlspecialchars(ucwords($_SESSION['specialOrder'][$special_order_id]['SODAYS'])); ?></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- Special Order End -->
-                <?php } ?>
-                <?php if ($special_order_id > 0) { ?>
-                    <div class="card-container">
-                        <?php $status = $_SESSION['specialOrder'][$special_order_id]['SOSTATUS'] ?? ''; ?>
-                        <?php if ($status === 'unapproved') { ?>
-                            <?php foreach ($requests as $request): ?>
-                            <?php // Fetch wholesaler details
-                            $stmt_wholesaler = $conn->prepare("
-                                SELECT BUSINESS_NAME, BUSINESS_TYPE 
-                                FROM account 
-                                WHERE user_id = ?
-                            ");
-                                $stmt_wholesaler->bind_param('i', $request['WS_ID']);
-                                $stmt_wholesaler->execute();
-                                $result_wholesaler = $stmt_wholesaler->get_result();
-                                $wholesaler = $result_wholesaler->fetch_assoc();
-                               ?>
-                            <div class="card col-12 border border-1 border-white-50 mb-3 p-3">
-                                <div class="row">
-                                    <div class="col-12 col-md-4">
-                                        <div class="card-body">
-                                            <h4 class="card-title"><?= htmlspecialchars($wholesaler['BUSINESS_NAME'] ?? 'Unknown Wholesaler') ?></h4>
-                                            <p><?= htmlspecialchars(ucfirst($wholesaler['BUSINESS_TYPE'] ?? 'Unknown Business Type')) ?></p>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-8 align-content-center">
-                                        <div class="d-flex flex-column flex-md-row justify-content-around align-items-end">
-                                            <a class="btn btn-secondary m-1" href="view-file.php?contract=<?= urlencode($request['RCONTRACT_FILE'] ?? 'File Not Found') ?>">View Contract</a>
-                                            <a class="btn btn-danger m-1" href="">Reject</a>
-                                            <form class="d-flex" action="assets/php/request.php" method="POST" enctype="multipart/form-data">
-                                                <input type="hidden" name="soid" value="<?= htmlspecialchars($request['RSOID']) ?>">
-                                                <input type="hidden" name="sonumber" value="<?= htmlspecialchars($_SESSION['specialOrder'][$special_order_id]['SONUMBER']) ?>">
-                                                <input type="hidden" name="wsid" value="<?= htmlspecialchars($request['WS_ID']) ?>">
-                                                <input type="file" class="form-control" name="contract_file" id="contract_file" placeholder="No File Chosen" required />
-                                                <span class="mx-2"></span>
-                                                <button class="btn btn-primary m-1" type="submit" name="apply-submit">Apply</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
-                        <?php }elseif ($status === 'approved') { ?>
-                            <div class="card col-12 border border-1 border-white-50 mb-3 p-3">
-                                <div class="row">
-                                    <div class="col-12 col-md-4">
-                                        <div class="card-body">
-                                            <h4 class="card-title"><?= htmlspecialchars($_SESSION['wholesaler'][$wholesaler_id]['BUSINESS_NAME'] ?? 'Unknown Wholesaler') ?></h4>
-                                            <p><?= htmlspecialchars(ucfirst($_SESSION['wholesaler'][$wholesaler_id]['BUSINESS_TYPE'] ?? 'Unknown Business Type')) ?></p>
-                                            <div class="d-flex star-rating" data-stars="<?= isset($rate) ? $rate : "" ?>"></div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-8 align-content-center">
-                                        <div class="d-flex flex-column flex-md-row justify-content-around align-items-end">
-                                            <a class="btn btn-secondary m-1" href="view-file.php?contract=<?= urlencode($_SESSION['specialOrder'][$special_order_id]['CONTRACT_FILE'] ?? 'File Not Found') ?>">View Contract</a>
-                                            <a class="btn btn-danger m-1" href="">Reject</a>
-                                            <form class="d-flex" action="assets/php/request.php" method="POST" enctype="multipart/form-data">
-                                                <input type="hidden" name="soid" value="<?= htmlspecialchars($_SESSION['specialOrder'][$special_order_id]['SOID'] ?? 0) ?>">
-                                                <input type="file" class="form-control" name="contract_file" id="contract_file" placeholder="No File Chosen" required />
-                                                <span class="mx-2"></span>
-                                                <button class="btn btn-primary m-1" type="submit" name="apply-submit">Apply</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php } elseif ($status === 'applied') { ?>
-                            <div class="card col-12 border border-1 border-white-50 mb-3 p-3">
-                                <div class="row">
-                                    <div class="col-8 col-md-10">
-                                        <div class="card-body">
-                                            <h4 class="card-title">
-                                                <p><?= htmlspecialchars($_SESSION['wholesaler'][$wholesaler_id]['BUSINESS_NAME'] ?? 'Unknown Wholersaler') ?></p>
-                                            </h4>
-                                            <p><?= htmlspecialchars(ucfirst($_SESSION['wholesaler'][$wholesaler_id]['BUSINESS_TYPE'] ?? 'Unknown Business Type')) ?></p>
-                                            <div class="d-flex star-rating" data-stars="<?= isset($rate) ? $rate : "" ?>"></div>
-                                        </div>
-                                    </div>
-                                    <div class="col-4 col-md-2 align-content-center">
-                                        <div class="text-end">
-                                            <div class="row">
-                                                <div class="col mb-3">
-                                                    <a class="btn btn-secondary" href="chat.php?wsid=<?= $wholesaler_id ?>&soid=<?= $special_order_id ?>">Chat</a>
-                                                </div>
-                                                <div class="col mb-3">
-                                                    <form action="assets/php/request.php" method="POST">
-                                                        <input type="hidden" name="soid" value="<?= htmlspecialchars($_SESSION['specialOrder'][$special_order_id]['SOID'] ?? 0) ?>">
-                                                        <button class="btn btn-primary" type="submit" name="finish-submit">Finished</button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php } else { ?>
-                            <?php if ($status !== 'finished') { ?>
-                                <!-- Order Not Found Start -->
-                                <!--    Alter Warning Start  -->
-                                <div class="container py-5">
-                                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                                        <div class="d-flex flex-column align-items-center">
-                                            <i class="bx bx-timer bx-lg"></i>
-                                            <p><strong>Order Didn't Approved Yet!</strong> Wait for Approved Or</p>
-                                            <strong>Contact With Provider</strong>
-                                            <a href="providers.php" class="alert-link p-2 border border-accent rounded-circle mb-3"><i class="bx bx-support bx-sm"></i></a>
-                                            <a class="mb-3 btn btn-accent" href="my-orders.php">My Orders</a>
-                                        </div>
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                    </div>
-                                </div>
-                                <!--    Alter Warning End   -->
-                                <!-- Order Not Found End -->
-                            <?php } ?>
-                        <?php } ?>
-                    </div>
-                    <!--    Special Order Requests Section  -->
-                <?php } elseif ($order_id > 0) { ?>
                     <?php $status = $_SESSION['standardOrder'][$order_id]['OSTATUS'] ?? ''; ?>
                     <?php $stage = $_SESSION['standardOrder'][$order_id]['OSTAGE'] ?? ''; ?>
                     <?php if ($status === 'approved') { ?>
@@ -395,7 +396,41 @@ if ($order_id > 0) {
                             </div>
                         </div>
                         <!--    Track Order Section  -->
-                    <?php } elseif ($status !== 'closed') { ?>
+                    <?php } elseif ($status === 'finished') { ?>
+                        <!--   Review Order Details Section End     -->
+                        <!--    Review and Feedback Section Start     -->
+                        <div class="container-fluid py-5">
+                            <div class="container">
+                                <div class="section-title mb-3">
+                                    <h1>Review and Feedback</h1>
+                                    <h3 class="text-muted">Write Your Opinion On Wholesaler</h3>
+                                </div>
+                                <div class="container">
+                                    <div class="my-3">
+                                        <h5>Enter Order Details</h5>
+                                    </div>
+                                    <form action="assets/php/review.php" method="POST">
+                                        <input type="hidden" name="oid" value="<?= htmlspecialchars($_SESSION['standardOrder'][$order_id]['OID'] ?? 0) ?>">
+                                        <input type="hidden" name="wsid" value="<?= htmlspecialchars($_SESSION['standardOrder'][$order_id]['WS_ID'] ?? 0) ?>">
+                                        <div class="col-3 mb-3">
+                                            <label for="rate" class="form-label">RATE:</label>
+                                            <input class="form-range" min="0" max="5" type="range" name="rate" id="rate" placeholder="rate" />
+                                            <p class="text-muted">Rate Wholesaler From 1 → 5</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="message" class="form-label">MESSAGE:</label>
+                                            <textarea class="form-control" name="message" id="message" cols="30" rows="10" placeholder="Write Message About The Order Trip"></textarea>
+                                        </div>
+                                        <div class="mb-3 text-end">
+                                            <a class="btn btn-accent" type="reset" href="home.php">Home</a>
+                                            <button class="btn btn-primary" type="submit" name="closed-submit">Send and Close Order</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <!--    Review and Feedback Section Start     -->
+                    <?php } else { ?>
                         <!-- Order Not Found Start -->
                         <!--    Alter Warning Start  -->
                         <div class="container py-5">
@@ -412,9 +447,16 @@ if ($order_id > 0) {
                         </div>
                         <!--    Alter Warning End   -->
                         <!-- Order Not Found End -->
+                        <!-- Order Didn't Approved Yet Start -->
+
                     <?php }  ?>
+                    <!--  Back Button    -->
+                    <div class="container">
+                        <div class="row">
+                            <a href="my-orders.php" class="btn btn-accent"><i class="bx bx-left-arrow-alt"></i> <span class="fw-bold"> Back</span></a>
+                        </div>
+                    </div>
                 <?php } else { ?>
-                    <!-- Order Didn't Approved Yet Start -->
                     <!--    Alter Default Start  -->
                     <div class="container py-5">
                         <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -432,41 +474,6 @@ if ($order_id > 0) {
 
             </div>
         </div>
-        <!--    Order Details Section End     -->
-        <?php if ($order_id > 0 && $stage === 'done') { ?>
-            <!--    Review and Feedback Section Start     -->
-            <div class="container-fluid py-5">
-                <div class="container">
-                    <div class="section-title mb-3">
-                        <h1>Review and Feedback</h1>
-                        <h3 class="text-muted">Write Your Opinion On Wholesaler</h3>
-                    </div>
-                    <div class="container">
-                        <div class="my-3">
-                            <h5>Enter Order Details</h5>
-                        </div>
-                        <form action="assets/php/review.php" method="POST">
-                            <input type="hidden" name="oid" value="<?= htmlspecialchars($_SESSION['standardOrder'][$order_id]['OID'] ?? 0) ?>">
-                            <input type="hidden" name="wsid" value="<?= htmlspecialchars($_SESSION['standardOrder'][$order_id]['WS_ID'] ?? 0) ?>">
-                            <div class="col-3 mb-3">
-                                <label for="rate" class="form-label">RATE:</label>
-                                <input class="form-range" min="0" max="5" type="range" name="rate" id="rate" placeholder="rate" />
-                                <p class="text-muted">Rate Wholesaler From 1 → 5</p>
-                            </div>
-                            <div class="mb-3">
-                                <label for="message" class="form-label">MESSAGE:</label>
-                                <textarea class="form-control" name="message" id="message" cols="30" rows="10" placeholder="Write Message About The Order Trip"></textarea>
-                            </div>
-                            <div class="mb-3 text-end">
-                                <a class="btn btn-accent" type="reset" href="home.php">Home</a>
-                                <button class="btn btn-primary" type="submit" name="closed-submit">Send and Close Order</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <!--    Review and Feedback Section Start     -->
-        <?php } ?>
     </section>
 </main>
 

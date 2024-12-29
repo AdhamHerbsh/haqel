@@ -90,8 +90,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply-submit'])) {
 
     // Contract File
     $contract_file = $_FILES['contract_file']['name']; // Assuming file upload
-    $upload_dir = "../files/contracts/retailers/" . $order_status . "-" . $special_order_number . "-";
-    $uploaded_file_path = $upload_dir . basename($contract_file);
+    $upload_dir = "../files/contracts/retailers/";
+    $filename = $order_status . "-" . $special_order_number . "-" . basename($contract_file);
+    $uploaded_file_path = $upload_dir . $order_status . "-" . $special_order_number . "-" . basename($contract_file);
 
     // Handle file upload
     if (!move_uploaded_file($_FILES['contract_file']['tmp_name'], $uploaded_file_path)) {
@@ -99,10 +100,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply-submit'])) {
     }
 
     // Prepare the SQL query
-    $stmt = $conn->prepare("UPDATE special_orders SET SOSTATUS = ?, WS_ID = ? WHERE SOID = ?");
+    $stmt = $conn->prepare("UPDATE special_orders SET SOSTATUS = ?, CONTRACT_FILE = ?, WS_ID = ? WHERE SOID = ?");
 
     // Bind parameters with appropriate types
-    $stmt->bind_param("sii", $order_status, $wholesaler_id, $special_order_id);
+    $stmt->bind_param("ssii", $order_status, $filename, $wholesaler_id, $special_order_id);
 
     // Execute the statement
     if($stmt->execute()) {
@@ -173,4 +174,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
 
     // Optionally, redirect to another page
     header("Location: ../../home.php");
+}
+
+if(isset($_GET['soid'])) {
+
+    $special_order_id = $_GET['soid'];
+
+    // Prepare SQL to fetch special order data
+    $stmt = $conn->prepare("DELETE FROM requests WHERE RSOID = ? And WS_ID = ?");
+
+    $stmt->bind_param("ii", $special_order_id, $user_id); // Bind user_id as an integer
+    
+    // Check if data exists
+    if ($stmt->execute()) {
+        header("Location: ../../active-orders.php");
+    } else {
+        echo "<script>alert('Special Order Data Didn't Found!');</script>";
+        exit();
+    }
+
+    // Close the statement and connection
+    $stmt->close();
+    $conn->close();
 }

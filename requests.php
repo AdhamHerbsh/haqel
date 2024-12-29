@@ -23,14 +23,14 @@
 
     // Bind user_id as an integer
     $stmt->bind_param('i', $user_id);
-           
+
     // Execute the query    
     $stmt->execute();
 
     // Fetch data as an associative array
     $result = $stmt->get_result();
     $special_orders = $result->fetch_all(MYSQLI_ASSOC);
-    
+
     // Close the statement and connection
     $stmt->close();
     $conn->close();
@@ -46,6 +46,13 @@
                             <h1>Requests of Special Orders</h1>
                             <h3 class="text-muted"> Approve Your Request To Get Deal</h3>
                         </div>
+                        <div class="col-12 mb-3">
+                            <div class="text-end">
+                                <a class="btn btn-outline-secondary" href="active-orders.php">Active Special Orders <i class="bx bx-time"></i></a>
+                                <a class="btn btn-primary" href="finished-orders.php">Finished Special Orders <i class="bx bx-check"></i></a>
+                            </div>
+                        </div>
+
                         <!--    Apprved Message Start  -->
                         <?php if (isset($_GET['action']) && $_GET['action'] === 'approved') { ?>
                             <div class="alert alert-primary alert-dismissible fade show" role="alert">
@@ -105,55 +112,55 @@
                                                     <div class="d-flex justify-content-end">
                                                         <button class="btn btn-danger fw-bold" type="button">Reject</button>
                                                         <span class="mx-2"></span>
-                                                        <a  class="btn btn-primary fw-bold approve-request" type="button" href="#contract-modal" data-bs-toggle="modal" data-bs-target="#contract-modal" data-o-id="<?= $specialorder['SOID'] ?>" data-o-num="<?= $specialorder['SONUMBER'] ?>">Approve</a>
+                                                        <a class="btn btn-primary fw-bold approve-request" type="button" href="#contract-modal" data-bs-toggle="modal" data-bs-target="#contract-modal" data-o-id="<?= $specialorder['SOID'] ?>" data-o-num="<?= $specialorder['SONUMBER'] ?>">Approve</a>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <?php endforeach; ?>
-                                    <!--    Upload Contart Modal Start      -->
-                                    <!--    Modal Body     -->
-                                    <!--    if you want to close by clicking outside the modal, delete the last endpoint:data-bs-backdrop and data-bs-keyboard   -->
-                                    <!-- Optimized Upload Contract Modal -->
-                                    <div class="modal fade" id="contract-modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="modalTitleId">
-                                        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="modalTitleId">Upload Contract</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <form action="assets/php/request.php" method="POST" enctype="multipart/form-data" id="uploadContractForm">
-                                                    <input type="hidden" name="soid" value="" />
-                                                    <input type="hidden" name="sonumber" value="" />
-                                                    <div class="modal-body overflow-hidden">
-                                                        <div class="mb-3">
-                                                            <label for="contract_file" class="form-label">Choose File:</label>
-                                                            <fieldset class="upload_dropZone text-center mb-3 p-4">
-                                                                <p class="small my-2">Drag and Drop File</p>
-                                                                <input id="contract_file" class="position-absolute invisible" type="file" name="contract_file" required accept="image/*,.pdf" />
-                                                                <label id="upload_label" class="mb-3" for="contract_file">No File Chosen</label>
-                                                                <div class="upload_gallery d-flex flex-wrap justify-content-center gap-3 mb-0"></div>
-                                                            </fieldset>
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Terms and Conditions:</label>
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox" id="terms-conditions" required />
-                                                                <label class="form-check-label" for="terms-conditions">I accept all terms and conditions of the website</label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button class="btn btn-accent fw-bold" type="reset" data-bs-dismiss="modal">Cancel</button>
-                                                        <button class="btn btn-primary fw-bold" type="submit" name="approve-submit">Send</button>
-                                                    </div>
-                                                </form>
+                                <?php endforeach; ?>
+                                <!--    Upload Contart Modal Start      -->
+                                <!--    Modal Body     -->
+                                <!--    if you want to close by clicking outside the modal, delete the last endpoint:data-bs-backdrop and data-bs-keyboard   -->
+                                <!-- Optimized Upload Contract Modal -->
+                                <div class="modal fade" id="contract-modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="modalTitleId">
+                                    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="modalTitleId">Upload Contract</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
+                                            <form action="assets/php/request.php" method="POST" enctype="multipart/form-data" id="uploadContractForm">
+                                                <input type="hidden" name="soid" value="" />
+                                                <input type="hidden" name="sonumber" value="" />
+                                                <div class="modal-body overflow-hidden">
+                                                    <div class="mb-3">
+                                                        <label for="contract_file" class="form-label">Choose File:</label>
+                                                        <fieldset class="upload_dropZone text-center mb-3 p-4">
+                                                            <p class="small my-2">Drag and Drop File</p>
+                                                            <input id="contract_file" class="position-absolute invisible" type="file" name="contract_file" required accept="image/*,.pdf" />
+                                                            <label id="upload_label" class="mb-3" for="contract_file">No File Chosen</label>
+                                                            <div class="upload_gallery d-flex flex-wrap justify-content-center gap-3 mb-0"></div>
+                                                        </fieldset>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Terms and Conditions:</label>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="terms-conditions" required />
+                                                            <label class="form-check-label" for="terms-conditions">I accept all terms and conditions of the website</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button class="btn btn-accent fw-bold" type="reset" data-bs-dismiss="modal">Cancel</button>
+                                                    <button class="btn btn-primary fw-bold" type="submit" name="approve-submit">Send</button>
+                                                </div>
+                                            </form>
                                         </div>
                                     </div>
+                                </div>
 
-                                    <!--    Upload Contart Modal End    -->
+                                <!--    Upload Contart Modal End    -->
                             <?php } else { ?>
                                 <!--    Alter Warning Start  -->
                                 <div class="container py-5">
@@ -191,4 +198,3 @@
 
     <!--    Include Footer   -->
     <?php include('assets/inc/footer.php') ?>
-    

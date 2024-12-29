@@ -18,7 +18,7 @@ if ($user_id === null | $user_type != "retailer") {
     exit();
 }
 
-$status_closed = 'closed';
+$status_closed = 'finished';
 
 // Prepare SQL to fetch orders data
 $stmt = $conn->prepare("SELECT * FROM `orders` WHERE USER_ID = ? AND OSTATUS NOT LIKE ?");

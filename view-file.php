@@ -25,16 +25,30 @@ if ($user_id === null) {
     <section id="" class="">
         <div class="container-fluid py-5">
             <div class="container">
-                <div class="section-title mb-3">
-                    <h1>View Commerical Register File</h1>
-                    <h3 class="text-muted">See User Commerical Register File</h3>
-                </div>
-                <?php if (isset($_GET['file'])) { ?>
+
+                <?php if (isset($_GET['request-file']) && $_GET['request-file'] != null ) { ?>
+                    <div class="section-title mb-3">
+                        <h1>Request Contract File</h1>
+                        <h3 class="text-muted">See Contract File Of Special Order</h3>
+                    </div>
+                    <!-- View File -->
+                    <iframe src="assets/php/<?= $_GET['request-file'] ?>" frameborder="0" width="100%" height="800"></iframe>
+                    <!-- View File -->
+                    <iframe src="assets/php/<?= $_GET['contract'] ?>" frameborder="0" width="100%" height="800"></iframe>
+                <?php } elseif (isset($_GET['file']) && $_GET['file'] != null ) { ?>
+                    <div class="section-title mb-3">
+                        <h1>View Commerical Register File</h1>
+                        <h3 class="text-muted">See User Commerical Register File</h3>
+                    </div>
                     <!-- View File -->
                     <iframe src="assets/php/<?= $_GET['file'] ?>" frameborder="0" width="100%" height="800"></iframe>
-                    <?php } elseif (isset($_GET['contract'])) { ?>
-                        <!-- View File -->
-                        <iframe src="assets/php/<?= $_GET['contract'] ?>" frameborder="0" width="100%" height="800"></iframe>
+                <?php } elseif (isset($_GET['contract']) && $_GET['contract'] != null ) { ?>
+                    <div class="section-title mb-3">
+                        <h1>Contract File</h1>
+                        <h3 class="text-muted">See Contract File Of Special Order with Number <?= $_GET['sonumber'] ?></h3>
+                    </div>
+                    <!-- View File -->
+                    <iframe src="assets/php/<?= $_GET['contract'] ?>" frameborder="0" width="100%" height="800"></iframe>
                 <?php } else { ?>
                     <!--    Alter Warning Start  -->
                     <div class="container py-5">
@@ -49,7 +63,6 @@ if ($user_id === null) {
                     </div>
                     <!--    Alter Warning End   -->
                 <?php } ?>
-
             </div>
         </div>
     </section>

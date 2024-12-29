@@ -22,8 +22,8 @@
             </div>
             <form class="col-10 m-auto" action="assets/php/user.php" method="POST">
                 <div class="mb-3">
-                    <label for="email" class="form-label">USERNAME:</label>
-                    <input type="email" class="form-control" name="username" id="email" placeholder="Enter Your Username" />
+                    <label for="email" class="form-label">EMAIL ADDRESS:</label>
+                    <input type="email" class="form-control" name="username" id="email" placeholder="Enter Your Email Address" />
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">PASSWORD:</label>

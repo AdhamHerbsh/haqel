@@ -19,7 +19,7 @@
     if (isset($_GET['pid'])) {
         $pid = $_GET['pid'];
         // Prepare SQL to fetch product data
-        $stmt = $conn->prepare("SELECT PNAME, PCATEGORY, PPRICE, PSTATUS, PKEYWORDS, PQUANTITY, PDESCRIPTION, PIMAGE, USER_ID FROM products WHERE PID = ?");
+        $stmt = $conn->prepare("SELECT PNAME, PCATEGORY, PCOUNTRY, PPRICE, PSTATUS, PKEYWORDS, PQUANTITY, PDESCRIPTION, PIMAGE, USER_ID FROM products WHERE PID = ?");
 
         $stmt->bind_param("i", $pid); // Bind user_id as an integer
         $stmt->execute();
@@ -28,7 +28,7 @@
         // Check if data exists
         if ($stmt->num_rows > 0) {
             // Bind the result
-            $stmt->bind_result($pname, $pcategory, $pprice, $pstatus, $pkeywords, $pquantity, $pdescription, $pimage, $user_id);
+            $stmt->bind_result($pname, $pcategory, $pcountry, $pprice, $pstatus, $pkeywords, $pquantity, $pdescription, $pimage, $user_id);
             $stmt->fetch();
         } else {
             echo "<script>alert('Product Data Didn't Found!');</script>";
@@ -120,6 +120,9 @@
                                         </div>
                                         <div class="row">
                                             <p><strong>Keywords:</strong> <?= $pkeywords ?></p>
+                                        </div>
+                                        <div class="row">
+                                            <p><strong>Country:</strong> <?= $pcountry ?></p>
                                         </div>
                                         <div class="row">
                                             <p><strong>Quantity In Stock:</strong> <?= $pquantity ?></p>

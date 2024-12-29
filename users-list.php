@@ -105,10 +105,10 @@ $conn->close();
                                         <p class="mb-0 mt-4">••••••••••••</p>
                                     </td>
                                     <td>
-                                        <a class="btn btn-primary" href="view-file.php?file=<?= urlencode($user['commercial_register_file']); ?>">View</a>
+                                        <a class="btn btn-primary" href="view-file.php?file=<?= urlencode($user['commercial_register_file']) ?? " no_file"; ?>">View</a>
                                     </td>
                                     <td>
-                                        <a class="btn btn-danger" href="assets/php/order.php?orderid=<?= htmlspecialchars($user['ID']); ?>">Delete</a>
+                                        <a class="btn btn-danger" href="assets/php/user.php?id=<?= htmlspecialchars($user['ID']); ?>">Delete</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
