@@ -7,9 +7,12 @@ session_start();
 
 $user_id = $_SESSION['user_id'];
 
-// Check if the form is submitted
+// Check user id from session
+if (!$user_id) {
+    die("User not logged in.");
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['standard-order'])) {
-    // Check if cart is available in the session
     if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
         die("No items in the cart to place an order.");
     }
@@ -20,43 +23,83 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['standard-order'])) {
     $delivery_option = $_POST['delivery_option'] ?? '';
     $delivery_schedule = $_POST['delivery_schedule'] ?? '';
     $days = isset($_POST['days']) ? implode(', ', $_POST['days']) : '';
-    $totalprice = (float) ($_POST['totalprice'] ?? 0.00);
-    $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null; // Assuming user_id is stored in the session
 
-    if (!$user_id) {
-        die("User not logged in.");
-    }
-
-    // Insert into `orders` table
-    $order_number = uniqid('ORD'); // Generate a unique order number
-    $order_date = date('Y-m-d H:i:s'); // Current date and time
-    $order_status = 'unapproved'; // Default status
-    $order_stage = 'shipping'; // Default stage
-
-    $query = "INSERT INTO orders (ONUMBER, OTYPE, ODATE, OSTATUS, OSTAGE, OPAYMETHOD, ODELIVERY, OSCHEDULE, ODAYS, OTOTALPRICE, USER_ID)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param('sssssssssdi', $order_number, $otype, $order_date, $order_status, $order_stage, $pay_method, $delivery_option, $delivery_schedule, $days, $totalprice, $user_id);
-
-    if (!$stmt->execute()) {
-        die("Failed to insert order: " . $stmt->error);
-    }
-
-    $order_id = $stmt->insert_id; // Get the last inserted order ID
-
-    // Insert items into `order_items` table
-    $query_item = "INSERT INTO order_items (OIPID, OIOID, OIQUANTITY, OIPRICE) VALUES (?, ?, ?, ?);";
-    $stmt_item = $conn->prepare($query_item);
-
+    // Group cart items by wholesaler ID
+    $grouped_cart = [];
     foreach ($_SESSION['cart'] as $pid => $item) {
-        $quantity = $item['QUANTITY'];
-        $price = $item['PPRICE'];
+        $wholesaler_id = $item['PUSER_ID'];
+        if (!isset($grouped_cart[$wholesaler_id])) {
+            $grouped_cart[$wholesaler_id] = [];
+        }
+        $grouped_cart[$wholesaler_id][] = $item;
+    }
 
-        $stmt_item->bind_param('iiid', $pid, $order_id, $quantity, $price);
+    foreach ($grouped_cart as $wholesaler_id => $items) {
+        // Calculate total price for this wholesaler's products
+        $totalprice = array_reduce($items, function ($sum, $item) {
+            return $sum + ($item['PPRICE'] * $item['QUANTITY']);
+        }, 0);
 
-        if (!$stmt_item->execute()) {
-            die("Failed to insert order item: " . $stmt_item->error);
+        // Insert into `orders` table
+        $order_number = uniqid('ORD');
+        $order_date = date('Y-m-d H:i:s');
+        $order_stage = 'shipping';
+
+        $query = "INSERT INTO orders (ONUMBER, OTYPE, ODATE, OSTAGE, OPAYMETHOD, ODELIVERY, OSCHEDULE, ODAYS, OTOTALPRICE, USER_ID, WS_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param('ssssssssdii', $order_number, $otype, $order_date, $order_stage, $pay_method, $delivery_option, $delivery_schedule, $days, $totalprice, $user_id, $wholesaler_id);
+        if (!$stmt->execute()) {
+            die("Failed to insert order: " . $stmt->error);
+        }
+
+        $order_id = $stmt->insert_id;
+
+        // Insert items into `order_items` table
+        $query_item = "INSERT INTO order_items (OIPID, OIOID, OIQUANTITY, OIPRICE) VALUES (?, ?, ?, ?);";
+        $stmt_item = $conn->prepare($query_item);
+
+        foreach ($items as $item) {
+            $pid = $item['PID'];
+            $quantity = $item['QUANTITY'];
+            $price = $item['PPRICE'];
+
+            // Insert order items
+            $stmt_item->bind_param('iiid', $pid, $order_id, $quantity, $price);
+            if (!$stmt_item->execute()) {
+                die("Failed to insert order item: " . $stmt_item->error);
+            }
+
+            // Check and update product stock
+            $query_stock = "SELECT PQUANTITY FROM products WHERE PID = ?";
+            $stmt_stock = $conn->prepare($query_stock);
+            $stmt_stock->bind_param('i', $pid);
+            if (!$stmt_stock->execute()) {
+                die("Failed to fetch product stock: " . $stmt_stock->error);
+            }
+
+            $result_stock = $stmt_stock->get_result();
+            if ($result_stock->num_rows > 0) {
+                $product = $result_stock->fetch_assoc();
+                $current_stock = $product['PQUANTITY'];
+
+                if ($current_stock < $quantity) {
+                    die("Insufficient stock for product ID $pid.");
+                }
+
+                // Update product quantity
+                $new_stock = $current_stock - $quantity;
+                $new_status = $new_stock === 0 ? 'unavailable' : 'available';
+
+                $query_update_stock = "UPDATE products SET PQUANTITY = ?, PSTATUS = ? WHERE PID = ?";
+                $stmt_update_stock = $conn->prepare($query_update_stock);
+                $stmt_update_stock->bind_param('isi', $new_stock, $new_status, $pid);
+                if (!$stmt_update_stock->execute()) {
+                    die("Failed to update product stock: " . $stmt_update_stock->error);
+                }
+            } else {
+                die("Product ID $pid not found in the database.");
+            }
         }
     }
 
@@ -64,10 +107,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['standard-order'])) {
     unset($_SESSION['cart']);
     unset($_SESSION['cartCount']);
 
-    // Success message or redirect
     // Redirect to a success page
     header("Location: ../../my-orders.php?action=added&type=standard");
+    exit;
 }
+
 
 // Check if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['special-order'])) {

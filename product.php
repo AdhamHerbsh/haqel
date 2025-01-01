@@ -52,7 +52,6 @@
                             <div class="col-12 col-md-6 position-relative">
                                 <div class="mb-3">
                                     <h1><?= ucfirst($pname) ?></h1>
-                                    <div class="px-3 py-1 rounded position-absolute  <?= ($pstatus === 'available') ? "bg-primary-50" : "bg-gray text-white" ?>" style="top: 0%; left: 50%;"><span><?= ucfirst($pstatus) ?></span></div>
                                 </div>
                                 <div class="mb-3">
                                     <p class="text-primary fs-4"> <small class="text-black fs-6">SAR</small> <?= $pprice ?></p>
@@ -93,7 +92,7 @@
                                 <div class="mb-3">
                                     <div class="row">
                                         <div class="col-12 col-md-2">
-                                            <div class="input-group quantity bg-white rounded-pill py-3" style="width: 100px;">
+                                            <div class="input-group quantity bg-white rounded-pill py-3" style="width: 150px;">
                                                 <div class="input-group-btn">
                                                     <button class="btn btn-sm btn-minus rounded-circle bg-light border qty-btn">
                                                         <i class="bx bx-minus"></i>

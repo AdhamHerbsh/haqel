@@ -223,48 +223,53 @@
     const cartData = [];
 
     $("table tbody tr").each(function () {
-      const row = $(this);
-      const pid = row.find("input[name='pid']").val();
-      const pname = row.find("input[name='pname']").val();
-      const price = row.find("input[name='pprice']").val();
-      const pimage = row.find("input[name='pimage']").val();
-      const puser_id = row.find("input[name='puser_id']").val();
-      const pwholersaler = row.find("input[name='pwholesaler']").val();
-      const quantity = row.find("input[name='quantity']").val();
+        const row = $(this);
+        const pid = row.find("input[name='pid']").val();
+        const pname = row.find("input[name='pname']").val();
+        const price = row.find("input[name='pprice']").val();
+        const pimage = row.find("input[name='pimage']").val();
+        const puser_id = row.find("input[name='puser_id']").val();
+        const pwholesaler = row.find("input[name='pwholesaler']").val();
+        const quantity = row.find("input[name='quantity']").val();
 
-      if (pid && quantity) {
-        cartData.push({
-          PID: pid,
-          PNAME: pname,
-          PPRICE: price,
-          PIMAGE: pimage,
-          PUSER_ID: puser_id,
-          PWHOLESALER: pwholersaler,
-          QUANTITY: parseInt(quantity, 10),
-        });
-      }
+        if (pid && quantity) {
+            cartData.push({
+                PID: pid,
+                PNAME: pname,
+                PPRICE: price,
+                PIMAGE: pimage,
+                PUSER_ID: puser_id,
+                PWHOLESALER: pwholesaler,
+                QUANTITY: parseInt(quantity, 10),
+            });
+        }
     });
 
     // Send the cart data to the PHP file via AJAX
     $.ajax({
-      url: "assets/php/cart.php", // PHP file to handle the request
-      type: "POST",
-      data: {
-        action: "updateCart",
-        cart: cartData,
-      },
-      success: function (response) {
-        // Handle the success response
-        sessionStorage["response"] = response;
-        location.reload(); // Optionally reload the page to reflect updates
-      },
-      error: function (xhr, status, error) {
-        // Handle errors
-        console.error("An error occurred:", error);
-        alert("Failed to update cart. Please try again.");
-      },
+        url: "assets/php/cart.php", // PHP file to handle the request
+        type: "POST",
+        data: {
+            action: "updateCart",
+            cart: cartData,
+        },
+        success: function (response) {
+            const res = JSON.parse(response);
+
+            if (res.status === "success") {
+                location.reload(); // Optionally reload the page to reflect updates
+            } else if (res.status === "error") {
+              $('.alert').removeClass('d-none').text("Cart update failed:\n" + res.errors.join("\n"));
+                // location.reload();
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("An error occurred:", error);
+            alert("Failed to update cart. Please try again.");
+        },
     });
-  });
+});
+
 
   // When any checkbox (other than "One Time") is clicked
   $(".days-select input.form-check-input:not(#one-time)").on(

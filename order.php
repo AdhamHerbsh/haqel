@@ -27,7 +27,7 @@ $_SESSION['wholesaler'] = $_SESSION['wholesaler'] ?? [];
 
 
 if ($order_id > 0) {
-    $stmt = $conn->prepare("SELECT OID, ONUMBER, OSTATUS, OSTAGE, WS_ID, OSCHEDULE, ODAYS FROM orders WHERE OID = ?");
+    $stmt = $conn->prepare("SELECT OID, ONUMBER, OSTAGE, WS_ID, OSCHEDULE, ODAYS FROM orders WHERE OID = ?");
     $stmt->bind_param('i', $order_id);
 
     if ($stmt->execute()) {
@@ -243,42 +243,30 @@ if ($order_id > 0) {
                                     </div>
                                 </div>
                             </div>
-
-                            <!--    Contract File Title Start    -->
-                            <div class="mt-3">
-                                <h2>Contract File</h2>
-                                <h6>Contract File of Special Order Number: <?= $_SESSION['specialOrder'][$special_order_id]['SONUMBER']; ?></h6>
-                            </div>
-                            <!--    Contract File Title End    -->
-                            <iframe src="assets/files/contracts/retailers/<?= $_SESSION['specialOrder'][$special_order_id]['CONTRACT_FILE']; ?>" width="100%" height="635" frameborder="0"></iframe>
-                            <!--  Back Button    -->
-                            <div class="container">
-                                <div class="row">
-                                    <a href="" class="btn btn-accent"><i class="bx bx-left-arrow-alt"></i> <span class="fw-bold"> Back</span></a>
-                                </div>
-                            </div>
-
-                        <?php } elseif ($status === 'applied' || $status === 'finished' && $user_id === $wholesaler_id) { ?>
-                            <!--    Contract File Title Start    -->
-                            <div class="mt-3">
-                                <h2>Contract File</h2>
-                                <h6>Contract File of Special Order Number: <?= $_SESSION['specialOrder'][$special_order_id]['SONUMBER']; ?></h6>
-                            </div>
-                            <!--    Contract File Title End    -->
-                            <iframe src="assets/files/contracts/retailers/<?= $_SESSION['specialOrder'][$special_order_id]['CONTRACT_FILE']; ?>" width="100%" height="635" frameborder="0"></iframe>
-                            <!--  Back Button    -->
-                            <div class="container">
-                                <div class="row">
-                                    <a href="requests.php" class="btn btn-accent"><i class="bx bx-left-arrow-alt"></i> <span class="fw-bold"> Back</span></a>
-                                </div>
-                            </div>
                         <?php } else { ?>
-                            <?php if ($status === 'finished') { ?>
 
-                            <?php } ?>
                         <?php } ?>
-                    </div>
-                    <!--    Special Order Requests Section  -->
+                        <?php if($status === 'applied' || $status === 'finished') { ?>
+                            <!--    Contract File Title Start    -->
+                            <div class="mt-3">
+                                <h2>Contract File</h2>
+                                <h6>Contract File of Special Order Number: <?= $_SESSION['specialOrder'][$special_order_id]['SONUMBER']; ?></h6>
+                            </div>
+                            <!--    Contract File Title End    -->
+                            
+                            <!-- Iframe for Contract File -->
+                            <iframe src="assets/files/contracts/retailers/<?= $_SESSION['specialOrder'][$special_order_id]['CONTRACT_FILE']; ?>" width="100%" height="635" frameborder="0"></iframe>
+                            <!-- Iframe for Contract File -->
+                            
+                            <!--  Back Button    -->
+                            <div class="container">
+                                <div class="row">
+                                    <a href="<?= ($user_id !== $wholesaler_id)? 'my-orders.php' : 'requests.php'?>" class="btn btn-accent"><i class="bx bx-left-arrow-alt"></i> <span class="fw-bold"> Back</span></a>
+                                </div>
+                            </div>
+                        </div>
+                        <!--    Special Order Requests Section  -->
+                        <?php } ?>
                 <?php } elseif ($order_id > 0) { ?>
                     <!-- Standard Order Start -->
                     <div class="container mb-3">
@@ -329,9 +317,8 @@ if ($order_id > 0) {
                         </table>
                     </div>
                     <!-- Standard Order End -->
-                    <?php $status = $_SESSION['standardOrder'][$order_id]['OSTATUS'] ?? ''; ?>
                     <?php $stage = $_SESSION['standardOrder'][$order_id]['OSTAGE'] ?? ''; ?>
-                    <?php if ($status === 'approved') { ?>
+                    <?php if ($stage === 'shipping' || $stage === 'delivery' || $stage === 'receive') { ?>
                         <!--    Track Order Section  -->
                         <div class="text-center">
                             <h2>Track Order</h2>
@@ -396,7 +383,7 @@ if ($order_id > 0) {
                             </div>
                         </div>
                         <!--    Track Order Section  -->
-                    <?php } elseif ($status === 'finished') { ?>
+                    <?php } elseif ($stage === 'received') { ?>
                         <!--   Review Order Details Section End     -->
                         <!--    Review and Feedback Section Start     -->
                         <div class="container-fluid py-5">

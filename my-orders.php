@@ -18,13 +18,14 @@ if ($user_id === null | $user_type != "retailer") {
     exit();
 }
 
-$status_closed = 'finished';
+$status_finished = 'finished';
+$stage = 'received';
 
 // Prepare SQL to fetch orders data
-$stmt = $conn->prepare("SELECT * FROM `orders` WHERE USER_ID = ? AND OSTATUS NOT LIKE ?");
+$stmt = $conn->prepare("SELECT * FROM `orders` WHERE USER_ID = ? AND OSTAGE NOT LIKE ? ");
 
 // Bind user_id as an integer
-$stmt->bind_param('is', $user_id, $status_closed);
+$stmt->bind_param('is', $user_id, $stage);
 
 $stmt->execute();
 
@@ -36,7 +37,7 @@ $orders = $result->fetch_all(MYSQLI_ASSOC);
 $stmt = $conn->prepare("SELECT * FROM `special_orders` WHERE USER_ID = ? AND SOSTATUS NOT LIKE ? ");
 
 // Bind user_id as an integer
-$stmt->bind_param('is', $user_id, $status_closed);
+$stmt->bind_param('is', $user_id, $status_finished);
 
 $stmt->execute();
 
@@ -82,11 +83,11 @@ $special_orders = $result->fetch_all(MYSQLI_ASSOC);
                         <!-- Welcome Message End -->
                     <?php } ?>
                 </div>
-                <div class="table-responsive overflow-md-hidden mb-3">
+                <div class="table-responsive mb-3 overflow-md-hidden " style="overflow-y:auto !important; max-height: 400px;">
                     <table class="table table-hover" id="ordersTable">
-                        <thead>
+                        <thead class="table-header">
                             <tr>
-                                <div class="row text-black-50 border-bottom border-1">
+                                <div class="row search-bar text-black-50 border-bottom border-1">
                                     <div class="col-1 text-center align-content-center">
                                         <i class="bx bx-search-alt bx-md"></i>
                                     </div>
@@ -102,7 +103,7 @@ $special_orders = $result->fetch_all(MYSQLI_ASSOC);
                                 <th scope="col">Order Total Price</th>
                                 <th scope="col">Order Date</th>
                                 <th scope="col">Order Days</th>
-                                <th scope="col">Status</th>
+                                <th scope="col">Stage</th>
                                 <th scope="col">######</th>
                             </tr>
                         </thead>
@@ -114,11 +115,9 @@ $special_orders = $result->fetch_all(MYSQLI_ASSOC);
                                     <td><?= htmlspecialchars($order['OTOTALPRICE']); ?></td>
                                     <td><?= htmlspecialchars($order['ODATE']); ?></td>
                                     <td><?= htmlspecialchars($order['ODAYS']); ?></td>
-                                    <td><?= htmlspecialchars($order['OSTATUS']); ?></td>
+                                    <td><?= htmlspecialchars($order['OSTAGE']); ?></td>
                                     <td>
-                                        <?php if ($order['OSTATUS'] !== 'closed') { ?>
-                                            <a class="btn btn-secondary" href="order.php?oid=<?= $order['OID'] ?>">Details <i class="bx bx-right-arrow-alt"></i></a>
-                                        <?php } ?>
+                                        <a class="btn btn-secondary" href="order.php?oid=<?= $order['OID'] ?>">Details <i class="bx bx-right-arrow-alt"></i></a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -132,9 +131,7 @@ $special_orders = $result->fetch_all(MYSQLI_ASSOC);
                                     <td><?= htmlspecialchars($specialorder['SOSCHEDULEOPTION']); ?></td>
                                     <td><?= htmlspecialchars($specialorder['SOSTATUS']); ?></td>
                                     <td>
-                                        <?php if ($specialorder['SOSTATUS'] !== 'closed') { ?>
-                                            <a class="btn btn-secondary" href="order.php?soid=<?= $specialorder['SOID'] ?>">Details <i class="bx bx-right-arrow-alt"></i></a>
-                                        <?php } ?>
+                                        <a class="btn btn-secondary" href="order.php?soid=<?= $specialorder['SOID'] ?>">Details <i class="bx bx-right-arrow-alt"></i></a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -144,10 +141,10 @@ $special_orders = $result->fetch_all(MYSQLI_ASSOC);
 
                 <?php
                 // Prepare SQL to fetch orders data
-                $stmt = $conn->prepare("SELECT * FROM `orders` WHERE USER_ID = ? AND OSTATUS LIKE ?");
+                $stmt = $conn->prepare("SELECT * FROM `orders` WHERE USER_ID = ? AND OSTAGE LIKE ?");
 
                 // Bind user_id as an integer
-                $stmt->bind_param('is', $user_id, $status_closed);
+                $stmt->bind_param('is', $user_id, $stage);
 
                 $stmt->execute();
 
@@ -157,9 +154,9 @@ $special_orders = $result->fetch_all(MYSQLI_ASSOC);
 
                 // Prepare SQL to fetch special orders data
                 $stmt = $conn->prepare("SELECT * FROM `special_orders` WHERE USER_ID = ? AND SOSTATUS LIKE ? ");
-                $status_closed = 'finished';
+                $status_finished = 'finished';
                 // Bind user_id as an integer
-                $stmt->bind_param('is', $user_id, $status_closed);
+                $stmt->bind_param('is', $user_id, $status_finished);
 
                 $stmt->execute();
 
@@ -175,20 +172,9 @@ $special_orders = $result->fetch_all(MYSQLI_ASSOC);
                     <h2>Old Orders History</h2>
                 </div>
                 <!--    Old Orders Title End    -->
-                <div class="table-responsive overflow-md-hidden">
+                <div class="table-responsive overflow-md-hidden " style="overflow-y:auto !important; max-height: 400px;">
                     <table class="table table-hover" id="ordersTable">
-                        <thead>
-                            <tr>
-                                <div class="row text-black-50 border-bottom border-1">
-                                    <div class="col-1 text-center align-content-center">
-                                        <i class="bx bx-search-alt bx-md"></i>
-                                    </div>
-                                    <div class="col-11 form-floating">
-                                        <input type="text" class="form-control border-0 text-black" name="search" id="search" placeholder="">
-                                        <label for="search">Search</label>
-                                    </div>
-                                </div>
-                            </tr>
+                        <thead class="table-header">
                             <tr>
                                 <th scope="col">Order Number</th>
                                 <th scope="col">Order Type</th>
@@ -207,7 +193,7 @@ $special_orders = $result->fetch_all(MYSQLI_ASSOC);
                                     <td><?= htmlspecialchars($old_order['OTOTALPRICE']); ?></td>
                                     <td><?= htmlspecialchars($old_order['ODATE']); ?></td>
                                     <td><?= htmlspecialchars($old_order['ODAYS']); ?></td>
-                                    <td><?= htmlspecialchars($old_order['OSTATUS']); ?></td>
+                                    <td><?= htmlspecialchars($old_order['OSTAGE']); ?></td>
                                     <td>
                                         <a class="btn btn-secondary" href="order.php?oid=<?= $old_order['OID'] ?>">Details <i class="bx bx-right-arrow-alt"></i></a>
                                     </td>

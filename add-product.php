@@ -427,7 +427,10 @@ $conn->close();
                                                 alt="">
                                         </div>
                                         <div class="p-4">
-                                            <p><?= ucfirst($product['PNAME']) ?></p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <p><?= ucfirst($product['PNAME']) ?></p>
+                                                <div class="px-3 py-1 rounded <?= ($product['PSTATUS'] === 'available') ? "bg-primary-50" : "bg-gray text-white" ?>" ><span><?= ucfirst($product['PSTATUS']) ?></span></div>
+                                            </div>
                                             <div class="row">
                                                 <div class="col-6">
                                                     <p class="text-dark fs-5 fw-bold"><small>SAR</small>

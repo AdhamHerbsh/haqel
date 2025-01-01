@@ -31,6 +31,10 @@ if ($user_id === null | $user_type != "retailer") {
                 </div>
                 <div class="row">
                     <div class="col-12 col-md-6">
+                        <div class="alert alert-warning d-none" role="alert">
+                            <strong>Alert Heading</strong> This is a warning alert—check it out!
+                        </div>
+                        
                         <div class="table-responsive p-4 my-2 rounded-2 border border-1 border-white-50 overflow-hidden">
                             <table class="table">
                                 <thead>
@@ -60,7 +64,7 @@ if ($user_id === null | $user_type != "retailer") {
                                                     <p class="mb-0 mt-4"><?= $item['PPRICE'] ?></p>
                                                 </td>
                                                 <td>
-                                                    <div class="input-group quantity bg-white rounded-pill py-3" style="width: 100px;">
+                                                    <div class="input-group quantity bg-white rounded-pill py-3" style="width: 130px;">
                                                         <div class="input-group-btn">
                                                             <button class="btn btn-sm btn-minus rounded-circle bg-light border qty-btn" type="button">
                                                                 <i class="bx bx-minus"></i>
@@ -248,7 +252,6 @@ if ($user_id === null | $user_type != "retailer") {
                             </div>
                             <!--   Checkout Modal End -->
                         </form>
-
                     </div>
                 </div>
             </div>

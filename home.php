@@ -63,6 +63,16 @@
                                             <a href="cart.php" class="alert-link"><i class="bx bx-cart bx-sm"></i></a>
                                         </div>
                                         <!--    Added Message End    -->
+                                        <?php }elseif (isset($_GET['action']) && $_GET['action'] === 'insufficient_stock') { ?>
+                                            <!--    Product Out of Stock Message Start    -->
+                                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                <i class='bx bx-task-x bx-sm'></i>
+                                                <strong>Product Out of Stock Maximum Number You Can Buy Is <?= $_GET['stock'] ?></strong>
+                                                <strong>See your Cart</strong>
+                                                <a href="cart.php" class="alert-link"><i class="bx bx-cart bx-sm"></i></a>
+                                            </div>
+                                            <!--    Product Out of Stock Message End    -->
                                     <?php } ?>
                                     <div class="tabs-class">
                                         <div class="row g-4">
@@ -341,8 +351,10 @@
                                         <div class="row g-4" style="min-height: 800px; max-height:1400px; overflow-y: auto;">
                                             <?php
                                             // Prepare SQL to fetch orders data
-                                            $stmt = $conn->prepare("SELECT * FROM `orders` WHERE OSTAGE = 'shipping'");
+                                            $stmt = $conn->prepare("SELECT * FROM `orders` WHERE OSTAGE = 'shipping' AND WS_ID = ?");
 
+                                            // Bind user_id as an integer
+                                            $stmt->bind_param('i', $user_id);
                                             $stmt->execute();
 
                                             // Fetch data as an associative array
@@ -431,8 +443,8 @@
                                                                 <div class="col-12 text-end">
                                                                     <form class="d-inline" action="assets/php/request.php" method="POST">
                                                                         <input type="hidden" name="oid" value="<?= $order['OID'] ?>" />
-                                                                        <input type="hidden" name="ostage" value="delivery" />
-                                                                        <button class="btn btn-primary fw-blod" type="submit" name="submit">Go To Delivey</button>
+                                                                        <input type="hidden" name="ostage" value="<?= ($order['ODELIVERY'] === 'logistic_shipping') ? 'delivery' : 'receive' ?>" />
+                                                                        <button class="btn btn-primary fw-blod" type="submit" name="delivery-submit">Go To <?= ($order['ODELIVERY'] === 'logistic_shipping') ? 'Logistic Shipping' : 'Personal Receive' ?> Stage</button>
                                                                     </form>
                                                                 </div>
                                                             </div>
@@ -463,8 +475,10 @@
                                         <div class="row g-4" style="min-height: 800px; max-height:1400px; overflow-y: auto;">
                                             <?php
                                             // Prepare SQL to fetch orders data
-                                            $stmt = $conn->prepare("SELECT * FROM `orders` WHERE OSTATUS = 'approved' AND OSTAGE = 'delivery' ");
+                                            $stmt = $conn->prepare("SELECT * FROM `orders` WHERE OSTAGE = 'delivery' AND WS_ID = ?");
 
+                                            // Bind user_id as an integer
+                                            $stmt->bind_param('i', $user_id);
                                             $stmt->execute();
 
                                             // Fetch data as an associative array
@@ -554,7 +568,7 @@
                                                                     <form class="d-inline" action="assets/php/request.php" method="POST">
                                                                         <input type="hidden" name="oid" value="<?= $order['OID'] ?>" />
                                                                         <input type="hidden" name="ostage" value="receive" />
-                                                                        <button class="btn btn-primary fw-blod" type="submit" name="submit">Go To Receive</button>
+                                                                        <button class="btn btn-primary fw-blod" type="submit" name="receive-submit">Go To Receive</button>
                                                                     </form>
                                                                 </div>
                                                             </div>
@@ -582,11 +596,16 @@
                             <div id="receive-tab" class="tab-pane fade show p-0">
                                 <div class="row g-4">
                                     <div class="col-lg-12">
-                                        <div class="row g-4" style="min-height: 800px; max-height:1400px; overflow-y: auto;">
+                                        <div class="mb-3">
+                                            <h2>Wait for Receive</h2>
+                                        </div>
+                                        <div class="row g-4" style="min-height: 600px; max-height:1400px; overflow-y: auto;">
                                             <?php
                                             // Prepare SQL to fetch orders data
-                                            $stmt = $conn->prepare("SELECT * FROM `orders` WHERE OSTATUS = 'approved' AND OSTAGE = 'receive' ");
+                                            $stmt = $conn->prepare("SELECT * FROM `orders` WHERE OSTAGE = 'receive' AND WS_ID = ?");
 
+                                            // Bind user_id as an integer
+                                            $stmt->bind_param('i', $user_id);
                                             $stmt->execute();
 
                                             // Fetch data as an associative array
@@ -675,9 +694,127 @@
                                                                 <div class="col-12 text-end">
                                                                     <form class="d-inline" action="assets/php/request.php" method="POST">
                                                                         <input type="hidden" name="oid" value="<?= $order['OID'] ?>" />
-                                                                        <input type="hidden" name="ostage" value="done" />
-                                                                        <button class="btn btn-primary fw-blod" type="submit" name="submit">Done</button>
+                                                                        <input type="hidden" name="ostage" value="finished" />
+                                                                        <button class="btn btn-primary fw-blod" type="submit" name="finish-submit">Finish Order</button>
                                                                     </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            <?php } else { ?>
+                                                <!--    Alter Warning Start  -->
+                                                <div class="container py-5">
+                                                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                                        <div class="d-flex flex-column align-items-center">
+                                                            <i class="bx bx-data bx-lg"></i>
+                                                            <p><strong>No Data Found Enter At Later Time</strong></p>
+                                                            <a class="mb-3 btn btn-primary" href="requests.php">See Requests</a>
+                                                        </div>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                    </div>
+                                                </div>
+                                                <!--    Alter Warning End   -->
+                                            <?php } ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-4">
+                                    <div class="col-lg-12">
+                                        <div class="mb-3">
+                                            <h2>Orders Received</h2>
+                                        </div>
+                                        <div class="row g-4" style="min-height: 800px; max-height:1400px; overflow-y: auto;">
+                                            <?php
+                                            // Prepare SQL to fetch orders data
+                                            $stmt = $conn->prepare("SELECT * FROM `orders` WHERE OSTAGE = 'received' AND WS_ID = ?");
+
+                                            // Bind user_id as an integer
+                                            $stmt->bind_param('i', $user_id);
+                                            $stmt->execute();
+
+                                            // Fetch data as an associative array
+                                            $result = $stmt->get_result();
+                                            $orders = $result->fetch_all(MYSQLI_ASSOC);
+
+                                            ?>
+                                            <?php if ($result->num_rows > 0) { ?>
+                                                <?php foreach ($orders as $order) : ?>
+                                                    <div class="col-12 col-md-6">
+                                                        <div class="position-relative">
+                                                            <div class="order-number text-center p-2 border border-primary border-1 rounded-2 mb-3">
+                                                                <span><strong>Request Number:</strong> #<?= $order['ONUMBER'] ?></span>
+                                                            </div>
+                                                            <div class="order-details border border-gray border-1 rounded-2 p-3">
+
+                                                                <div class="row m-2">
+                                                                    <div class="col mb-3">
+                                                                        <label class="form-label">NAME:</label>
+                                                                    </div>
+                                                                    <div class="col mb-3">
+                                                                        <label class="form-label">CATEGORY:</label>
+                                                                    </div>
+                                                                    <div class="col mb-3">
+                                                                        <label class="form-label">PRICE:</label>
+                                                                    </div>
+                                                                    <div class="col mb-3">
+                                                                        <label class="form-label">QUANTITY:</label>
+                                                                    </div>
+                                                                </div>
+                                                                <?php
+                                                                $stmt = $conn->prepare("SELECT * FROM `order_items` WHERE OIOID = ?");
+                                                                $stmt->bind_param('i', $order['OID']);
+                                                                $stmt->execute();
+                                                                $result = $stmt->get_result();
+                                                                $order_items = $result->fetch_all(MYSQLI_ASSOC);
+
+                                                                foreach ($order_items as $orderitem) :
+                                                                    $stmt = $conn->prepare("SELECT PNAME, PCATEGORY FROM `products` WHERE PID = ?");
+                                                                    $stmt->bind_param('i', $orderitem['OIPID']);
+                                                                    $stmt->execute();
+                                                                    $stmt->store_result();
+                                                                    $stmt->bind_result($pname, $pcategory);
+                                                                    $stmt->fetch();
+                                                                ?>
+                                                                    <?php foreach ($order_items as $orderitem) ?>
+                                                                    <div class="row border border-warning rounded-pill p-2 m-2">
+                                                                        <div class="col">
+                                                                            <p class="p-0 m-0"><?= $pname ?></p>
+                                                                        </div>
+                                                                        <div class="col">
+                                                                            <p class="p-0 m-0"><?= $pcategory ?></p>
+                                                                        </div>
+                                                                        <div class="col">
+                                                                            <p class="p-0 m-0"><?= $orderitem['OIPRICE'] ?></p>
+                                                                        </div>
+                                                                        <div class="col">
+                                                                            <p class="p-0 m-0"><?= $orderitem['OIQUANTITY'] ?></p>
+                                                                        </div>
+                                                                    </div>
+                                                                <?php endforeach; ?>
+
+                                                                <div class="row">
+                                                                    <div class="col-12 col-md-4 mb-3">
+                                                                        <label class="form-label">PAYMENT METHOD:</label>
+                                                                        <p><?= $order['OPAYMETHOD'] ?></p>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-4 mb-3">
+                                                                        <label class="form-label">DELIVER OPTION:</label>
+                                                                        <p><?= $order['ODELIVERY'] ?></p>
+
+                                                                    </div>
+                                                                    <div class="col-12 col-md-4 mb-3">
+                                                                        <label class="form-label">DELIVERY SCHEDULE:</label>
+                                                                        <p><?= $order['OSCHEDULE'] ?></p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-12">
+                                                                    <label class="form-label">DAYS:</label>
+                                                                    <p><?= $order['ODAYS'] ?></p>
+                                                                </div>
+                                                                <div class="col-12">
+                                                                    <label class="form-label">TOTAL PRICE:</label>
+                                                                    <p><?= $order['OTOTALPRICE'] ?></p>
                                                                 </div>
                                                             </div>
                                                         </div>
