@@ -70,6 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['chat-input'])) {
     } else {
         echo "Invalid input data";
     }
+    header('Location: ../../index.php'); // Redirect back to the chat page
     exit; // Terminate script after sending the response
 }
 ?>
