@@ -64,7 +64,8 @@
                                         <th scope="col">Order Number</th>
                                         <th scope="col">Order Type</th>
                                         <th scope="col">Order Total Price</th>
-                                        <th scope="col">Order Date</th>
+                                        <th scope="col">Start Date</th>
+                                        <th scope="col">End Date</th>
                                         <th scope="col">Order Days</th>
                                         <th scope="col">Status</th>
                                         <th scope="col">######</th>
@@ -76,7 +77,8 @@
                                             <td><?= htmlspecialchars($specialorder['SONUMBER']); ?></td>
                                             <td><?= htmlspecialchars($specialorder['SOTYPE']); ?></td>
                                             <td><?= htmlspecialchars($specialorder['SOTOTALPRICE']); ?></td>
-                                            <td><?= htmlspecialchars($specialorder['SORECEIVEDDATE']); ?></td>
+                                            <td><?= htmlspecialchars($specialorder['SOSTARTDATE']); ?></td>
+                                            <td><?= htmlspecialchars($specialorder['SOENDDATE']); ?></td>
                                             <td><?= htmlspecialchars($specialorder['SOSCHEDULEOPTION']); ?></td>
                                             <td><?= htmlspecialchars($specialorder['SOSTATUS']); ?></td>
                                             <td>

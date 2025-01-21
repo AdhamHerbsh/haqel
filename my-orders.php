@@ -8,223 +8,238 @@
 <?php include('assets/inc/nav.php'); ?>
 
 <?php
-
 // Get UserID from session
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
 // Check if the user ID is valid
-if ($user_id === null | $user_type != "retailer") {
-    header("Location: 404.php"); // Redirect to 404 page if user is not logged in
+if ($user_id === null || $user_type != "retailer") {
+    header("Location: 404.php");
     exit();
 }
 
 $status_finished = 'finished';
 $stage = 'received';
 
-// Prepare SQL to fetch orders data
-$stmt = $conn->prepare("SELECT * FROM `orders` WHERE USER_ID = ? AND OSTAGE NOT LIKE ? ");
-
-// Bind user_id as an integer
+// Fetch active orders
+$stmt = $conn->prepare("SELECT * FROM `orders` WHERE USER_ID = ? AND OSTAGE NOT LIKE ?");
 $stmt->bind_param('is', $user_id, $stage);
-
 $stmt->execute();
+$orders = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-// Fetch data as an associative array
-$result = $stmt->get_result();
-$orders = $result->fetch_all(MYSQLI_ASSOC);
-
-// Prepare SQL to fetch special orders data
-$stmt = $conn->prepare("SELECT * FROM `special_orders` WHERE USER_ID = ? AND SOSTATUS NOT LIKE ? ");
-
-// Bind user_id as an integer
+// Fetch active special orders
+$stmt = $conn->prepare("SELECT * FROM `special_orders` WHERE USER_ID = ? AND SOSTATUS NOT LIKE ?");
 $stmt->bind_param('is', $user_id, $status_finished);
-
 $stmt->execute();
+$special_orders = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-// Fetch data as an associative array
-$result = $stmt->get_result();
-$special_orders = $result->fetch_all(MYSQLI_ASSOC);
+// Fetch completed orders
+$stmt = $conn->prepare("SELECT * FROM `orders` WHERE USER_ID = ? AND OSTAGE LIKE ?");
+$stmt->bind_param('is', $user_id, $stage);
+$stmt->execute();
+$old_orders = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
+// Fetch completed special orders
+$stmt = $conn->prepare("SELECT * FROM `special_orders` WHERE USER_ID = ? AND SOSTATUS LIKE ?");
+$stmt->bind_param('is', $user_id, $status_finished);
+$stmt->execute();
+$old_special_orders = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 ?>
 
-<!-- User Profile Section Start -->
+<!-- Main Content -->
 <main>
-    <section id="my-orders" class="">
-        <div class="container-fluid py-5">
-            <div class="container">
-                <div class="section-title mb-3">
-                    <h1> My Orders</h1>
-                    <h3 class="text-muted">Track Your Order Until Receive It</h3>
+    <section id="my-orders" class="py-5">
+        <div class="container">
+            <!-- Header Section -->
+            <div class="row mb-4">
+                <div class="col-12 col-md-8">
+                    <h1 class="display-4 fw-bold mb-2">My Orders</h1>
+                    <p class="text-muted lead">Track your orders from creation to delivery</p>
                 </div>
-                <div class="col-12">
-                    <div class="text-end">
-                        <a class="btn btn-primary" href="special-order.php">Create Special Order <i class="bx bx-plus"></i></a>
+                <div class="col-12 col-md-4 d-flex align-items-center justify-content-md-end">
+                    <a class="btn btn-primary btn-lg" href="special-order.php">
+                        <i class="bx bx-plus me-2"></i>Create Special Order
+                    </a>
+                </div>
+            </div>
+
+            <!-- Alerts Section -->
+            <div class="row mb-4">
+                <div class="col-12 col-lg-8">
+                    <?php if (isset($_GET['action']) && isset($_GET['type'])) : ?>
+                        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                            <div class="d-flex align-items-center">
+                                <i class="bx bx-check-circle bx-md me-2"></i>
+                                <div>
+                                    <h4 class="alert-heading mb-1"><?= $_GET['type'] === 'standard' ? 'Standard' : 'Special' ?> Order Created Successfully</h4>
+                                    <p class="mb-0">
+                                        Need assistance? <a href="providers.php" class="alert-link">Contact provider <i class="bx bx-support"></i></a>
+                                    </p>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <?php else : ?>
+                        <div class="alert alert-info border-start border-info border-4 shadow-sm" role="alert">
+                            <h4 class="alert-heading mb-1">Welcome Back! 👋</h4>
+                            <p class="mb-0">View and manage all your orders in one place</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Active Orders Table -->
+            <div class="shadow-sm mb-5">
+                <div class="card-header bg-white py-3">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h5 class="mb-0">Active Orders</h5>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-end-0">
+                                    <i class="bx bx-search"></i>
+                                </span>
+                                <input type="text" class="form-control border-start-0 ps-0" 
+                                       id="searchActive" placeholder="Search orders...">
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-12 col-md-6 justify-content-center">
-                    <?php if (isset($_GET['action']) && isset($_GET['type'])) { ?>
-                        <!-- Created Message Start -->
-                        <div class="alert alert-primary alert-dismissible fade show m-2" role="alert">
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            <h4 class="alert-heading"><i class="bx bx-check-circle bx-sm"></i> <?= $_GET['type'] === 'standard' ? 'Standard' : 'Special' ?> Order Created Successfully</h4>
-                            <strong>Contact With Provider</strong>
-                            <a href="providers.php" class="alert-link"><i class="bx bx-support bx-sm"></i></a>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="ordersActiveTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Order Number</th>
+                                    <th>Type</th>
+                                    <th>Total Price</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Schedule</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($orders as $order) : ?>
+                                    <tr>
+                                        <td class="fw-bold"><?= htmlspecialchars($order['ONUMBER']); ?></td>
+                                        <td><span class="badge bg-primary"><?= htmlspecialchars($order['OTYPE']); ?></span></td>
+                                        <td class="fw-bold text-success">$<?= number_format(htmlspecialchars($order['OTOTALPRICE']), 2); ?></td>
+                                        <td><?= date('M d, Y', strtotime($order['ODATE'])); ?></td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td><span class="badge bg-info"><?= htmlspecialchars($order['OSTAGE']); ?></span></td>
+                                        <td>
+                                            <a class="btn btn-sm btn-outline-primary" href="order.php?oid=<?= $order['OID'] ?>">
+                                                View Details <i class="bx bx-right-arrow-alt"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+
+                                <?php foreach ($special_orders as $specialorder) : ?>
+                                    <tr>
+                                        <td class="fw-bold"><?= htmlspecialchars($specialorder['SONUMBER']); ?></td>
+                                        <td><span class="badge bg-warning"><?= htmlspecialchars($specialorder['SOTYPE']); ?></span></td>
+                                        <td class="fw-bold text-success">$<?= number_format(htmlspecialchars($specialorder['SOTOTALPRICE']), 2); ?></td>
+                                        <td><?= date('M d, Y', strtotime($specialorder['SOSTARTDATE'])); ?></td>
+                                        <td><?= date('M d, Y', strtotime($specialorder['SOENDDATE'])); ?></td>
+                                        <td><?= htmlspecialchars($specialorder['SOSCHEDULEOPTION']); ?></td>
+                                        <td><span class="badge bg-info"><?= htmlspecialchars($specialorder['SOSTATUS']); ?></span></td>
+                                        <td>
+                                            <a class="btn btn-sm btn-outline-primary" href="order.php?soid=<?= $specialorder['SOID'] ?>">
+                                                View Details <i class="bx bx-right-arrow-alt"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completed Orders -->
+            <div class="shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h5 class="mb-0">Order History</h5>
                         </div>
-                        <!-- Created Message End -->
-                    <?php } else { ?>
-                        <!-- Welcome Message Start -->
-                        <div class="alert border border-primary alert-dismissible fade show m-2" role="alert">
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            <h4 class="alert-heading">Good Morning ☻</h4>
-                            <p>Welcome To Your Space</p>
-                            <hr />
-                            <p class="mb-0">This Table For All Orders You Created</p>
+                        <div class="col-12 col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-end-0">
+                                    <i class="bx bx-search"></i>
+                                </span>
+                                <input type="text" class="form-control border-start-0 ps-0" 
+                                       id="search" placeholder="Search order history...">
+                            </div>
                         </div>
-                        <!-- Welcome Message End -->
-                    <?php } ?>
+                    </div>
                 </div>
-                <div class="table-responsive mb-3 overflow-md-hidden " style="overflow-y:auto !important; max-height: 400px;">
-                    <table class="table table-hover" id="ordersTable">
-                        <thead class="table-header">
-                            <tr>
-                                <div class="row search-bar text-black-50 border-bottom border-1">
-                                    <div class="col-1 text-center align-content-center">
-                                        <i class="bx bx-search-alt bx-md"></i>
-                                    </div>
-                                    <div class="col-11 form-floating">
-                                        <input type="text" class="form-control border-0 text-black" name="search" id="search" placeholder="">
-                                        <label for="search">Search</label>
-                                    </div>
-                                </div>
-                            </tr>
-                            <tr>
-                                <th scope="col">Order Number</th>
-                                <th scope="col">Order Type</th>
-                                <th scope="col">Order Total Price</th>
-                                <th scope="col">Order Date</th>
-                                <th scope="col">Order Days</th>
-                                <th scope="col">Stage</th>
-                                <th scope="col">######</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($orders as $order) : ?>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="ordersTable">
+                            <thead class="table-light">
                                 <tr>
-                                    <td><?= htmlspecialchars($order['ONUMBER']); ?></td>
-                                    <td><?= htmlspecialchars($order['OTYPE']); ?></td>
-                                    <td><?= htmlspecialchars($order['OTOTALPRICE']); ?></td>
-                                    <td><?= htmlspecialchars($order['ODATE']); ?></td>
-                                    <td><?= htmlspecialchars($order['ODAYS']); ?></td>
-                                    <td><?= htmlspecialchars($order['OSTAGE']); ?></td>
-                                    <td>
-                                        <a class="btn btn-secondary" href="order.php?oid=<?= $order['OID'] ?>">Details <i class="bx bx-right-arrow-alt"></i></a>
-                                    </td>
+                                    <th>Order Number</th>
+                                    <th>Type</th>
+                                    <th>Total Price</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Schedule</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
                                 </tr>
-                            <?php endforeach; ?>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($old_orders as $old_order) : ?>
+                                    <tr>
+                                        <td class="fw-bold"><?= htmlspecialchars($old_order['ONUMBER']); ?></td>
+                                        <td><span class="badge bg-secondary"><?= htmlspecialchars($old_order['OTYPE']); ?></span></td>
+                                        <td class="fw-bold">$<?= number_format(htmlspecialchars($old_order['OTOTALPRICE']), 2); ?></td>
+                                        <td><?= date('M d, Y', strtotime($old_order['ODATE'])); ?></td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td><span class="badge bg-success"><?= htmlspecialchars($old_order['OSTAGE']); ?></span></td>
+                                        <td>
+                                            <a class="btn btn-sm btn-outline-secondary" href="order.php?oid=<?= $old_order['OID'] ?>">
+                                                View Details <i class="bx bx-right-arrow-alt"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
 
-                            <?php foreach ($special_orders as $specialorder) : ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($specialorder['SONUMBER']); ?></td>
-                                    <td><?= htmlspecialchars($specialorder['SOTYPE']); ?></td>
-                                    <td><?= htmlspecialchars($specialorder['SOTOTALPRICE']); ?></td>
-                                    <td><?= htmlspecialchars($specialorder['SORECEIVEDDATE']); ?></td>
-                                    <td><?= htmlspecialchars($specialorder['SOSCHEDULEOPTION']); ?></td>
-                                    <td><?= htmlspecialchars($specialorder['SOSTATUS']); ?></td>
-                                    <td>
-                                        <a class="btn btn-secondary" href="order.php?soid=<?= $specialorder['SOID'] ?>">Details <i class="bx bx-right-arrow-alt"></i></a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-
-                <?php
-                // Prepare SQL to fetch orders data
-                $stmt = $conn->prepare("SELECT * FROM `orders` WHERE USER_ID = ? AND OSTAGE LIKE ?");
-
-                // Bind user_id as an integer
-                $stmt->bind_param('is', $user_id, $stage);
-
-                $stmt->execute();
-
-                // Fetch data as an associative array
-                $result = $stmt->get_result();
-                $old_orders = $result->fetch_all(MYSQLI_ASSOC);
-
-                // Prepare SQL to fetch special orders data
-                $stmt = $conn->prepare("SELECT * FROM `special_orders` WHERE USER_ID = ? AND SOSTATUS LIKE ? ");
-                $status_finished = 'finished';
-                // Bind user_id as an integer
-                $stmt->bind_param('is', $user_id, $status_finished);
-
-                $stmt->execute();
-
-                // Fetch data as an associative array
-                $result = $stmt->get_result();
-                $old_special_orders = $result->fetch_all(MYSQLI_ASSOC);
-
-                ?>
-
-
-                <!--    Old Orders Title Start    -->
-                <div class="mb-3">
-                    <h2>Old Orders History</h2>
-                </div>
-                <!--    Old Orders Title End    -->
-                <div class="table-responsive overflow-md-hidden " style="overflow-y:auto !important; max-height: 400px;">
-                    <table class="table table-hover" id="ordersTable">
-                        <thead class="table-header">
-                            <tr>
-                                <th scope="col">Order Number</th>
-                                <th scope="col">Order Type</th>
-                                <th scope="col">Order Total Price</th>
-                                <th scope="col">Order Date</th>
-                                <th scope="col">Order Days</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">######</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($old_orders as $old_order) : ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($old_order['ONUMBER']); ?></td>
-                                    <td><?= htmlspecialchars($old_order['OTYPE']); ?></td>
-                                    <td><?= htmlspecialchars($old_order['OTOTALPRICE']); ?></td>
-                                    <td><?= htmlspecialchars($old_order['ODATE']); ?></td>
-                                    <td><?= htmlspecialchars($old_order['ODAYS']); ?></td>
-                                    <td><?= htmlspecialchars($old_order['OSTAGE']); ?></td>
-                                    <td>
-                                        <a class="btn btn-secondary" href="order.php?oid=<?= $old_order['OID'] ?>">Details <i class="bx bx-right-arrow-alt"></i></a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-
-                            <?php foreach ($old_special_orders as $old_specialorder) : ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($old_specialorder['SONUMBER']); ?></td>
-                                    <td><?= htmlspecialchars($old_specialorder['SOTYPE']); ?></td>
-                                    <td><?= htmlspecialchars($old_specialorder['SOTOTALPRICE']); ?></td>
-                                    <td><?= htmlspecialchars($old_specialorder['SORECEIVEDDATE']); ?></td>
-                                    <td><?= htmlspecialchars($old_specialorder['SOSCHEDULEOPTION']); ?></td>
-                                    <td><?= htmlspecialchars($old_specialorder['SOSTATUS']); ?></td>
-                                    <td>
-                                        <a class="btn btn-secondary" href="order.php?soid=<?= $old_specialorder['SOID'] ?>">Details <i class="bx bx-right-arrow-alt"></i></a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                                <?php foreach ($old_special_orders as $old_specialorder) : ?>
+                                    <tr>
+                                        <td class="fw-bold"><?= htmlspecialchars($old_specialorder['SONUMBER']); ?></td>
+                                        <td><span class="badge bg-secondary"><?= htmlspecialchars($old_specialorder['SOTYPE']); ?></span></td>
+                                        <td class="fw-bold">$<?= number_format(htmlspecialchars($old_specialorder['SOTOTALPRICE']), 2); ?></td>
+                                        <td><?= date('M d, Y', strtotime($old_specialorder['SOSTARTDATE'])); ?></td>
+                                        <td><?= date('M d, Y', strtotime($old_specialorder['SOENDDATE'])); ?></td>
+                                        <td><?= htmlspecialchars($old_specialorder['SOSCHEDULEOPTION']); ?></td>
+                                        <td><span class="badge bg-success"><?= htmlspecialchars($old_specialorder['SOSTATUS']); ?></span></td>
+                                        <td>
+                                            <a class="btn btn-sm btn-outline-secondary" href="order.php?soid=<?= $old_specialorder['SOID'] ?>">
+                                                View Details <i class="bx bx-right-arrow-alt"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
-    <?php
-    // Close the statement and connection
-    $stmt->close();
-    $conn->close();
-    ?>
 </main>
-<!-- User Profile Section End -->
+
+<?php
+$stmt->close();
+$conn->close();
+?>
+
 <!-- Include Footer -->
 <?php include('assets/inc/footer.php'); ?>

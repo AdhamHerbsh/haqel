@@ -204,6 +204,7 @@
 
     // // Update the quantity input value in the UI
     parentRow.find("input[name='quantity']").val(quantity);
+    const product_price = $("input[name='pprice']").val();
 
     $(".add-to-cart").attr(
       "href",
@@ -213,63 +214,150 @@
         quantity +
         ""
     );
+
+    updateCart();
+
+    $("#totalPrice").val(product_price * quantity);
   });
 
-  // jQuery function to handle the "Update Cart" button
-  $(".update-cart").on("click", function (e) {
-    e.preventDefault(); // Prevent the default link behavior
 
-    // Collect product data from the table
-    const cartData = [];
+  
 
-    $("table tbody tr").each(function () {
-        const row = $(this);
-        const pid = row.find("input[name='pid']").val();
-        const pname = row.find("input[name='pname']").val();
-        const price = row.find("input[name='pprice']").val();
-        const pimage = row.find("input[name='pimage']").val();
-        const puser_id = row.find("input[name='puser_id']").val();
-        const pwholesaler = row.find("input[name='pwholesaler']").val();
-        const quantity = row.find("input[name='quantity']").val();
+  // jQuery function to handle the "Place Standard order" button
+  const standardOrderForm = $("#standard-order");
 
-        if (pid && quantity) {
-            cartData.push({
-                PID: pid,
-                PNAME: pname,
-                PPRICE: price,
-                PIMAGE: pimage,
-                PUSER_ID: puser_id,
-                PWHOLESALER: pwholesaler,
-                QUANTITY: parseInt(quantity, 10),
-            });
-        }
-    });
+  // Prevent form submission from refreshing the page
+  standardOrderForm.on("submit", function (e) {
+    e.preventDefault();
 
-    // Send the cart data to the PHP file via AJAX
-    $.ajax({
-        url: "assets/php/cart.php", // PHP file to handle the request
+    const formData = new FormData(standardOrderForm[0]);
+
+    // First, update the cart, then make the order
+    updateCart()
+      .then(() => makeOrder(formData))
+      .catch((error) => {
+        console.error("Error during the process:", error);
+      });
+  });
+
+  // Function to update the cart
+  function updateCart() {
+    return new Promise((resolve, reject) => {
+      const cartData = collectCartData();
+
+      if (cartData.length === 0) {
+        alert("No items in the cart to update.");
+        return reject("Cart is empty.");
+      }
+
+      // Send the cart data via AJAX
+      $.ajax({
+        url: "assets/php/cart.php",
         type: "POST",
         data: {
-            action: "updateCart",
-            cart: cartData,
+          action: "updateCart",
+          cart: cartData,
         },
         success: function (response) {
+          try {
             const res = JSON.parse(response);
 
             if (res.status === "success") {
-                location.reload(); // Optionally reload the page to reflect updates
+              resolve();
             } else if (res.status === "error") {
-              $('.alert').removeClass('d-none').text("Cart update failed:\n" + res.errors.join("\n"));
-                // location.reload();
+              displayAlert("Cart update failed:\n" + res.errors.join("\n"));
+              reject(res.errors);
             }
+          } catch (error) {
+            console.error("Invalid JSON response:", response);
+            reject("Invalid response from server.");
+          }
         },
         error: function (xhr, status, error) {
-            console.error("An error occurred:", error);
-            alert("Failed to update cart. Please try again.");
+          console.error("Cart update failed:", error);
+          reject(error);
         },
+      });
     });
-});
+  }
 
+  // Function to make a standard order
+  function makeOrder(formData) {
+    return new Promise((resolve, reject) => {
+      const payMethod = $("input[name='pay_method']").val();
+      const deliveryOption = $("input[name='delivery_option']").val();
+      
+      // Send order data via AJAX
+      $.ajax({
+        url: "assets/php/order.php",
+        type: "POST",
+        data: {
+          action: "standard-order",
+          otype: "standard",
+          pay_method: payMethod,
+          delivery_option: deliveryOption,
+        },
+        success: function () {
+          window.location.assign("my-orders.php?action=added&type=standard")
+          resolve();
+        },
+        error: function (xhr, status, error) {
+          console.error("Order submission failed:", error);
+          alert("An error occurred while placing the order. Please try again.");
+          reject(error);
+        },
+      });
+    });
+  }
+
+  // Helper function to collect cart data
+  function collectCartData() {
+    const cartData = [];
+
+    $("table tbody tr").each(function () {
+      const row = $(this);
+      const product = {
+        PID: row.find("input[name='pid']").val(),
+        PNAME: row.find("input[name='pname']").val(),
+        PPRICE: row.find("input[name='pprice']").val(),
+        PIMAGE: row.find("input[name='pimage']").val(),
+        PUSER_ID: row.find("input[name='puser_id']").val(),
+        PWHOLESALER: row.find("input[name='pwholesaler']").val(),
+        QUANTITY: parseInt(row.find("input[name='quantity']").val(), 10),
+      };
+
+      // Only add valid products with a quantity
+      if (product.PID && product.QUANTITY > 0) {
+        cartData.push(product);
+      }
+    });
+
+    return cartData;
+  }
+
+  // Helper function to display alert messages
+  function displayAlert(message) {
+    $(".alert")
+      .removeClass("d-none")
+      .text(message);
+  }
+  // Credit Details Model
+  // Initially hide both the button and the modal link
+  $("#checkoutModel").hide();
+
+  // Attach a change event listener to the radio buttons
+  $('input[name="pay_method"]').change(function () {
+    // Check which option is selected
+    if ($(this).val() === "credit") {
+      // If "Credit" is selected, show the modal link and hide the button
+      $("#checkoutModel").show(100);
+      $("#submitBtn").hide(100);
+    } else {
+      // If any other option is selected, show the button and hide the modal link
+      $("#submitBtn").show(100);
+      $("#checkoutModel").hide(100);
+    }
+  });
 
   // When any checkbox (other than "One Time") is clicked
   $(".days-select input.form-check-input:not(#one-time)").on(
@@ -307,12 +395,17 @@
   });
 
   // Search Table
-  $("#search").on("keyup change", function () {
+  $("#search, #searchActive").on("keyup change", function () {
     var value = $(this).val().toLowerCase(); // Get the input value in lowercase
-    $("#usersTable tbody tr, #ordersTable tbody tr").filter(function () {
+    $(
+      "#usersTable tbody tr, #ordersTable tbody tr, #ordersActiveTable tbody tr"
+    ).filter(function () {
       $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
     });
   });
+
+  // Trigger the change event on page load to set the initial state
+  $('input[name="pay_method"]:checked').trigger("change");
 
   // Listen for input in the search bar
   $('input[type="text"]').on("input", function () {
@@ -320,9 +413,9 @@
     $(".product-item").each(function () {
       const productName = $(this).find("h2, p").text().toLowerCase(); // Get the product name from the card
       if (productName.includes(searchValue)) {
-        $(this).parent().show(); // Show the card if it matches
+        $(this).parent().show(100); // Show the card if it matches
       } else {
-        $(this).parent().hide(); // Hide the card if it doesn't match
+        $(this).parent().hide(100); // Hide the card if it doesn't match
       }
     });
   });
@@ -333,17 +426,16 @@
     $("#comm_field").toggleClass("d-none", isFarmer);
   });
 
-  
   // Filter products based on category selection
-//   $('#pcategory').on('input', function () {
-//     const selectedCategory = $(this).val();
+  //   $('#pcategory').on('input', function () {
+  //     const selectedCategory = $(this).val();
 
-//     if (selectedCategory === 'Fruits') {
-//         $('.select2-results__option--group[aria-label="Fruits"]').hide(); // Hide the "Fruits" list
-//     } else {
-//         $('.select2-results__option--group[aria-label="Fruits"]').show(); // Show the "Fruits" list
-//     }
-// });
+  //     if (selectedCategory === 'Fruits') {
+  //         $('.select2-results__option--group[aria-label="Fruits"]').hide(); // Hide the "Fruits" list
+  //     } else {
+  //         $('.select2-results__option--group[aria-label="Fruits"]').show(100 ); // Show the "Fruits" list
+  //     }
+  // });
 
   // Initialize Select2 for searchable dropdown
   $(".searchable-select").select2({
@@ -367,20 +459,23 @@
   $(".days-select").hide();
 
   // Handle the change event on the radio buttons
-  $("input[name='delivery_schedule'],input[name='schedule_option']").on("change", function () {
-    if ($(this).val() === "week") {
-      $(".days-select").fadeIn(500); // Hide days-select input
-    } else {
-      $(".days-select input[type='checkbox']").prop("checked", false); // Uncheck all checkboxes
-      $(".days-select").fadeOut(100) // Show days-select input
+  $("input[name='delivery_schedule'],input[name='schedule_option']").on(
+    "change",
+    function () {
+      if ($(this).val() === "week") {
+        $(".days-select").fadeIn(500); // Hide days-select input
+      } else {
+        $(".days-select input[type='checkbox']").prop("checked", false); // Uncheck all checkboxes
+        $(".days-select").fadeOut(100); // Show days-select input
+      }
     }
-  });
+  );
 
   // Set Special Order Number To Approve Modal
   $(".approve-request").on("click", function () {
-    const orderId = $(this).attr('data-o-id');
+    const orderId = $(this).attr("data-o-id");
     $("[name='soid']").val(orderId);
-    const orderNumber = $(this).attr('data-o-num');
+    const orderNumber = $(this).attr("data-o-num");
     $("[name='sonumber']").val(orderNumber);
   });
 

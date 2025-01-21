@@ -427,14 +427,6 @@
                                                                         <p><?= $order['ODELIVERY'] ?></p>
 
                                                                     </div>
-                                                                    <div class="col-12 col-md-4 mb-3">
-                                                                        <label class="form-label">DELIVERY SCHEDULE:</label>
-                                                                        <p><?= $order['OSCHEDULE'] ?></p>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-12">
-                                                                    <label class="form-label">DAYS:</label>
-                                                                    <p><?= $order['ODAYS'] ?></p>
                                                                 </div>
                                                                 <div class="col-12">
                                                                     <label class="form-label">TOTAL PRICE:</label>
@@ -551,14 +543,6 @@
                                                                         <p><?= $order['ODELIVERY'] ?></p>
 
                                                                     </div>
-                                                                    <div class="col-12 col-md-4 mb-3">
-                                                                        <label class="form-label">DELIVERY SCHEDULE:</label>
-                                                                        <p><?= $order['OSCHEDULE'] ?></p>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-12">
-                                                                    <label class="form-label">DAYS:</label>
-                                                                    <p><?= $order['ODAYS'] ?></p>
                                                                 </div>
                                                                 <div class="col-12">
                                                                     <label class="form-label">TOTAL PRICE:</label>
@@ -678,14 +662,6 @@
                                                                         <p><?= $order['ODELIVERY'] ?></p>
 
                                                                     </div>
-                                                                    <div class="col-12 col-md-4 mb-3">
-                                                                        <label class="form-label">DELIVERY SCHEDULE:</label>
-                                                                        <p><?= $order['OSCHEDULE'] ?></p>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-12">
-                                                                    <label class="form-label">DAYS:</label>
-                                                                    <p><?= $order['ODAYS'] ?></p>
                                                                 </div>
                                                                 <div class="col-12">
                                                                     <label class="form-label">TOTAL PRICE:</label>
@@ -803,14 +779,6 @@
                                                                         <p><?= $order['ODELIVERY'] ?></p>
 
                                                                     </div>
-                                                                    <div class="col-12 col-md-4 mb-3">
-                                                                        <label class="form-label">DELIVERY SCHEDULE:</label>
-                                                                        <p><?= $order['OSCHEDULE'] ?></p>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-12">
-                                                                    <label class="form-label">DAYS:</label>
-                                                                    <p><?= $order['ODAYS'] ?></p>
                                                                 </div>
                                                                 <div class="col-12">
                                                                     <label class="form-label">TOTAL PRICE:</label>

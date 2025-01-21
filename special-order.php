@@ -112,8 +112,12 @@
                             <div class="row">
                                 <div class="col-12 col-md-6">
                                     <div class="mb-3">
-                                        <label for="received_date" class="form-label">RECEIVED DATE:</label>
-                                        <input type="date" class="form-control" name="received_date" id="received_date" placeholder="Write Keywords About Product" min="<?= date('Y-m-d') ?>" required />
+                                        <label for="start_date" class="form-label">START DATE:</label>
+                                        <input type="date" class="form-control" name="start_date" id="start_date" min="<?= date('Y-m-d') ?>" required />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="end_date" class="form-label">END DATE:</label>
+                                        <input type="date" class="form-control" name="end_date" id="end_date" min="<?= date('Y-m-d') ?>" required />
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-6">
@@ -122,49 +126,47 @@
                                         <div class="mb-3">
                                             <div class="form-check form-check-inline"> <input class="form-check-input" type="radio" name="schedule_option" id="radio-schedule_option_daily" value="day" required /> <label class="form-check-label" for="radio-schedule_option_daily">Daily</label> </div>
                                             <div class="form-check form-check-inline"> <input class="form-check-input" type="radio" name="schedule_option" id="radio-schedule_option_weekly" value="week" required /> <label class="form-check-label" for="radio-schedule_option_weekly">Weekly</label> </div>
+                                            <div class="form-check form-check-inline"> <input class="form-check-input" type="radio" name="schedule_option" id="radio-schedule_option_onetime" value="onetime" required /> <label class="form-check-label" for="radio-schedule_option_onetime">One Time</label> </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="row col-8 days-select">
-                                <label for="" class="form-label">Select Days</label>
+                                    <div class="days-select mb-3">
+                                <label class="form-label">Select Days</label>
                                 <div class="d-flex flex-wrap justify-content-between">
-                                    <div class="form-check mx-2">
-                                        <input id="one-time" class="form-check-input" type="checkbox" name="days[]" value="one-time" checked />
-                                        <label class="form-check-label" for="one-time">One Time</label>
-                                    </div>
-                                    <div class="form-check mx-2">
+                                    <div class="form-check">
                                         <input id="saturday" class="form-check-input" type="checkbox" name="days[]" value="saturday" />
                                         <label class="form-check-label" for="saturday">Saturday</label>
                                     </div>
-                                    <div class="form-check mx-2">
+                                    <div class="form-check">
                                         <input id="sunday" class="form-check-input" type="checkbox" name="days[]" value="sunday" />
                                         <label class="form-check-label" for="sunday">Sunday</label>
                                     </div>
-                                    <div class="form-check mx-2">
+                                    <div class="form-check">
                                         <input id="monday" class="form-check-input" type="checkbox" name="days[]" value="monday" />
                                         <label class="form-check-label" for="monday">Monday</label>
                                     </div>
-                                    <div class="form-check mx-2">
+                                    <div class="form-check">
                                         <input id="thuesday" class="form-check-input" type="checkbox" name="days[]" value="thuesday" />
                                         <label class="form-check-label" for="thuesday">Thuesday</label>
                                     </div>
-                                    <div class="form-check mx-2">
+                                    <div class="form-check">
                                         <input id="wensday" class="form-check-input" type="checkbox" name="days[]" value="wensday" />
                                         <label class="form-check-label" for="wensday">Wensday</label>
                                     </div>
-                                    <div class="form-check mx-2">
+                                    <div class="form-check">
                                         <input id="thrusday" class="form-check-input" type="checkbox" name="days[]" value="thrusday" />
                                         <label class="form-check-label" for="thrusday">Thrusday</label>
                                     </div>
-                                    <div class="form-check mx-2">
+                                    <div class="form-check">
                                         <input id="friday" class="form-check-input" type="checkbox" name="days[]" value="friday" />
                                         <label class="form-check-label" for="friday">Friday</label>
                                     </div>
-                                    <div class="form-check mx-2">
+                                    <div class="form-check">
                                         <input id="dayandday" class="form-check-input" type="checkbox" name="days[]" value="dayandday" />
                                         <label class="form-check-label" for="dayandday">Day and Day</label>
                                     </div>
+                                </div>
+                            </div>
+
                                 </div>
                             </div>
                             <div class="row">

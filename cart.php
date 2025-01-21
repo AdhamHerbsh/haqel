@@ -34,9 +34,9 @@ if ($user_id === null | $user_type != "retailer") {
                         <div class="alert alert-warning d-none" role="alert">
                             <strong>Alert Heading</strong> This is a warning alert—check it out!
                         </div>
-                        
+
                         <div class="table-responsive p-4 my-2 rounded-2 border border-1 border-white-50 overflow-hidden">
-                            <table class="table">
+                            <table id="productsTable" class="table">
                                 <thead>
                                     <tr>
                                         <th scope="col">####</th>
@@ -84,9 +84,9 @@ if ($user_id === null | $user_type != "retailer") {
                                                         </div>
                                                     </div>
                                                 </td>
-                                                    <td>
-                                                        <p class="mb-0 mt-4"><?= $item['PWHOLESALER'] ?></p>
-                                                    </td>
+                                                <td>
+                                                    <p class="mb-0 mt-4"><?= $item['PWHOLESALER'] ?></p>
+                                                </td>
                                             </tr>
                                             <?php $itemTotalPrice = $item['PPRICE'] * $item['QUANTITY']; ?>
                                             <?php $totalPrice += $itemTotalPrice; ?>
@@ -110,14 +110,13 @@ if ($user_id === null | $user_type != "retailer") {
                             <div class="d-flex justify-content-between">
                                 <a class="btn btn-white border border-1" href="home.php">Return To Home</a>
                                 <div>
-                                    <a class="btn btn-accent <?= isset($_SESSION['cart']) ? "" : "disabled" ?>" href="assets/php/cart.php?action=clear" role="button">Clear</a>
-                                    <a class="btn btn-secondary update-cart <?= isset($_SESSION['cart']) ? "" : "disabled" ?>" href="#" role="button">Update</a>
+                                    <a class="btn btn-accent <?= isset($_SESSION['cart']) ? "" : "disabled" ?>" href="assets/php/cart.php?action=clear" role="button"><i class="bx bx-trash bx-sm"></i></a>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-12 col-md-6">
-                        <form class="p-4 my-2 rounded-2 border border-1 border-white-50" action="assets/php/order.php" method="POST">
+                        <form id="standard-order" class="p-4 my-2 rounded-2 border border-1 border-white-50">
                             <h4>Order</h4>
                             <div class="row">
                                 <div class="col-4">
@@ -142,56 +141,6 @@ if ($user_id === null | $user_type != "retailer") {
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-4">
-                                    <div class="mb-3">
-                                        <label for="" class="form-label">Delivery Schedule:</label>
-                                        <div class="mb-3">
-                                            <div class="form-check"> <input class="form-check-input" type="radio" name="delivery_schedule" id="radio-delivery_schedule_day" value="day" required /> <label class="form-check-label" for="radio-delivery_schedule_day">Daily</label> </div>
-                                            <div class="form-check"> <input class="form-check-input" type="radio" name="delivery_schedule" id="radio-delivery_schedule_week" value="week" required /> <label class="form-check-label" for="radio-delivery_schedule_week">Weekly</label> </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row days-select">
-                                <label for="" class="form-label">Select Days</label>
-                                <div class="d-flex flex-wrap">
-                                    <div class="form-check">
-                                        <input id="one-time" class="form-check-input" type="checkbox" name="days[]" value="one-time" checked />
-                                        <label class="form-check-label" for="one-time">One Time</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input id="saturday" class="form-check-input" type="checkbox" name="days[]" value="saturday" />
-                                        <label class="form-check-label" for="saturday">Saturday</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input id="sunday" class="form-check-input" type="checkbox" name="days[]" value="sunday" />
-                                        <label class="form-check-label" for="sunday">Sunday</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input id="monday" class="form-check-input" type="checkbox" name="days[]" value="monday" />
-                                        <label class="form-check-label" for="monday">Monday</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input id="thuesday" class="form-check-input" type="checkbox" name="days[]" value="thuesday" />
-                                        <label class="form-check-label" for="thuesday">Thuesday</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input id="wensday" class="form-check-input" type="checkbox" name="days[]" value="wensday" />
-                                        <label class="form-check-label" for="wensday">Wensday</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input id="thrusday" class="form-check-input" type="checkbox" name="days[]" value="thrusday" />
-                                        <label class="form-check-label" for="thrusday">Thrusday</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input id="friday" class="form-check-input" type="checkbox" name="days[]" value="friday" />
-                                        <label class="form-check-label" for="friday">Friday</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input id="dayandday" class="form-check-input" type="checkbox" name="days[]" value="dayandday" />
-                                        <label class="form-check-label" for="dayandday">Day and Day</label>
-                                    </div>
-                                </div>
                             </div>
                             <div class="d-flex justify-content-between my-5">
                                 <div class="col-6">
@@ -200,12 +149,13 @@ if ($user_id === null | $user_type != "retailer") {
                                 <div class="col-6">
                                     <span>
                                         <small>SAR</small>
-                                        <input type="text" class="fs-4 fw-bold border-0 bg-transparent w-75 w-25" name="totalprice" value="<?= isset($totalPrice) ? (float)$totalPrice : 0.00 ?>" step="0.01" readonly />
+                                        <input type="text" id="totalPrice" class="fs-4 fw-bold border-0 bg-transparent w-75 w-25" name="totalprice" value="<?= isset($totalPrice) ? (float)$totalPrice : 0.00 ?>" step="0.01" readonly />
                                     </span>
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <a class="col-12 btn btn-primary <?= isset($_SESSION['cart']) ? "" : "disabled" ?>" data-bs-toggle="modal" href="#checkout" role="button">Proceed To Checkout</a>
+                                <button id="submitBtn" class="col-12 btn btn-primary <?= isset($_SESSION['cart']) ? "" : "disabled" ?>" type="submit" name="standard-order">Checkout</button>
+                                <a id="checkoutModel" class="col-12 btn btn-primary <?= isset($_SESSION['cart']) ? "" : "disabled" ?>" data-bs-toggle="modal" href="#checkout" role="button">Proceed To Checkout</a>
                             </div>
                             <!--   Checkout Modal Start -->
                             <div class="modal fade" id="checkout" aria-hidden="true" aria-labelledby="checkoutLabel" tabindex="-1">
@@ -244,7 +194,7 @@ if ($user_id === null | $user_type != "retailer") {
                                             <div class="d-flex justify-content-end">
                                                 <button type="reset" class="btn btn-accent fw-bold shadow-sm" data-bs-dismiss="modal" aria-label="Close">Cancle</button>
                                                 <span class="mx-2"></span>
-                                                <button type="submit" class="btn btn-primary fw-bold shadow-sm" name="standard-order" data-bs-dismiss="modal">Submit</button>
+                                                <button class="col-12 btn btn-primary <?= isset($_SESSION['cart']) ? "" : "disabled" ?> shadow-sm" type="submit" name="standard-order" data-bs-dismiss="modal">Checkout</button>
                                             </div>
                                         </div>
                                     </div>

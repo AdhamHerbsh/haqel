@@ -16,22 +16,22 @@
                     <div class="col-12 col-md-6 align-content-center">
                         <div class="container">
                             <div class="row">
-                            <div class="col-6 text-center">
-                                <h5 class="text-primary">About</h5>
-                                <ul class="list-unstyled">
-                                    <li><a href="home.php">Home</a></li>
-                                    <li><a href="index.php#about">About us</a></li>
-                                    <li><a href="index.php#contact">Contact us</a></li>
-                                </ul>
-                            </div>
-                            <div class="col-6 text-center">
-                                <h5 class="text-primary">Customer Support</h5>
-                                <ul class="list-unstyled">
-                                    <li><a href="home.php">Shipping</a></li>
-                                    <li><a href="home.php">Predictive</a></li>
-                                    <li><a href="home.php">Orders</a></li>
-                                </ul>
-                            </div>
+                                <div class="col-6 text-center">
+                                    <h5 class="text-primary">About</h5>
+                                    <ul class="list-unstyled">
+                                        <li><a href="home.php">Home</a></li>
+                                        <li><a href="index.php#about">About us</a></li>
+                                        <li><a href="index.php#contact">Contact us</a></li>
+                                    </ul>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <h5 class="text-primary">Customer Support</h5>
+                                    <ul class="list-unstyled">
+                                        <li><a href="home.php">Shipping</a></li>
+                                        <li><a href="home.php">Predictive</a></li>
+                                        <li><a href="home.php">Orders</a></li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>

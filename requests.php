@@ -96,12 +96,18 @@
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-12 col-md-6 mb-3">
-                                                        <label class="form-label">RE-RECEIVED DATE:</label>
-                                                        <p><?= $specialorder['SORECEIVEDDATE'] ?></p>
-                                                    </div>
-                                                    <div class="col-12 col-md-6 mb-3">
                                                         <label class="form-label">SCHEDULE OPTION:</label>
                                                         <p><?= $specialorder['SOSCHEDULEOPTION'] ?></p>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12 col-md-6 mb-3">
+                                                        <label class="form-label">START DATE:</label>
+                                                        <p><?= $specialorder['SOSTARTDATE'] ?></p>
+                                                    </div>
+                                                    <div class="col-12 col-md-6 mb-3">
+                                                        <label class="form-label">END DATE:</label>
+                                                        <p><?= $specialorder['SOENDDATE'] ?></p>
                                                     </div>
                                                 </div>
                                                 <div class="col-12">

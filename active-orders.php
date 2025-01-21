@@ -20,7 +20,7 @@
 
     // Prepare SQL to fetch user and account data
     $stmt = $conn->prepare("SELECT *  FROM special_orders WHERE SOSTATUS = 'unapproved' AND SOID IN (SELECT RSOID FROM requests r WHERE r.WS_ID = ?)");
-    
+
     // Bind user_id as an integer
     $stmt->bind_param('i', $user_id);
 
@@ -80,7 +80,8 @@
                                         <th scope="col">Order Number</th>
                                         <th scope="col">Order Type</th>
                                         <th scope="col">Order Total Price</th>
-                                        <th scope="col">Order Date</th>
+                                        <th scope="col">Start Date</th>
+                                        <th scope="col">End Date</th>
                                         <th scope="col">Order Days</th>
                                         <th scope="col">Status</th>
                                         <th scope="col">######</th>
@@ -92,7 +93,8 @@
                                             <td><?= htmlspecialchars($uspecialorder['SONUMBER']); ?></td>
                                             <td><?= htmlspecialchars($uspecialorder['SOTYPE']); ?></td>
                                             <td><?= htmlspecialchars($uspecialorder['SOTOTALPRICE']); ?></td>
-                                            <td><?= htmlspecialchars($uspecialorder['SORECEIVEDDATE']); ?></td>
+                                            <td><?= htmlspecialchars($uspecialorder['SOSTARTDATE']); ?></td>
+                                            <td><?= htmlspecialchars($uspecialorder['SOENDDATE']); ?></td>
                                             <td><?= htmlspecialchars($uspecialorder['SOSCHEDULEOPTION']); ?></td>
                                             <td><?= htmlspecialchars($uspecialorder['SOSTATUS']); ?></td>
                                             <td>
@@ -124,7 +126,8 @@
                                         <th scope="col">Order Number</th>
                                         <th scope="col">Order Type</th>
                                         <th scope="col">Order Total Price</th>
-                                        <th scope="col">Order Date</th>
+                                        <th scope="col">Start Date</th>
+                                        <th scope="col">End Date</th>
                                         <th scope="col">Order Days</th>
                                         <th scope="col">Status</th>
                                         <th scope="col">######</th>
@@ -136,7 +139,8 @@
                                             <td><?= htmlspecialchars($specialorder['SONUMBER']); ?></td>
                                             <td><?= htmlspecialchars($specialorder['SOTYPE']); ?></td>
                                             <td><?= htmlspecialchars($specialorder['SOTOTALPRICE']); ?></td>
-                                            <td><?= htmlspecialchars($specialorder['SORECEIVEDDATE']); ?></td>
+                                            <td><?= htmlspecialchars($specialorder['SOSTARTDATE']); ?></td>
+                                            <td><?= htmlspecialchars($specialorder['SOENDDATE']); ?></td>
                                             <td><?= htmlspecialchars($specialorder['SOSCHEDULEOPTION']); ?></td>
                                             <td><?= htmlspecialchars($specialorder['SOSTATUS']); ?></td>
                                             <td>

@@ -48,7 +48,7 @@ if (isset($_POST['register_submit'])) {
 
         if ($stmt->execute()) {
             $user_id = $stmt->insert_id; // Get the inserted user ID
-            
+
             $_SESSION['user_id'] = $user_id; // Store user ID in session
             $_SESSION['username'] = $username; // Store user ID in session
             $_SESSION['user_type'] = $user_type; // Store user ID in session
@@ -69,7 +69,7 @@ if (isset($_POST['register_submit'])) {
         $stmt->close();
         $conn->close();
     }
-}elseif (isset($_POST['login_submit'])) {
+} elseif (isset($_POST['login_submit'])) {
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // Retrieve and sanitize inputs
         $username = htmlspecialchars(trim($_POST['username']));
@@ -98,6 +98,7 @@ if (isset($_POST['register_submit'])) {
                 $_SESSION['user_id'] = $user_id; // Store user ID in session
                 $_SESSION['username'] = $username; // Store username in session
                 $_SESSION['user_type'] = $user_type; // Store username in session
+                $_SESSION['session_start'] = date("Y-m-d H:i:s"); // Store username in session
 
                 $user_type == "admin" ? header("Location: ../../admin.php") : header("Location: ../../home.php"); // Redirect to dashboard or homepage
                 exit();
@@ -111,7 +112,7 @@ if (isset($_POST['register_submit'])) {
         $stmt->close();
         $conn->close();
     }
-}elseif (isset($_GET['id'])){
+} elseif (isset($_GET['id'])) {
     $user_id = $_GET['id'];
     // Begin a transaction to ensure data consistency
     $conn->begin_transaction();
@@ -140,7 +141,5 @@ if (isset($_POST['register_submit'])) {
         $conn->rollback();
         echo "Error deleting user: " . $e->getMessage();
     }
-
-}else{
-
+} else {
 }

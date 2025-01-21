@@ -30,7 +30,8 @@
         a.BUSINESS_EMAIL, 
         a.BUSINESS_TYPE, 
         a.BUSINESS_SEGMENT, 
-        a.COMMERCIAL_REGISTER_FILE
+        a.COMMERCIAL_REGISTER_FILE,
+        a.RATE
     FROM 
         users u
     LEFT JOIN 
@@ -61,17 +62,6 @@
                     <div class="card-container">
                         <div class="row">
                             <?php foreach ($users as $user) : ?>
-                                <?php
-                                    // Prepare SQL to get rate of wholesaler
-                                    $stmt = $conn->prepare("SELECT COALESCE(r.RATE, 'Not Reviewed Yet!') AS RATE FROM (SELECT ? AS WS_ID) AS ws LEFT JOIN reviews r ON ws.WS_ID = r.WS_ID   ");
-                                    $stmt->bind_param("s", $user['ID']);
-                                    $stmt->execute();
-                                    $stmt->store_result();    
-                                    // Bind the result
-                                    $stmt->bind_result($rate);
-                                    $stmt->fetch();
-                                ?>
-
                                 <div class="col-12 col-md-4">
                                     <div class="card border-primary text-center mb-2">
                                         <div class="card-icon mb-3">
@@ -85,10 +75,10 @@
                                                 <p class="card-title"><?= htmlspecialchars(ucfirst($user['BUSINESS_TYPE'])); ?></p>
                                             </div>
                                             <div class="mb-3">
-                                                <?php if($rate !== 'Not Reviewed Yet!'){ ?>
-                                                    <div class="star-rating" data-stars="<?= isset($rate)? $rate : "0" ?>"></div>
+                                                <?php if($user['RATE'] !== 0){ ?>
+                                                    <div class="star-rating" data-stars="<?= $user['RATE'] ?>"></div>
                                                 <?php }else{ ?>
-                                                    <p class="card-title"><?= htmlspecialchars($rate); ?></p>
+                                                    <i class='bx bx-message-alt-x bx-sm'></i>
                                                 <?php } ?>
                                             </div>
                                             <div class="my-3">

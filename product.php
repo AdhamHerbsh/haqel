@@ -60,7 +60,7 @@
                                 if (isset($_GET['pid'])) {
                                     $pid = $_GET['pid'];
                                     // Prepare SQL to fetch product data
-                                    $stmt = $conn->prepare("SELECT FNAME, LNAME FROM users WHERE ID = ?");
+                                    $stmt = $conn->prepare("SELECT BUSINESS_NAME, RATE  FROM account WHERE USER_ID = ?");
 
                                     $stmt->bind_param("i", $user_id); // Bind user_id as an integer
                                     $stmt->execute();
@@ -69,9 +69,9 @@
                                     // Check if data exists
                                     if ($stmt->num_rows > 0) {
                                         // Bind the result
-                                        $stmt->bind_result($fname, $lname);
+                                        $stmt->bind_result($business_name, $rate);
                                         $stmt->fetch();
-                                        $provider = $fname . " " . $lname;
+                                        $provider = $business_name;
                                     } else {
                                         $provider = "Haqel";
                                     }
@@ -83,6 +83,7 @@
                                 ?>
                                 <div class="mb-3">
                                     <p class="fs-5"><strong>Business Name:</strong> <?= ucfirst($provider) ?> </p>
+                                    <p class="fs-5"><strong>Rate:</strong>  <span class="star-rating" data-stars="<?= isset($rate)? $rate : "0" ?>"></span> </p>
                                 </div>
                                 <hr>
                                 <div class="mb-3">

@@ -124,6 +124,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 'PWHOLESALER' => $item['PWHOLESALER'],
                 'QUANTITY' => $quantity,
             ];
+
+            
         } else {
             // Handle product not found
             $response['status'] = 'error';
@@ -135,7 +137,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     // Return the response
     echo json_encode($response);
-    exit;
 }
 
 
@@ -147,3 +148,4 @@ if (isset($_GET['action']) && $_GET['action'] === 'clear') {
     header("Location: ../../home.php?action=cleared");
     exit;
 }
+?>

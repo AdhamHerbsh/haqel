@@ -12,17 +12,14 @@ if (!$user_id) {
     die("User not logged in.");
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['standard-order'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'standard-order') {
     if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
         die("No items in the cart to place an order.");
     }
-
     // Collect data from the form
     $otype = $_POST['otype'] ?? 'standard';
     $pay_method = $_POST['pay_method'] ?? '';
     $delivery_option = $_POST['delivery_option'] ?? '';
-    $delivery_schedule = $_POST['delivery_schedule'] ?? '';
-    $days = isset($_POST['days']) ? implode(', ', $_POST['days']) : '';
 
     // Group cart items by wholesaler ID
     $grouped_cart = [];
@@ -45,10 +42,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['standard-order'])) {
         $order_date = date('Y-m-d H:i:s');
         $order_stage = 'shipping';
 
-        $query = "INSERT INTO orders (ONUMBER, OTYPE, ODATE, OSTAGE, OPAYMETHOD, ODELIVERY, OSCHEDULE, ODAYS, OTOTALPRICE, USER_ID, WS_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        $query = "INSERT INTO orders (ONUMBER, OTYPE, ODATE, OSTAGE, OPAYMETHOD, ODELIVERY, OTOTALPRICE, USER_ID, WS_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
         $stmt = $conn->prepare($query);
-        $stmt->bind_param('ssssssssdii', $order_number, $otype, $order_date, $order_stage, $pay_method, $delivery_option, $delivery_schedule, $days, $totalprice, $user_id, $wholesaler_id);
+        $stmt->bind_param('ssssssdii', $order_number, $otype, $order_date, $order_stage, $pay_method, $delivery_option, $totalprice, $user_id, $wholesaler_id);
         if (!$stmt->execute()) {
             die("Failed to insert order: " . $stmt->error);
         }
@@ -107,8 +104,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['standard-order'])) {
     unset($_SESSION['cart']);
     unset($_SESSION['cartCount']);
 
-    // Redirect to a success page
-    header("Location: ../../my-orders.php?action=added&type=standard");
     exit;
 }
 
@@ -121,7 +116,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['special-order'])) {
     $pcategory = $_POST['pcategory'] ?? '';
     $pprice = $_POST['pprice'] ?? 0;
     $quantity = $_POST['quantity'] ?? 1;
-    $receiveddate = $_POST['received_date'] ?? '';
+    $startdate = $_POST['start_date'] ?? '';
+    $enddate = $_POST['end_date'] ?? '';
     $schedule_option = $_POST['schedule_option'] ?? '';
     $days = isset($_POST['days']) ? implode(', ', $_POST['days']) : '';
     $description = $_POST['description'] ?? '';
@@ -132,20 +128,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['special-order'])) {
     $order_status = 'unapproved'; // Default status
 
     // Validate required fields
-    if (empty($pname) || empty($pcategory) || empty($pprice) || empty($receiveddate) || empty($schedule_option)) {
-        echo "<script>alert('Please fill in all required fields.'); window.history.back();</script>";
+    if (empty($pname) || empty($pcategory) || empty($pprice) || empty($startdate) || empty($enddate) || empty($schedule_option)) {
+        echo "<script>alert('Please fill in all required fields.'); window.history.back();</scripte>";
         exit;
     }
 
     // Prepare SQL query
-    $sql = "INSERT INTO special_orders (SONUMBER, SOTYPE, SOSTATUS, PNAME, PCATEGORY, PPRICE, SOQUANTITY, SORECEIVEDDATE, SOSCHEDULEOPTION, SODESCRIPTION, SOTOTALPRICE, SODATE, USER_ID, SODAYS) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)";
+    $sql = "INSERT INTO special_orders (SONUMBER, SOTYPE, SOSTATUS, PNAME, PCATEGORY, PPRICE, SOQUANTITY, SOSTARTDATE, SOENDDATE, SOSCHEDULEOPTION, SODESCRIPTION, SOTOTALPRICE, SODATE, USER_ID, SODAYS) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)";
 
     $stmt = $conn->prepare($sql);
 
     if ($stmt) {
         // Bind parameters
-        $stmt->bind_param('sssssissssdis', $order_number, $otype, $order_status, $pname, $pcategory, $pprice, $quantity, $receiveddate, $schedule_option, $description, $totalprice, $user_id, $days);
+        $stmt->bind_param('sssssisssssdis', $order_number, $otype, $order_status, $pname, $pcategory, $pprice, $quantity, $startdate, $enddate, $schedule_option, $description, $totalprice, $user_id, $days);
 
         // Execute the query
         if ($stmt->execute()) {

@@ -55,11 +55,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['chat-input'])) {
     $sender = $_POST['chat-sender'] ?? 0;
     $receiver = $_POST['chat-receiver'] ?? 0;
     $soid = $_POST['chat-soid'] ?? '';
-
+    $currentDateTime = date("Y-m-d H:i:s");
     // Validate inputs
     if ($sender > 0 && $receiver > 0 && !empty($soid) && !empty($message)) {
-        $stmt = $conn->prepare("INSERT INTO chats (CSENDER, CRECEIVER, CSOID, CMESSAGE, CDATE) VALUES (?, ?, ?, ?, NOW())");
-        $stmt->bind_param("iiss", $sender, $receiver, $soid, $message);
+        $stmt = $conn->prepare("INSERT INTO chats (CSENDER, CRECEIVER, CSOID, CMESSAGE, CDATE) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("iisss", $sender, $receiver, $soid, $message, $currentDateTime);
         $stmt->execute();
 
         if ($stmt->affected_rows > 0) {
@@ -73,4 +73,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['chat-input'])) {
     header('Location: ../../index.php'); // Redirect back to the chat page
     exit; // Terminate script after sending the response
 }
+
 ?>

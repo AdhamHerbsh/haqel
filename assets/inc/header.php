@@ -3,7 +3,6 @@
 <?php 
     require('assets/php/config.php');
     session_start();
-
 ?>
 
 <!DOCTYPE html>
