@@ -214,10 +214,11 @@
         quantity +
         ""
     );
+    if ($("#productsTable").length) {
+      updateCart();
+      $("#totalPrice").parseFloat(val(product_price * quantity)).toFixed(2);
+    }
 
-    updateCart();
-
-    $("#totalPrice").val(product_price * quantity);
   });
 
 
